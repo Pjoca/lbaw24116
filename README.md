@@ -1,4 +1,4 @@
-#LBAW
+# LBAW
 
 # ER: Requirements Specification Component
 
@@ -127,12 +127,12 @@ Em baixo, é possível ver a descrição de cada _actor_
 | ----------------------- | --------- | 
 |  Administrador          | O administrador tem o poder de remover mensagens, bloquear e desbloquear pessoas |
 |  Utilizador             | Utilizador normal |
-|  Visitante              | Utilizador não autenticado que pode consultar informações públicas, registar-se ou iniciar a sessão  |
-|  Autenticado            | US Name 1 |
-|  Membro do grupo        | US Name 1 |
-|  Proprietário do grupo  | US Name 1 |
-|  Autor da publicação    | US Name 1 |
-|  Autor do comentário    | US Name 1 |
+|  Visitante              | Utilizadores não autenticados podem consultar informações públicas, registarem-se ou iniciar a sessão  |
+|  Autenticado            | Utilizadores autenticados podem consultar informações, comentar em publicações de outras pessoas, enviar e receber mensagens com outras pessoas ou grupos |
+|  Membro do grupo        | Membros de um grupo podem participar, conversar e publicar num grupo, mas não tèm permissões especiais |
+|  Proprietário do grupo  | Proprietários de um grupo além de terem as mesmas permissões que um membro, podem também editar o nome do grupo, a descrição, adicionar/remover membros e editar as permissões de outros participantes |
+|  Autor da publicação    | Os utilizadores podem eliminar ou editar a sua publicação |
+|  Autor do comentário    | Os utilizadores podem em qualquer publicação, além de editar ou eliminar os seus próprios comentários |
 
 ### 2. User Stories
 
