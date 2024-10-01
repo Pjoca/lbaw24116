@@ -112,16 +112,14 @@ Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivo
 
 ## A2: Actors and User stories
 
-> Brief presentation of the artifact goals.
+Os _actors_ e as _stories_ dos utilizadores contêm informações sobre as pessoas que vão utilizar o TinderFEUP e de que forma utilizar. 
 
 
 ### 1. Actors
 
-Os _actors_ e as _stories_ dos utilizadores contêm informações sobre as pessoas que vão utilizar o TinderFEUP e de que forma utilizar. 
-
 Na figura abaixo, é possível ver a representação dos _actors_
 
-[img]
+![](IMG/Actors.png)
 
 Em baixo, é possível ver a descrição de cada _actor_
 
