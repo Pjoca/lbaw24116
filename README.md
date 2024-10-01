@@ -4,15 +4,32 @@
 
 > Project vision.
 
-## A1: Project Name
+## A1 - TinderFEUP
 
-> Goals, business context and environment.  
-> Motivation.  
-> Main features.  
-> User profiles.
+###Contexto 
 
+Fazer conexões reais com colegas de universidade pode ser um desafio, especialmente numa faculdade de grandes dimensões como a FEUP. Quer se trate de interesses românticos ou estabelecer novas amizades, os alunos podem sentir dificuldades em encontrar pessoas com os mesmos interesses. Este projeto tem como objetivo ajudar, até os mais introvertidos, a criar relações únicas e verdadeiras. 
 
----
+###Motivação
+
+A motivação para realizar este projeto vem de uma necessidade de criar uma plataforma onde os estudantes da FEUP possam encontrar o amor, num espaço seguro e de confiança. Esta rede social poderá ajudar, até os alunos mais tímidos, a socializar e, possivelmente, encontrar o seu par de sonhos. 
+
+###Objetivos
+
+A principal missão desta plataforma é ajudar os estudantes da mesma faculdade a criar relações, sejam elas significativas, pessoais ou profissionais.  
+ Assegurar que apenas alunos verificados da FEUP possam utilizar a plataforma é um importante fator em conta, de forma a proteger os dados pessoais. 
+Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivos.
+
+###Principais características
+
+Utilizador:
+Registo
+Iniciar/terminar sessão
+Recuperar palavra-passe
+Ver um perfil público
+Editar perfil
+Eliminar conta
+
 
 
 ## A2: Actors and User stories
@@ -94,8 +111,9 @@ Changes made to the first submission:
 1. ...
 
 ***
-GROUPYYgg, DD/MM/20YY
+GROUP24116, 01/10/2024
 
-* Group member 1 name, email (Editor)
-* Group member 2 name, email
-* ...
+* Alexandre Chouzende - 202207429@up.pt
+* Rui Borges - 202207475@up.pt
+* Pedro Paixão- 202008467@up.pt
+* Tiago Torrado - 202206399@up.pt
