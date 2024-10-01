@@ -117,8 +117,15 @@ Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivo
 
 ### 1. Actors
 
-> Diagram identifying actors and their relationships.  
-> Table identifying actors, including a brief description.
+Os _actors_ e as _stories_ dos utilizadores contêm informações sobre as pessoas que vão utilizar o TinderFEUP e de que forma utilizar. 
+
+Na figura abaixo, é possível ver a representação dos _actors_
+
+[img]
+
+Em baixo, é possível ver a descrição de cada _actor_
+
+[img]
 
 
 ### 2. User Stories
