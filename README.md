@@ -6,21 +6,21 @@
 
 ## A1 - TinderFEUP
 
-###Contexto 
+### Contexto 
 
 Fazer conexões reais com colegas de universidade pode ser um desafio, especialmente numa faculdade de grandes dimensões como a FEUP. Quer se trate de interesses românticos ou estabelecer novas amizades, os alunos podem sentir dificuldades em encontrar pessoas com os mesmos interesses. Este projeto tem como objetivo ajudar, até os mais introvertidos, a criar relações únicas e verdadeiras. 
 
-###Motivação
+### Motivação
 
 A motivação para realizar este projeto vem de uma necessidade de criar uma plataforma onde os estudantes da FEUP possam encontrar o amor, num espaço seguro e de confiança. Esta rede social poderá ajudar, até os alunos mais tímidos, a socializar e, possivelmente, encontrar o seu par de sonhos. 
 
-###Objetivos
+### Objetivos
 
 A principal missão desta plataforma é ajudar os estudantes da mesma faculdade a criar relações, sejam elas significativas, pessoais ou profissionais.  
  Assegurar que apenas alunos verificados da FEUP possam utilizar a plataforma é um importante fator em conta, de forma a proteger os dados pessoais. 
 Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivos.
 
-###Principais características
+### Principais características
 
 Utilizador:
 Registo
