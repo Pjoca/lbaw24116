@@ -22,13 +22,91 @@ Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivo
 
 ### Principais características
 
-Utilizador:
-Registo
-Iniciar/terminar sessão
-Recuperar palavra-passe
-Ver um perfil público
-Editar perfil
-Eliminar conta
+**Utilizador:**
+
+- Registo
+- Iniciar/terminar sessão
+- Recuperar palavra-passe
+- Ver um perfil público
+- Editar perfil
+- Eliminar conta
+
+**Utilizador Autenticado:**
+
+- Ver perfil
+- Editar perfil
+- Mudar foto do perfil
+- Ver notificações pessoais
+- Ver linha de tempo personalizada
+- Pesquisa de publicações, comentários, grupos e utilizadores
+- Filtros de pesquisa
+- Enviar pedidos de amizade
+- Ver perfis amigos
+- Gerir os pedidos de amizade recebidos
+- Gerir amigos
+- Criar publicação
+- Comentar publicações
+- Gostar de publicações
+- Responder a comentários
+- Criar grupos
+- Ver o feed dos utilizadores
+- Juntar-se a um grupo público
+- Gerir notificações
+- Marcar amigos em publicações
+- Ver feed dos amigos
+- Pedir para entrar em grupos públicos
+
+**Autor da publicação:**
+
+- Editar publicação
+- Apagar publicação
+- Gerir a visibilidade da publicação
+
+**Autor do comentário:**
+
+- Editar comentário
+- Apagar comentário
+
+**Membro do grupo:**
+
+- Ver membros do grupo
+- Publicar no grupo
+- Sair do grupo
+
+
+**Proprietário do grupo:**
+
+- Editar informações do grupo
+- Remover membro
+- Convidar para o grupo
+- Remover publicação do grupo
+- Alterar a visibilidade do grupo
+- Gerir convites para grupo
+- Gerir pedidos de adesão
+
+**Notificações:**
+- Gostar da sua própria publicação
+- Comentários na própria publicação
+- Pedido de amizade
+
+**Administrador:**
+- Administrar contas de utilizadores
+- Bloquear e desbloquear contas de utilizador
+- Eliminar contas de utilizador
+
+
+**Ajuda:**
+
+- Marcadores para entradas de formulários
+- Mensagens de erro contextuais
+- Ajuda contextual
+
+
+
+**Informações sobre o site:**
+- Sobre nós
+- Principais caraterísticas
+- Contactos
 
 
 
