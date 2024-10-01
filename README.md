@@ -123,8 +123,16 @@ Na figura abaixo, é possível ver a representação dos _actors_
 
 Em baixo, é possível ver a descrição de cada _actor_
 
-[img]
-
+| Identifier              | Name      |                                     
+| ----------------------- | --------- | 
+|  Administrador          | O administrador tem o poder de remover mensagens, bloquear e desbloquear pessoas |
+|  Utilizador             | Utilizador normal |
+|  Visitante              | Utilizador não autenticado que pode consultar informações públicas, registar-se ou iniciar a sessão  |
+|  Autenticado            | US Name 1 |
+|  Membro do grupo        | US Name 1 |
+|  Proprietário do grupo  | US Name 1 |
+|  Autor da publicação    | US Name 1 |
+|  Autor do comentário    | US Name 1 |
 
 ### 2. User Stories
 
