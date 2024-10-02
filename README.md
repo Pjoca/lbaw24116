@@ -138,19 +138,89 @@ Below, you can see the description of each actor
 > For each actor, a table containing a line for each user story, and for each user story: an identifier, a name, a priority, and a description (following the recommended pattern).
 > Below is a template for presenting the user stories.
 
-| Identifier   | Name      | Priority    | Responsible        | Description                                           |
-| ------------ | --------- | ----------- | ------------------ | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | Ana Alice          | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | John Silva         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | Francisco Alves    | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 
-#### 2.1. Actor 1
 
-#### 2.2. Actor 2
+#### 2.1. Administrador 1
 
-#### 2.N. Actor n
+- **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+#### 2.2. Utilizador
+
+- **User**: Manages personal profile information and account settings.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.3 Visitante
+
+- **Visitor**: Browses public information, registers, and logs in.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+
+#### 2.4. Autenticado
+
+- **Authenticated User**: Has access to features like posting, commenting, managing friends, and joining groups.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.5 Membro do grupo
+
+- **Group Member**: Interacts within groups by posting and engaging with other group members.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.6 Proprietário do grupo
+
+- **Group Owner**: Manages group settings and membership, controls group visibility.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.7 Autor da publicação
+
+- **Post Author**: Edits or deletes their own posts.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.8 Autor do comentário
+
+- **Comment Author**: Edits or deletes their own comments.
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 ### 3. Supplementary Requirements
 
