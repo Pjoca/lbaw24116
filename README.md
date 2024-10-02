@@ -20,7 +20,7 @@ The primary mission of this platform is to facilitate meaningful connections amo
 
 ### Main features
 
-**User
+**User**
 
 - Registration
 - Sign in/out
@@ -30,7 +30,7 @@ The primary mission of this platform is to facilitate meaningful connections amo
 - Delete account
 
 
-**Authenticated User
+**Authenticated User**
 
 - View profile
 - Edit profile
@@ -55,7 +55,7 @@ The primary mission of this platform is to facilitate meaningful connections amo
 - View friends' feeds
 - Ask to join public groups
 
-**Author of the post
+**Author of the post**
 
 - Edit post
 - Delete post
@@ -101,7 +101,7 @@ The primary mission of this platform is to facilitate meaningful connections amo
 - Contextual help
 
 
-**Information about the site
+**Information about the site**
 - About us
 - Main features
 - Contact
