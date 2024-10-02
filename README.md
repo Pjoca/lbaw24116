@@ -141,9 +141,9 @@ Below, you can see the description of each actor
 
 
 
-#### 2.1. Administrador 1
+#### 2.1. Administer
 
-- **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
+- **Administer**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
 | Identifier   | Name                   | Priority    | Description                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
@@ -162,25 +162,34 @@ Below, you can see the description of each actor
 
 
 
-#### 2.2. Utilizador
+#### 2.2. User
 
 - **User**: Manages personal profile information and account settings.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                           |
+| ------------ | ------------------ | ----------- | --------------------------------------------------------------------- |
+|  US01        | Edit Profile        | High        | Edit personal profile information to keep it accurate and up to date.  |
+|  US02        | Change Password     | Medium      | Change the account password to enhance account security.               |
+|  US03        | Delete Account      | Low         | Delete the account to permanently remove personal data from the platform. |
+|  US04        | Update Profile Picture | Medium   | Update the profile picture to reflect a new image.                     |
+|  US05        | Set Profile Visibility | Medium   | Set the profile's visibility to public or private to control who sees the information. |
+|  US06        | Recover Password    | High        | Recover a lost or forgotten password to regain access to the account.  |
+|  US07        | Manage Notifications | Medium     | Manage notification preferences to control which alerts are received.  |
 
-### 2.3 Visitante
+
+### 2.3 Visitor
 
 - **Visitor**: Browses public information, registers, and logs in.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                  | Priority    | Description                                                         |
+| ------------ | --------------------- | ----------- | ------------------------------------------------------------------- |
+|  US01        | Register Account       | High        | Register a new account to access platform features.                  |
+|  US02        | Log In                 | High        | Log in to an existing account to access personalized features.       |
+|  US03        | Browse Public Profiles | Medium      | Browse public profiles to explore users before registering or logging in. |
+|  US04        | Recover Password       | Medium      | Recover a lost or forgotten password to regain access to the account. |
+|  US05        | View About Page        | Low         | View information about the platform, such as mission and goals.      |
+|  US06        | View Contact Page      | Low         | View contact information to reach out to platform administrators.    |
+
 
 
 #### 2.4. Autenticado
