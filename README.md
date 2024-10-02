@@ -4,135 +4,133 @@
 
 > Project vision.
 
-## A1 - TinderFEUP
+## A1 - ConnectFEUP
 
-### Contexto 
+### Context 
 
-Fazer conexões reais com colegas de universidade pode ser um desafio, especialmente numa faculdade de grandes dimensões como a FEUP. Quer se trate de interesses românticos ou estabelecer novas amizades, os alunos podem sentir dificuldades em encontrar pessoas com os mesmos interesses. Este projeto tem como objetivo ajudar, até os mais introvertidos, a criar relações únicas e verdadeiras. 
+Making real connections with fellow students can be a challenge, especially at a large university like FEUP. Whether it's romantic interests or establishing new friendships, students can find it difficult to find like-minded people. This project aims to help even the most introverted to create unique and true relationships. 
 
-### Motivação
+### Motivation
 
-A motivação para realizar este projeto vem de uma necessidade de criar uma plataforma onde os estudantes da FEUP possam encontrar o amor, num espaço seguro e de confiança. Esta rede social poderá ajudar, até os alunos mais tímidos, a socializar e, possivelmente, encontrar o seu par de sonhos. 
+The motivation to carry out this project comes from a need to create a platform where FEUP students can find friends, love, in a safe and trustworthy space. This social network could help even the shyest students to socialize and possibly find their dream partner. 
 
-### Objetivos
+### Objectives
 
-A principal missão desta plataforma é ajudar os estudantes da mesma faculdade a criar relações, sejam elas significativas, pessoais ou profissionais.  
- Assegurar que apenas alunos verificados da FEUP possam utilizar a plataforma é um importante fator em conta, de forma a proteger os dados pessoais. 
-Uma interface fácil e semelhante ao Tinder compatível com todos os dispositivos.
+The primary mission of this platform is to facilitate meaningful connections among students from the same faculty, whether personal, romantic, or professional. A key priority is ensuring that only verified FEUP students can access the platform, safeguarding personal data and privacy. The platform will feature an intuitive, user-friendly interface, incorporating Tinder-like functionality, and will be fully compatible across all devices.
 
-### Principais características
+### Main features
 
-**Utilizador:**
+**User
 
-- Registo
-- Iniciar/terminar sessão
-- Recuperar palavra-passe
-- Ver um perfil público
-- Editar perfil
-- Eliminar conta
-
-**Utilizador Autenticado:**
-
-- Ver perfil
-- Editar perfil
-- Mudar foto do perfil
-- Ver notificações pessoais
-- Ver linha de tempo personalizada
-- Pesquisa de publicações, comentários, grupos e utilizadores
-- Filtros de pesquisa
-- Enviar pedidos de amizade
-- Ver perfis amigos
-- Gerir os pedidos de amizade recebidos
-- Gerir amigos
-- Criar publicação
-- Comentar publicações
-- Gostar de publicações
-- Responder a comentários
-- Criar grupos
-- Ver o feed dos utilizadores
-- Juntar-se a um grupo público
-- Gerir notificações
-- Marcar amigos em publicações
-- Ver feed dos amigos
-- Pedir para entrar em grupos públicos
-
-**Autor da publicação:**
-
-- Editar publicação
-- Apagar publicação
-- Gerir a visibilidade da publicação
-
-**Autor do comentário:**
-
-- Editar comentário
-- Apagar comentário
-
-**Membro do grupo:**
-
-- Ver membros do grupo
-- Publicar no grupo
-- Sair do grupo
+- Registration
+- Sign in/out
+- Recover password
+- View a public profile
+- Edit profile
+- Delete account
 
 
-**Proprietário do grupo:**
+**Authenticated User
 
-- Editar informações do grupo
-- Remover membro
-- Convidar para o grupo
-- Remover publicação do grupo
-- Alterar a visibilidade do grupo
-- Gerir convites para grupo
-- Gerir pedidos de adesão
+- View profile
+- Edit profile
+- Change profile picture
+- View personal notifications
+- View personalized timeline
+- Search for posts, comments, groups and users
+- Search filters
+- Send friend requests
+- View friend profiles
+- Manage incoming friend requests
+- Manage friends
+- Create a post
+- Comment on posts
+- Like posts
+- Reply to comments
+- Create groups
+- View users' feeds
+- Join a public group
+- Manage notifications
+- Tag friends in posts
+- View friends' feeds
+- Ask to join public groups
 
-**Notificações:**
-- Gostar da sua própria publicação
-- Comentários na própria publicação
-- Pedido de amizade
+**Author of the post
 
-**Administrador:**
-- Administrar contas de utilizadores
-- Bloquear e desbloquear contas de utilizador
-- Eliminar contas de utilizador
+- Edit post
+- Delete post
+- Manage post visibility
+
+**Comment author:**
+
+- Edit comment
+- Delete comment
+
+**Group member:**
+
+- View group members
+- Post in the group
+- Leave the group
 
 
-**Ajuda:**
+**Group owner:**
 
-- Marcadores para entradas de formulários
-- Mensagens de erro contextuais
-- Ajuda contextual
+- Edit group information
+- Remove member
+- Invite to the group
+- Remove post from group
+- Change group visibility
+- Manage group invitations
+- Manage membership requests
+
+**Notifications
+- Like your own post
+- Comments on your own post
+- Friend request
+
+**Administrator:**
+- Administer user accounts
+- Lock and unlock user accounts
+- Delete user accounts
 
 
+**Help:**
 
-**Informações sobre o site:**
-- Sobre nós
-- Principais caraterísticas
-- Contactos
+- Bookmarks for form entries
+- Contextual error messages
+- Contextual help
+
+
+**Information about the site
+- About us
+- Main features
+- Contact
 
 
 
 ## A2: Actors and User stories
 
-Os _actors_ e as _stories_ dos utilizadores contêm informações sobre as pessoas que vão utilizar o TinderFEUP e de que forma utilizar. 
+The _actors_ and _user stories_ contain information about the people who will use ConnectFEUP and how to use it.  
 
 
 ### 1. Actors
 
-Na figura abaixo, é possível ver a representação dos _actors_
+In the figure below, you can see the representation of the actors
 
 ![](IMG/Actors.png)
 
-Em baixo, é possível ver a descrição de cada _actor_
+Below, you can see the description of each actor
 
 | Identifier              | Name      |                                     
 | ----------------------- | --------- | 
-|  Administrador          | O administrador tem o poder de remover mensagens, bloquear e desbloquear pessoas |
-|  Utilizador             | Utilizador normal |
-|  Visitante              | Utilizadores não autenticados podem consultar informações públicas, registarem-se ou iniciar a sessão  |
-|  Autenticado            | Utilizadores autenticados podem consultar informações, comentar em publicações de outras pessoas, enviar e receber mensagens com outras pessoas ou grupos |
-|  Membro do grupo        | Membros de um grupo podem participar, conversar e publicar num grupo, mas não tèm permissões especiais |
-|  Proprietário do grupo  | Proprietários de um grupo além de terem as mesmas permissões que um membro, podem também editar o nome do grupo, a descrição, adicionar/remover membros e editar as permissões de outros participantes |
-|  Autor da publicação    | Os utilizadores podem eliminar ou editar a sua publicação |
-|  Autor do comentário    | Os utilizadores podem em qualquer publicação, além de editar ou eliminar os seus próprios comentários |
+|  Administrator          | Administrator The administrator has the power to remove messages, block and unblock people. |
+|  User                   | Normal User. |
+|  Guest                  | Unauthenticated users can view public information, register or log in. |
+|  Autenticated User      | Authenticated users can view information, comment on other people's posts, send and receive messages with other people or groups. |
+|  Group Member           | Members of a group can participate, chat and post in a group, but do not have special permissions. |
+|  Group Owner            | Group owners not only have the same permissions as a member, but can also edit the group name, description, add/remove members and edit the permissions of other participants. |
+|  Post Author            | Users can delete or edit their post. |
+|  Comment Author         | Users can edit or delete their own comments on any post. |
 
 ### 2. User Stories
 
