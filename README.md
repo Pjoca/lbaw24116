@@ -140,18 +140,73 @@ Em baixo, é possível ver a descrição de cada _actor_
 > For each actor, a table containing a line for each user story, and for each user story: an identifier, a name, a priority, and a description (following the recommended pattern).
 > Below is a template for presenting the user stories.
 
-| Identifier   | Name      | Priority    | Responsible        | Description                                           |
-| ------------ | --------- | ----------- | ------------------ | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | Ana Alice          | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | John Silva         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | Francisco Alves    | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 
-#### 2.1. Actor 1
 
-#### 2.2. Actor 2
+#### 2.1. Administrador 1
 
-#### 2.N. Actor n
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+#### 2.2. Utilizador
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.3 Visitante
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+
+#### 2.4. Autenticado
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.5 Membro do grupo
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.6 Proprietário do grupo
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.7 Autor da publicação
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+
+### 2.8 Autor do comentário
+
+| Identifier   | Name      | Priority    | Description                                           |
+| ------------ | --------- | ----------- | ----------------------------------------------------- |
+|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 
 ### 3. Supplementary Requirements
