@@ -192,55 +192,75 @@ Below, you can see the description of each actor
 
 
 
-#### 2.4. Autenticado
+#### 2.4. Authenticated
 
 - **Authenticated User**: Has access to features like posting, commenting, managing friends, and joining groups.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                             |
+| ------------ | ------------------ | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Create Post         | High        | Create a post to share content with other users.                         |
+|  US02        | Comment on Post     | High        | Comment on a post to engage in discussions with other users.             |
+|  US03        | Send Friend Request | Medium      | Send a friend request to connect with other users.                       |
+|  US04        | Join Group          | Medium      | Join a group to interact with like-minded users.                         |
+|  US05        | Like Post           | Low         | Like a post to show appreciation or agreement.                           |
+|  US06        | Manage Friend List  | Medium      | Manage the list of friends by adding or removing users.                  |
+|  US07        | View Notifications  | Medium      | View notifications to stay updated on interactions related to your posts or profile. |
+|  US08        | Edit Group Post     | Low         | Edit posts within a group to update or correct information.              |
 
-### 2.5 Membro do grupo
+
+### 2.5 Group Member
 
 - **Group Member**: Interacts within groups by posting and engaging with other group members.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Create Group Post     | High        | Create a post within a group to share content with other group members.  |
+|  US02        | Comment on Group Post | Medium      | Comment on a group post to engage in discussions with other members.     |
+|  US03        | Like Group Post       | Low         | Like a post in a group to show appreciation or agreement with the content. |
+|  US04        | View Group Members    | Medium      | View the list of group members to know who is part of the group.         |
+|  US05        | Leave Group           | Low         | Leave the group to stop participating and receiving group notifications. |
+
 
 ### 2.6 Proprietário do grupo
 
 - **Group Owner**: Manages group settings and membership, controls group visibility.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Group Details    | High        | Edit group details such as name, description, and visibility settings.   |
+|  US02        | Add/Remove Members    | High        | Add or remove group members to control group participation.              |
+|  US03        | Approve Join Requests | Medium      | Approve or reject requests from users who want to join the group.        |
+|  US04        | Remove Group Post     | Medium      | Remove inappropriate or unwanted posts from the group.                   |
+|  US05        | Change Group Privacy  | Low         | Change the group’s privacy settings to make it public or private.        |
+|  US06        | Invite Members        | Medium      | Invite new members to join the group via direct invitation.              |
+|  US07        | Manage Group Roles    | Low         | Assign roles within the group, such as promoting a member to moderator.  |
 
-### 2.7 Autor da publicação
+
+### 2.7 Post Author
 
 - **Post Author**: Edits or deletes their own posts.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Post             | High        | Edit a post to correct or update the content after publishing.           |
+|  US02        | Delete Post           | High        | Delete a post to remove it permanently from the platform.                |
+|  US03        | Manage Post Visibility| Medium      | Manage the visibility of a post by making it public, private, or restricted to certain users. |
+|  US04        | Tag Friends in Post   | Medium      | Tag friends in a post to notify and include them in the shared content.  |
+|  US05        | Add Media to Post     | Low         | Add images or videos to a post to enhance the content.                   |
 
-### 2.8 Autor do comentário
+
+### 2.8 Comment Author
 
 - **Comment Author**: Edits or deletes their own comments.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                             |
+| ------------ | ------------------ | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Comment        | High        | Edit a comment to correct or update the content after posting.           |
+|  US02        | Delete Comment      | High        | Delete a comment to remove it permanently from a post.                   |
+|  US03        | Reply to Comment    | Medium      | Reply to a comment to engage in a conversation or clarify points.        |
+|  US04        | Like Comment        | Low         | Like a comment to show agreement or appreciation.                        |
+|  US05        | Tag Friends in Comment | Low      | Tag friends in a comment to bring them into the conversation.            |
+
 
 ### 3. Supplementary Requirements
 
