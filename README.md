@@ -143,7 +143,7 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 
 
-#### 2.1. Administrador 1
+#### 2.1. Administrador
 
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
