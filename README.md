@@ -145,11 +145,14 @@ Below, you can see the description of each actor
 
 - **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                              |
+| ------------ | -------------------| ----------- | -------------------------------------------------------------------------|
+|  US01        | Block User          | High        | Block users to prevent abusive behavior.                                  |
+|  US02        | Delete User Account | Medium      | Delete user accounts to remove inactive or inappropriate users.           |
+|  US03        | Edit Profile        | Low         | Edit user profiles to keep their information up to date.                  |
+
+
+
 
 #### 2.2. Utilizador
 
