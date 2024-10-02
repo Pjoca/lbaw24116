@@ -202,7 +202,7 @@ Below, you can see the description of each actor
 
 ### 1. Sitemap
 
-![](IMG/SiteMap.png){style="display: block; margin: 0 auto" }
+![](IMG/sitemap.png){style="display: block; margin: 0 auto" }
 
 
 ### 2. Wireframes
