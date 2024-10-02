@@ -143,7 +143,9 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 
 
-#### 2.1. Administrador
+#### 2.1. Administrador 1
+
+- **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
@@ -153,6 +155,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 #### 2.2. Utilizador
 
+- **User**: Manages personal profile information and account settings.
+
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
 |  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
@@ -160,6 +164,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 |  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 ### 2.3 Visitante
+
+- **Visitor**: Browses public information, registers, and logs in.
 
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
@@ -170,6 +176,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 #### 2.4. Autenticado
 
+- **Authenticated User**: Has access to features like posting, commenting, managing friends, and joining groups.
+
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
 |  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
@@ -177,6 +185,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 |  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 ### 2.5 Membro do grupo
+
+- **Group Member**: Interacts within groups by posting and engaging with other group members.
 
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
@@ -186,6 +196,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 ### 2.6 Proprietário do grupo
 
+- **Group Owner**: Manages group settings and membership, controls group visibility.
+
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
 |  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
@@ -193,6 +205,8 @@ Em baixo, é possível ver a descrição de cada _actor_
 |  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 
 ### 2.7 Autor da publicação
+
+- **Post Author**: Edits or deletes their own posts.
 
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
@@ -202,12 +216,13 @@ Em baixo, é possível ver a descrição de cada _actor_
 
 ### 2.8 Autor do comentário
 
+- **Comment Author**: Edits or deletes their own comments.
+
 | Identifier   | Name      | Priority    | Description                                           |
 | ------------ | --------- | ----------- | ----------------------------------------------------- |
 |  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 |  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
 |  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-
 
 ### 3. Supplementary Requirements
 
