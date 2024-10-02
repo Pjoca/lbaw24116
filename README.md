@@ -145,11 +145,19 @@ Below, you can see the description of each actor
 
 - **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
-| Identifier   | Name               | Priority    | Description                                                              |
-| ------------ | -------------------| ----------- | -------------------------------------------------------------------------|
-|  US01        | Block User          | High        | Block users to prevent abusive behavior.                                  |
-|  US02        | Delete User Account | Medium      | Delete user accounts to remove inactive or inappropriate users.           |
-|  US03        | Edit Profile        | Low         | Edit user profiles to keep their information up to date.                  |
+| Identifier   | Name                   | Priority    | Description                                                             |
+| ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Block User              | High        | Block users to prevent abusive behavior.                                 |
+|  US02        | Unblock User            | Medium      | Unblock users who were previously blocked to restore their access.       |
+|  US03        | Delete User Account     | Medium      | Delete user accounts to remove inactive or inappropriate users.          |
+|  US04        | Manage User Roles       | High        | Assign or change user roles (e.g., promote to moderator) to manage permissions. |
+|  US05        | View User Activity Logs | Medium      | View activity logs of users to monitor behavior and ensure compliance.   |
+|  US06        | Suspend User Account    | High        | Temporarily suspend user accounts for misconduct without permanent deletion. |
+|  US07        | Restore User Account    | Low         | Restore previously suspended or deleted user accounts.                   |
+|  US08        | Manage Content          | Medium      | Remove inappropriate or flagged content to maintain platform safety.     |
+|  US09        | Broadcast Announcement  | Low         | Send global announcements to all users for important updates or news.    |
+|  US10        | Manage Reports          | High        | Review and resolve reports made by users regarding inappropriate behavior or content. |
+
 
 
 
