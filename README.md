@@ -59,86 +59,126 @@ Below, you can see the description of each actor
 
 
 
-#### 2.1. Administrador 1
+#### 2.1. Administer
 
-- **Administrator**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
+- **Administer**: Manages user accounts, blocks or unblocks users, and ensures safe platform use.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                   | Priority    | Description                                                             |
+| ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Block User              | High        | Block users to prevent abusive behavior.                                 |
+|  US02        | Unblock User            | Medium      | Unblock users who were previously blocked to restore their access.       |
+|  US03        | Delete User Account     | Medium      | Delete user accounts to remove inactive or inappropriate users.          |
+|  US04        | Manage User Roles       | High        | Assign or change user roles (e.g., promote to moderator) to manage permissions. |
+|  US05        | View User Activity Logs | Medium      | View activity logs of users to monitor behavior and ensure compliance.   |
+|  US06        | Suspend User Account    | High        | Temporarily suspend user accounts for misconduct without permanent deletion. |
+|  US07        | Restore User Account    | Low         | Restore previously suspended or deleted user accounts.                   |
+|  US08        | Manage Content          | Medium      | Remove inappropriate or flagged content to maintain platform safety.     |
+|  US09        | Broadcast Announcement  | Low         | Send global announcements to all users for important updates or news.    |
+|  US10        | Manage Reports          | High        | Review and resolve reports made by users regarding inappropriate behavior or content. |
 
-#### 2.2. Utilizador
+
+
+
+
+#### 2.2. User
 
 - **User**: Manages personal profile information and account settings.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                           |
+| ------------ | ------------------ | ----------- | --------------------------------------------------------------------- |
+|  US01        | Edit Profile        | High        | Edit personal profile information to keep it accurate and up to date.  |
+|  US02        | Change Password     | Medium      | Change the account password to enhance account security.               |
+|  US03        | Delete Account      | Low         | Delete the account to permanently remove personal data from the platform. |
+|  US04        | Update Profile Picture | Medium   | Update the profile picture to reflect a new image.                     |
+|  US05        | Set Profile Visibility | Medium   | Set the profile's visibility to public or private to control who sees the information. |
+|  US06        | Recover Password    | High        | Recover a lost or forgotten password to regain access to the account.  |
+|  US07        | Manage Notifications | Medium     | Manage notification preferences to control which alerts are received.  |
 
-### 2.3 Visitante
+
+### 2.3 Visitor
 
 - **Visitor**: Browses public information, registers, and logs in.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                  | Priority    | Description                                                         |
+| ------------ | --------------------- | ----------- | ------------------------------------------------------------------- |
+|  US01        | Register Account       | High        | Register a new account to access platform features.                  |
+|  US02        | Log In                 | High        | Log in to an existing account to access personalized features.       |
+|  US03        | Browse Public Profiles | Medium      | Browse public profiles to explore users before registering or logging in. |
+|  US04        | Recover Password       | Medium      | Recover a lost or forgotten password to regain access to the account. |
+|  US05        | View About Page        | Low         | View information about the platform, such as mission and goals.      |
+|  US06        | View Contact Page      | Low         | View contact information to reach out to platform administrators.    |
 
 
-#### 2.4. Autenticado
+
+#### 2.4. Authenticated
 
 - **Authenticated User**: Has access to features like posting, commenting, managing friends, and joining groups.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                             |
+| ------------ | ------------------ | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Create Post         | High        | Create a post to share content with other users.                         |
+|  US02        | Comment on Post     | High        | Comment on a post to engage in discussions with other users.             |
+|  US03        | Send Friend Request | Medium      | Send a friend request to connect with other users.                       |
+|  US04        | Join Group          | Medium      | Join a group to interact with like-minded users.                         |
+|  US05        | Like Post           | Low         | Like a post to show appreciation or agreement.                           |
+|  US06        | Manage Friend List  | Medium      | Manage the list of friends by adding or removing users.                  |
+|  US07        | View Notifications  | Medium      | View notifications to stay updated on interactions related to your posts or profile. |
+|  US08        | Edit Group Post     | Low         | Edit posts within a group to update or correct information.              |
 
-### 2.5 Membro do grupo
+
+### 2.5 Group Member
 
 - **Group Member**: Interacts within groups by posting and engaging with other group members.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Create Group Post     | High        | Create a post within a group to share content with other group members.  |
+|  US02        | Comment on Group Post | Medium      | Comment on a group post to engage in discussions with other members.     |
+|  US03        | Like Group Post       | Low         | Like a post in a group to show appreciation or agreement with the content. |
+|  US04        | View Group Members    | Medium      | View the list of group members to know who is part of the group.         |
+|  US05        | Leave Group           | Low         | Leave the group to stop participating and receiving group notifications. |
+
 
 ### 2.6 Proprietário do grupo
 
 - **Group Owner**: Manages group settings and membership, controls group visibility.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Group Details    | High        | Edit group details such as name, description, and visibility settings.   |
+|  US02        | Add/Remove Members    | High        | Add or remove group members to control group participation.              |
+|  US03        | Approve Join Requests | Medium      | Approve or reject requests from users who want to join the group.        |
+|  US04        | Remove Group Post     | Medium      | Remove inappropriate or unwanted posts from the group.                   |
+|  US05        | Change Group Privacy  | Low         | Change the group’s privacy settings to make it public or private.        |
+|  US06        | Invite Members        | Medium      | Invite new members to join the group via direct invitation.              |
+|  US07        | Manage Group Roles    | Low         | Assign roles within the group, such as promoting a member to moderator.  |
 
-### 2.7 Autor da publicação
+
+### 2.7 Post Author
 
 - **Post Author**: Edits or deletes their own posts.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name                 | Priority    | Description                                                             |
+| ------------ | -------------------- | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Post             | High        | Edit a post to correct or update the content after publishing.           |
+|  US02        | Delete Post           | High        | Delete a post to remove it permanently from the platform.                |
+|  US03        | Manage Post Visibility| Medium      | Manage the visibility of a post by making it public, private, or restricted to certain users. |
+|  US04        | Tag Friends in Post   | Medium      | Tag friends in a post to notify and include them in the shared content.  |
+|  US05        | Add Media to Post     | Low         | Add images or videos to a post to enhance the content.                   |
 
-### 2.8 Autor do comentário
+
+### 2.8 Comment Author
 
 - **Comment Author**: Edits or deletes their own comments.
 
-| Identifier   | Name      | Priority    | Description                                           |
-| ------------ | --------- | ----------- | ----------------------------------------------------- |
-|  US01        | US Name 1 | High        | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US02        | US Name 2 | Medium      | As an \<actor\>, I want to \<what\>, so that \<why\>. |
-|  US03        | US Name 3 | Low         | As an \<actor\>, I want to \<what\>, so that \<why\>. |
+| Identifier   | Name               | Priority    | Description                                                             |
+| ------------ | ------------------ | ----------- | ----------------------------------------------------------------------- |
+|  US01        | Edit Comment        | High        | Edit a comment to correct or update the content after posting.           |
+|  US02        | Delete Comment      | High        | Delete a comment to remove it permanently from a post.                   |
+|  US03        | Reply to Comment    | Medium      | Reply to a comment to engage in a conversation or clarify points.        |
+|  US04        | Like Comment        | Low         | Like a comment to show agreement or appreciation.                        |
+|  US05        | Tag Friends in Comment | Low      | Tag friends in a comment to bring them into the conversation.            |
+
 
 ### 3. Supplementary Requirements
 
