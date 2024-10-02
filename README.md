@@ -6,105 +6,23 @@
 
 ## A1 - ConnectFEUP
 
-### Context 
+The project aims to develop a social networking platform specifically designed for students at FEUP, addressing the common challenge of making real connections in a large university setting. The motivation behind this initiative stems from the need for a safe and trustworthy space where students can form friendships and romantic relationships, particularly benefiting those who may be shy or introverted. This platform will help students meet like-minded peers, fostering meaningful and unique connections.
 
-Making real connections with fellow students can be a challenge, especially at a large university like FEUP. Whether it's romantic interests or establishing new friendships, students can find it difficult to find like-minded people. This project aims to help even the most introverted to create unique and true relationships. 
+The primary mission of the platform is to facilitate relationships among students, whether personal, romantic, or professional. A crucial aspect of this project is ensuring that only verified FEUP students can access the platform, thereby safeguarding personal data and maintaining user privacy. With an intuitive, user-friendly interface, the platform will incorporate Tinder-like functionalities, ensuring it is fully compatible across all devices, such as desktops, tablets, and smartphones.
 
-### Motivation
+To achieve this, the platform will provide a variety of features for users. It will allow new users to register easily with their FEUP credentials, sign in and out, and recover lost passwords. Users will have the ability to view public profiles, edit their personal information, and even delete their accounts if they choose to leave the platform.
 
-The motivation to carry out this project comes from a need to create a platform where FEUP students can find friends, love, in a safe and trustworthy space. This social network could help even the shyest students to socialize and possibly find their dream partner. 
+Once authenticated, users will gain access to a host of additional features. They will be able to view and edit their profiles, change their profile pictures, and check personal notifications. A personalized timeline will showcase updates based on friends' activities, while robust search functionalities will help users find posts, comments, groups, and other users, enhanced by customizable search filters.
 
-### Objectives
+Furthermore, users will have the ability to send and manage friend requests, view friend profiles, and create and interact with posts. They can comment on, like, and reply to posts, as well as create groups, join public groups, and tag friends in their posts. They will also have the option to view their friends' feeds and ask to join public groups.
 
-The primary mission of this platform is to facilitate meaningful connections among students from the same faculty, whether personal, romantic, or professional. A key priority is ensuring that only verified FEUP students can access the platform, safeguarding personal data and privacy. The platform will feature an intuitive, user-friendly interface, incorporating Tinder-like functionality, and will be fully compatible across all devices.
+For those who create content, features will include the ability to edit and delete their posts, as well as manage post visibility. Comment authors will also have the ability to edit or delete their comments. Group members will be able to view other members, post in groups, and leave groups when they wish, while group owners will have additional privileges, such as editing group information, managing membership requests, and removing members or posts from the group.
 
-### Main features
+Notifications will keep users informed about likes on their posts, comments on their content, and incoming friend requests, ensuring they remain engaged with their network. Administrators will play a vital role in managing user accounts, including locking, unlocking, and deleting accounts as needed.
 
-**User**
+To assist users, the platform will feature contextual help, bookmarks for form entries, and error messages to enhance user experience. Additionally, the site will provide information about itself, including an "About Us" section, details about its main features, and contact information for support.
 
-- Registration
-- Sign in/out
-- Recover password
-- View a public profile
-- Edit profile
-- Delete account
-
-
-**Authenticated User**
-
-- View profile
-- Edit profile
-- Change profile picture
-- View personal notifications
-- View personalized timeline
-- Search for posts, comments, groups and users
-- Search filters
-- Send friend requests
-- View friend profiles
-- Manage incoming friend requests
-- Manage friends
-- Create a post
-- Comment on posts
-- Like posts
-- Reply to comments
-- Create groups
-- View users' feeds
-- Join a public group
-- Manage notifications
-- Tag friends in posts
-- View friends' feeds
-- Ask to join public groups
-
-**Author of the post**
-
-- Edit post
-- Delete post
-- Manage post visibility
-
-**Comment author:**
-
-- Edit comment
-- Delete comment
-
-**Group member:**
-
-- View group members
-- Post in the group
-- Leave the group
-
-
-**Group owner:**
-
-- Edit group information
-- Remove member
-- Invite to the group
-- Remove post from group
-- Change group visibility
-- Manage group invitations
-- Manage membership requests
-
-**Notifications
-- Like your own post
-- Comments on your own post
-- Friend request
-
-**Administrator:**
-- Administer user accounts
-- Lock and unlock user accounts
-- Delete user accounts
-
-
-**Help:**
-
-- Bookmarks for form entries
-- Contextual error messages
-- Contextual help
-
-
-**Information about the site**
-- About us
-- Main features
-- Contact
+Overall, this social networking platform seeks to create a vibrant and secure environment for FEUP students, facilitating authentic connections and enriching their university experience.
 
 
 
@@ -117,7 +35,7 @@ The _actors_ and _user stories_ contain information about the people who will us
 
 In the figure below, you can see the representation of the actors
 
-![](IMG/Actors.png)
+![](IMG/Actors.png){style="display: block; margin: 0 auto" }
 
 Below, you can see the description of each actor
 
@@ -244,9 +162,7 @@ Below, you can see the description of each actor
 
 ### 1. Sitemap
 
-> Sitemap presenting the overall structure of the web application.  
-> Each page must be identified in the sitemap.  
-> Multiple instances of the same page (e.g. student profile in SIGARRA) are presented as page stacks.
+![](IMG/SiteMap.png){style="display: block; margin: 0 auto" }
 
 
 ### 2. Wireframes
