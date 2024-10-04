@@ -203,6 +203,15 @@ Below, you can see the description of each actor
 
 #### 3.2. Technical requirements
 
+| Identifier | Name                                    | Justification                                                                                                                                               |
+|------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **TR01**       | **Secure User Authentication**              | To prevent outsiders from accessing the platform, maintaining the safety and exclusivity of the TinderFEUP network.                                          |
+| TR02       | Scalable Architecture for Real-Time Interaction | Given the platform’s nature as a social network, users expect immediate responses for messages, notifications, and other interactions.                       |
+| **TR03**       | **Data Encryption and Privacy**             | To ensure compliance with data protection laws (e.g., GDPR) and protect users’ personal data from unauthorized access.                                       |
+| TR04       | Rate Limiting and Anti-Spam Measures    | Helps to prevent abuse, spam, and resource exhaustion, ensuring a positive user experience and preventing overload on the platform’s infrastructure.         |
+| TR05       | Responsive Design and Accessibility     | Ensures that the platform is accessible to all users, regardless of device or ability, promoting inclusivity and a consistent experience across devices.      |
+
+
 #### 3.3. Restrictions
 
 
