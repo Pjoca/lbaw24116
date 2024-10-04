@@ -191,6 +191,16 @@ Below, you can see the description of each actor
 
 #### 3.1. Business rules
 
+| **Identifier** | **Name**                                     | **Description**                                                                                                                                                                                                 |
+|----------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BR01           | User Voting/Commenting/Reviewing on Own Stories/Answers | A user can vote, comment, and view their own posts and comments.                                                                                                                                               |
+| BR02           | Content Ownership and Deletion               | When a user is deleted or removes their account, their content (posts, comments, groups, messages) remains visible. The profile will indicate that the user is deleted, preventing others from interacting further. |
+| BR03           | Group Ownership Transfer upon Deletion or Exit| If a group owner deletes their account, ownership is transferred to another member. If no member is eligible, the group is deleted.                                                                             |
+| BR04           | Date Validations (Entry Date/Exit Date)       | Exit dates associated with user activities (e.g., joining/leaving a group) must be greater than or equal to the entry date.                                                                                     |
+| BR05           | Mandatory Profile Completion for Engagement Features | Users must complete a minimum percentage of their profile before they can engage in features like sending friend requests, joining groups, posting content, or matching with others.                            |
+| BR06           | Account Creation and Log In                  | Only FEUP students can create accounts. All account-related actions (login, sign-in, change password) must be done using the student’s institutional email.                                                      |
+
+
 #### 3.2. Technical requirements
 
 #### 3.3. Restrictions
