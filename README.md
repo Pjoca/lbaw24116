@@ -214,6 +214,12 @@ Below, you can see the description of each actor
 
 #### 3.3. Restrictions
 
+| Identifier | Name                              | Description                                                                                                                                    |
+|------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| R01        | Age Restriction                   | Only users who are 18 years or older may use the platform, as the platform may deal with dating and sensitive social interactions.               |
+| R02        | Content Moderation and Offensive Behavior | All posts, comments, and interactions must comply with the platform’s code of conduct. Offensive content will be flagged, and repeat offenders banned. |
+| R03        | Data Retention Policy             | User data will be stored for a maximum of 4 years after account deletion, unless legally required otherwise. |
+
 
 ---
 
