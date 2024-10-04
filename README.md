@@ -54,13 +54,6 @@ Below, you can see the description of each actor
 |  Post Author            | Users can delete or edit their post. |
 |  Comment Author         | Users can edit or delete their own comments on any post. |
 
-### 2. User Stories
-
-> User stories organized by actor.  
-> For each actor, a table containing a line for each user story, and for each user story: an identifier, a name, a priority, and a description (following the recommended pattern).
-> Below is a template for presenting the user stories.
-
-
 
 ## 2. User Stories
 
