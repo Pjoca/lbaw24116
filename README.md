@@ -4,19 +4,24 @@
 
 ## A1 - ConnectFEUP
 
-The project aims to develop a social networking platform specifically designed for students at FEUP, addressing the common challenge of making real connections in a large university setting. The motivation behind this initiative stems from the need for a safe and trustworthy space where students can form friendships and romantic relationships, particularly benefiting those who may be shy or introverted. This platform will help students meet like-minded peers, fostering meaningful and unique connections.
+### Context and Motivation
 
-The primary mission of the platform is to facilitate relationships among students, whether personal, romantic, or professional. A crucial aspect of this project is ensuring that only verified FEUP students can access the platform, thereby safeguarding personal data and maintaining user privacy. With an intuitive, user-friendly interface, the platform will incorporate Tinder-like functionalities, ensuring it is fully compatible across all devices, such as desktops, tablets, and smartphones.
+The project's goal is to develop a social network platform specifically designed for FEUP students, addressing the problem of making genuine connections in a large university setting. The motivation for this platform is the need for a safe and trustworthy environment, where students can form friendships and romantic relationships, especially for those who may be shy or introverted. This platform will help students meet people compatible with them, allowing them to make meaningful and unique connections.
 
-To achieve this, the platform will provide a variety of features for users. It will allow new users to register easily with their FEUP credentials, sign in and out, and recover lost passwords. Users will have the ability to view public profiles, edit their personal information, and even delete their accounts if they choose to leave the platform.
+### Goals and Objectives
 
-Once authenticated, users will gain access to a host of additional features. They will be able to view and edit their profiles, change their profile pictures, and check personal notifications. A personalized timeline will showcase updates based on friends' activities, while robust search functionalities will help users find posts, comments, groups, and other users, enhanced by customizable search filters.
+The main objective of the project is to help relationships among students, whether personal, romantic, or professional. A crucial aspect is ensuring that only verified FEUP students can access the platform, thereby safeguarding personal data and maintaining user privacy. With an intuitive, user-friendly interface, the platform will incorporate Tinder-like features, ensuring it is fully compatible across all devices.
 
-Furthermore, users will have the ability to send and manage friend requests, view friend profiles, and create and interact with posts. They can comment on, like, and reply to posts, as well as create groups, join public groups, and tag friends in their posts. They will also have the option to view their friends' feeds and ask to join public groups.
+### Features
+
+
+The site will provide a variety of features for users. It will allow new users to register easily with their FEUP credentials, login in and logout, and recover forgotten passwords. Users will have the ability to view public profiles, edit their personal information, and even delete their accounts if they choose to leave the platform.
+
+Once authenticated, users will be able to access a variety of features. They will be able to view and edit their profiles, change their profile pictures, and check personal notifications. A personalized timeline will showcase updates based on friend's activities, while robust search functionalities will help users find posts, comments, groups, and other users, enhanced by advacend search filters.
+
+In addition, users will have the ability to send and manage friend requests, view friend profiles, and create and interact with posts. They can comment on, like, and reply to posts, as well as create groups, join public groups, and tag friends in their posts. They will also have the option to view their friends' feeds and ask to join public groups.
 
 For those who create content, features will include the ability to edit and delete their posts, as well as manage post visibility. Comment authors will also have the ability to edit or delete their comments. Group members will be able to view other members, post in groups, and leave groups when they wish, while group owners will have additional privileges, such as editing group information, managing membership requests, and removing members or posts from the group.
-
-The main objective of this project is to facilitate meaningful connections among students from the same faculty, whether personal, romantic, or professional. A key priority is ensuring that only verified FEUP students can access the platform, safeguarding personal data and privacy. The platform will feature an intuitive, user-friendly interface, incorporating Tinder-like functionality, and will be fully compatible across all devices.
 
 Notifications will keep users informed about likes on their posts, comments on their content, and incoming friend requests, ensuring they remain engaged with their network. Administrators will play a vital role in managing user accounts, including locking, unlocking, and deleting accounts as needed.
 
@@ -28,7 +33,7 @@ Overall, this social networking platform seeks to create a vibrant and secure en
 
 ## A2: Actors and User stories
 
-The _actors_ and _user stories_ contain information about the people who will use ConnectFEUP and how to use it.  
+The actors and user stories contain information about the people who will use ConnectFEUP and how to use it.  
 
 
 ### 1. Actors
