@@ -199,7 +199,7 @@ Below, you can see the description of each actor
 | TR02       | Scalable Architecture for Real-Time Interaction | Given the platform’s nature as a social network, users expect immediate responses for messages, notifications, and other interactions.                           |
 | **TR03**       | **Data Encryption and Privacy**                 | **To ensure compliance with data protection laws (e.g., GDPR) and protect users’ personal data from unauthorized access.**                                           |
 | TR04       | Rate Limiting and Anti-Spam Measures        | Helps to prevent abuse, spam, and resource exhaustion, ensuring a positive user experience and preventing overload on the platform’s infrastructure.             |
-| **TR05**       | **Responsive Design and Accessibility**         | **Ensures that the platform is accessible to all users, regardless of device or ability, promoting inclusivity and a consistent experience across devices. **         |
+| **TR05**       | **Responsive Design and Accessibility**         | **Ensures that the platform is accessible to all users, regardless of device or ability, promoting inclusivity and a consistent experience across devices.**         |
 | TR06       | System Response Times (< 2s)                | Ensures a smooth user experience by keeping response times under 2 seconds, helping maintain user engagement and attention.                                       |
 | TR07       | Robustness (Error Handling)                 | The system must be able to handle runtime errors gracefully and continue operating without major service disruption.                                              |
 | TR08       | Scalability                                 | The system must be designed to accommodate growth in the number of users and their interactions without degradation in performance.                              |
@@ -253,13 +253,6 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 <br>
 
 ---
-
-
-## Revision history
-
-Changes made to the first submission:
-1. Item 1
-1. ...
 
 ***
 GROUP24116, 01/10/2024
