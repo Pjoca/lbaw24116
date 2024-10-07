@@ -51,22 +51,22 @@ Below, you can see the description of each actor
 
 ## 2. User Stories
 
-#### 2.1. Administer
+#### 2.1. Administrator
 
-- **Administer**: Responsible for managing user accounts, blocking/unblocking users, overseeing platform content, and ensuring safety and compliance.
+- **Administrator**: Responsible for managing user accounts, blocking/unblocking users, overseeing platform content, and ensuring safety and compliance.
 
 | Identifier   | Name                   | Priority    | Description                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Block User              | High        | The system must allow admins to block users to prevent abusive behavior. |
-|  US02        | Unblock User            | Medium      | The system must allow admins to unblock users previously blocked to restore their access. |
-|  US03        | Delete User Account     | Medium      | Admins must be able to permanently delete user accounts that are inactive or inappropriate. |
-|  US04        | Manage User Roles       | High        | Admins should assign or change user roles (e.g., moderator) to manage permissions. |
-|  US05        | View User Activity Logs | Medium      | Admins must have access to user activity logs to monitor behavior and ensure compliance with platform policies. |
-|  US06        | Suspend User Account    | High        | Admins must be able to temporarily suspend user accounts for misconduct without deleting them. |
-|  US07        | Restore User Account    | Low         | Admins must be able to restore previously suspended or deleted user accounts if necessary. |
-|  US08        | Manage Content          | Medium      | Admins should be able to remove inappropriate or flagged content to maintain platform integrity. |
-|  US09        | Broadcast Announcement  | Low         | Admins should be able to send platform-wide announcements for updates or important information. |
-|  US10        | Manage Reports          | High        | Admins should be able to review and resolve user-submitted reports regarding misconduct or inappropriate content. |
+|  US01        | Block User              | High        | The system must allow administrators to block users to prevent abusive behavior. |
+|  US02        | Unblock User            | Medium      | The system must allow administrators to unblock users previously blocked to restore their access. |
+|  US03        | Delete User Account     | Medium      | Administrators must be able to permanently delete user accounts that are inactive or inappropriate. |
+|  US04        | Manage User Roles       | High        | Administrators should assign or change user roles (e.g., moderator) to manage permissions. |
+|  US05        | View User Activity Logs | Medium      | Administrators must have access to user activity logs to monitor behavior and ensure compliance with platform policies. |
+|  US06        | Suspend User Account    | High        | Administrators must be able to temporarily suspend user accounts for misconduct without deleting them. |
+|  US07        | Restore User Account    | Low         | Administrators must be able to restore previously suspended or deleted user accounts if necessary. |
+|  US08        | Manage Content          | Medium      | Administrators should be able to remove inappropriate or flagged content to maintain platform integrity. |
+|  US09        | Broadcast Announcement  | Low         | Administrators should be able to send platform-wide announcements for updates or important information. |
+|  US10        | Manage Reports          | High        | Administrators should be able to review and resolve user-submitted reports regarding misconduct or inappropriate content. |
 
 ---
 
