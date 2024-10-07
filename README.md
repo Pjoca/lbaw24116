@@ -2,8 +2,6 @@
 
 # ER: Requirements Specification Component
 
-> Project vision.
-
 ## A1 - ConnectFEUP
 
 The project aims to develop a social networking platform specifically designed for students at FEUP, addressing the common challenge of making real connections in a large university setting. The motivation behind this initiative stems from the need for a safe and trustworthy space where students can form friendships and romantic relationships, particularly benefiting those who may be shy or introverted. This platform will help students meet like-minded peers, fostering meaningful and unique connections.
@@ -54,11 +52,6 @@ Below, you can see the description of each actor
 
 
 ## 2. User Stories
-
-> User stories organized by actor.  
-> For each actor, a table is presented with an identifier, a name, a priority, and a description, following the recommended pattern.
-
----
 
 #### 2.1. Administer
 
@@ -186,9 +179,6 @@ Below, you can see the description of each actor
 
 ### 3. Supplementary Requirements
 
-> Section including business rules, technical requirements, and restrictions.  
-> For each subsection, a table containing identifiers, names, and descriptions for each requirement.
-
 #### 3.1. Business rules
 
 | **Identifier** | **Name**                                     | **Description**                                                                                                                                                                                                 |
@@ -252,6 +242,12 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 <p style="text-align:center;"><b> Figura 3: User Profile (UI03) wireframe. </b></p>
 <br>
 
+
+#### UI08: Matchmaking Feed
+
+![](IMG/matchmaking.png){style="display: block; margin: 0 auto" }
+<p style="text-align:center;"><b> Figura 4: User Matchmaking (UI08) wireframe. </b></p>
+<br>
 
 ---
 
