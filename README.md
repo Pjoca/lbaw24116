@@ -39,7 +39,7 @@ Below, you can see the description of each actor
 
 | Identifier              | Name      |                                     
 | ----------------------- | --------- | 
-|  Administrator          | Administrator The administrator has the power to remove messages, block and unblock people. |
+|  Administrator          | The administrator has the power to remove messages, block and unblock people. |
 |  User                   | Normal User. |
 |  Guest                  | Unauthenticated users can view public information, register or log in. |
 |  Autenticated User      | Authenticated users can view information, comment on other people's posts, send and receive messages with other people or groups. |
