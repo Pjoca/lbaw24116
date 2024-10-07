@@ -55,18 +55,18 @@ Below, you can see the description of each actor
 
 - **Administrator**: Responsible for managing user accounts, blocking/unblocking users, overseeing platform content, and ensuring safety and compliance.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Block User              | High        | The system must allow administrators to block users to prevent abusive behavior. |
-|  US02        | Unblock User            | Medium      | The system must allow administrators to unblock users previously blocked to restore their access. |
-|  US03        | Delete User Account     | Medium      | Administrators must be able to permanently delete user accounts that are inactive or inappropriate. |
-|  US04        | Manage User Roles       | High        | Administrators should assign or change user roles (e.g., moderator) to manage permissions. |
-|  US05        | View User Activity Logs | Medium      | Administrators must have access to user activity logs to monitor behavior and ensure compliance with platform policies. |
-|  US06        | Suspend User Account    | High        | Administrators must be able to temporarily suspend user accounts for misconduct without deleting them. |
-|  US07        | Restore User Account    | Low         | Administrators must be able to restore previously suspended or deleted user accounts if necessary. |
-|  US08        | Manage Content          | Medium      | Administrators should be able to remove inappropriate or flagged content to maintain platform integrity. |
-|  US09        | Broadcast Announcement  | Low         | Administrators should be able to send platform-wide announcements for updates or important information. |
-|  US10        | Manage Reports          | High        | Administrators should be able to review and resolve user-submitted reports regarding misconduct or inappropriate content. |
+|  US01        | Block User              | High        | As an administrator, I want to block users, so that I can prevent abusive behavior. |
+|  US06        | Suspend User Account    | High        | As an administrator, I want to temporarily suspend user accounts, so that I can address misconduct without permanent deletion. |
+|  US10        | Manage Reports          | High        | As an administrator, I want to review and resolve user-submitted reports, so that I can address misconduct or inappropriate content. |
+|  US04        | Manage User Roles       | High        | As an administrator, I want to assign or change user roles, so that I can manage user permissions effectively. |
+|  US05        | View User Activity Logs | Medium      | As an administrator, I want to view user activity logs, so that I can monitor behavior and ensure compliance. |
+|  US03        | Delete User Account     | Medium      | As an administrator, I want to delete user accounts, so that I can remove inactive or inappropriate accounts. |
+|  US08        | Manage Content          | Medium      | As an administrator, I want to remove inappropriate content, so that I can maintain platform integrity. |
+|  US02        | Unblock User            | Medium      | As an administrator, I want to unblock previously blocked users, so that they can regain access. |
+|  US07        | Restore User Account    | Low         | As an administrator, I want to restore suspended or deleted user accounts, so that users can regain access if necessary. |
+|  US09        | Broadcast Announcement  | Low         | As an administrator, I want to send platform-wide announcements, so that users stay informed about important updates. |
 
 ---
 
@@ -74,12 +74,12 @@ Below, you can see the description of each actor
 
 - **User**: Manages personal profile information, account settings, and preferences.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | View Public Timeline  | High     | Users should be able to view the public timeline in order to keep up with whats happening |
-|  US02        | Browse Public Profiles  | Medium      | Users should be able to browse public profiles before registering or logging in. |
-|  US03        | View About Page         | Low         | Users should be able to view an "About" page with information about the platform’s mission and goals. |
-|  US04        | View Contact Page       | Low         | Users should be able to view contact information to reach out to platform administrators. |
+|  US01        | View Public Timeline   | High        | As a user, I want to view the public timeline, so that I can keep up with current events. |
+|  US02        | Browse Public Profiles  | Medium      | As a user, I want to browse public profiles, so that I can learn more about others before registering. |
+|  US03        | View About Page        | Low         | As a user, I want to view the "About" page, so that I can understand the platform’s mission. |
+|  US04        | View Contact Page      | Low         | As a user, I want to view contact information, so that I can reach out to the platform administrators. |
 
 ---
 
@@ -87,10 +87,10 @@ Below, you can see the description of each actor
 
 - **Visitor**: Browses public information, registers for an account, and logs in.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Register Account        | High        | Visitors must be able to register a new account to access platform features. |
-|  US02        | Log In                  | High        | Visitors must be able to log in to an existing account. |
+|  US01        | Register Account        | High        | As a visitor, I want to register a new account, so that I can access the platform's features. |
+|  US02        | Log In                  | High        | As a visitor, I want to log into my account, so that I can access my personal content and settings. |
 
 ---
 
@@ -98,38 +98,39 @@ Below, you can see the description of each actor
 
 - **Authenticated User**: Gains access to posting, commenting, managing friends, and joining groups.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Edit Profile            | High        | Authenticated users must be able to edit personal profile information to keep it up to date. |
-|  US02        | Change Password         | Medium      | Authenticated users should be able to change their account password for enhanced security. |
-|  US03        | Delete Account          | Medium         | Authenticated users should have the option to delete their account and remove their data from the platform. |
-|  US04        | Update Profile Picture  | Medium      | Authenticated users should be able to upload and change their profile picture. |
-|  US05        | Set Profile Visibility  | Medium      | Authenticated users must be able to control their profile's visibility (public/private). |
-|  US06        | Recover Password        | High        | Authenticated users should be able to recover a lost or forgotten password. |
-|  US07        | Manage Notifications    | Medium      | Authenticated users should have the option to manage notification preferences. |
-|  US08    | Log Out                | High        | Authenticated users must be able to log out of their account securely, ensuring their session is ended and data is protected. |
-|  US09        | Create Post             | High        | Authenticated users should be able to create posts to share content with other users. |
-|  US010        | Comment on Post         | High        | Authenticated users must be able to comment on posts to participate in discussions. |
-|  US011        | Send Friend Request     | Medium      | Authenticated users should be able to send friend requests to other users. |
-|  US012        | Join Group              | Medium      | Authenticated users should be able to join groups to interact with like-minded people. |
-|  US013        | Like Post               | Low         | Users should be able to like posts to show appreciation or agreement. |
-|  US014        | Manage Friend List      | Medium      | Users must be able to manage their friends list by adding or removing friends. |
-|  US015        | View Notifications      | Medium      | Users should be able to view notifications about interactions related to their profile and posts. |
-|  US016        | Edit Group Post         | Low         | Users should be able to edit posts within a group. |
-|  US017    | Search Posts/Users/Groups/Tasks    | High        | Authenticated users must be able to search for posts, users, groups, and tasks using keywords or filters. |
+|  US01        | Edit Profile           | High        | As an authenticated user, I want to edit my profile information, so that it stays up to date. |
+|  US06        | Recover Password       | High        | As an authenticated user, I want to recover a lost or forgotten password, so that I can regain access to my account. |
+|  US08        | Log Out                | High        | As an authenticated user, I want to log out securely, so that my session ends and my data is protected. |
+|  US09        | Create Post            | High        | As an authenticated user, I want to create posts, so that I can share content with others. |
+|  US010       | Comment on Post        | High        | As an authenticated user, I want to comment on posts, so that I can participate in discussions. |
+|  US017       | Search Posts/Users/Groups/Tasks | High | As an authenticated user, I want to search for posts, users, groups, and tasks, so that I can find specific content quickly. |
+|  US02        | Change Password        | Medium      | As an authenticated user, I want to change my password, so that I can enhance my account security. |
+|  US03        | Delete Account         | Medium      | As an authenticated user, I want to delete my account, so that I can remove my data from the platform. |
+|  US04        | Update Profile Picture | Medium      | As an authenticated user, I want to change my profile picture, so that I can personalize my profile. |
+|  US05        | Set Profile Visibility | Medium      | As an authenticated user, I want to control my profile's visibility, so that I can manage who sees my information. |
+|  US07        | Manage Notifications   | Medium      | As an authenticated user, I want to manage my notification preferences, so that I only receive relevant alerts. |
+|  US011       | Send Friend Request    | Medium      | As an authenticated user, I want to send friend requests, so that I can connect with other users. |
+|  US012       | Join Group             | Medium      | As an authenticated user, I want to join groups, so that I can engage with like-minded people. |
+|  US015       | View Notifications     | Medium      | As an authenticated user, I want to view notifications, so that I can stay informed about interactions. |
+|  US014       | Manage Friend List     | Medium      | As an authenticated user, I want to manage my friends list, so that I can add or remove connections. |
+|  US013       | Like Post              | Low         | As an authenticated user, I want to like posts, so that I can show appreciation or agreement. |
+|  US016       | Edit Group Post        | Low         | As an authenticated user, I want to edit my posts in a group, so that I can update or correct information. |
+
 ---
 
 #### 2.5 Group Member
 
 - **Group Member**: Participates in group interactions through posts and engagement.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Create Group Post       | High        | Group members should be able to create posts within the group. |
-|  US02        | Comment on Group Post   | Medium      | Group members must be able to comment on group posts to engage in group discussions. |
-|  US03        | Like Group Post         | Low         | Group members should be able to like posts within the group. |
-|  US04        | View Group Members      | Medium      | Group members should be able to view the list of other members. |
-|  US05        | Leave Group             | Low         | Group members should be able to leave a group and stop receiving notifications. |
+|  US01        | Create Group Post      | High        | As a group member, I want to create posts within the group, so that I can share content with other members. |
+|  US02        | Comment on Group Post  | Medium      | As a group member, I want to comment on group posts, so that I can participate in discussions. |
+|  US04        | View Group Members     | Medium      | As a group member, I want to view the list of other members, so that I can see who is part of the group. |
+|  US03        | Like Group Post        | Low         | As a group member, I want to like posts within the group, so that I can express agreement. |
+|  US05        | Leave Group            | Low         | As a group member, I want to leave a group, so that I can stop receiving notifications from it. |
 
 ---
 
@@ -137,15 +138,15 @@ Below, you can see the description of each actor
 
 - **Group Owner**: Manages group settings, membership, and controls visibility.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Edit Group Details      | High        | Group owners should be able to edit the group’s name, description, and visibility settings. |
-|  US02        | Add/Remove Members      | High        | Group owners must be able to add or remove members from the group. |
-|  US03        | Approve Join Requests   | Medium      | Group owners should be able to approve or reject membership requests. |
-|  US04        | Remove Group Post       | Medium      | Group owners should be able to remove inappropriate posts from the group. |
-|  US05        | Change Group Privacy    | Low         | Group owners must be able to change the group’s privacy settings (public/private). |
-|  US06        | Invite Members          | Medium      | Group owners should be able to invite new members directly to join the group. |
-|  US07        | Manage Group Roles      | Low         | Group owners should be able to assign roles within the group, such as promoting members to moderators. |
+|  US01        | Edit Group Details     | High        | As a group owner, I want to edit the group’s details, so that I can keep its information accurate. |
+|  US02        | Add/Remove Members     | High        | As a group owner, I want to add or remove members, so that I can manage group membership. |
+|  US03        | Approve Join Requests  | Medium      | As a group owner, I want to approve or reject join requests, so that I can control who joins the group. |
+|  US04        | Remove Group Post      | Medium      | As a group owner, I want to remove inappropriate posts, so that the group remains a safe space. |
+|  US06        | Invite Members         | Medium      | As a group owner, I want to invite new members, so that I can grow the group. |
+|  US05        | Change Group Privacy   | Low         | As a group owner, I want to change the group’s privacy settings, so that I can adjust its visibility. |
+|  US07        | Manage Group Roles     | Low         | As a group owner, I want to assign roles, so that I can promote members to moderators. |
 
 ---
 
@@ -153,13 +154,13 @@ Below, you can see the description of each actor
 
 - **Post Author**: Controls the content of their own posts, with options to edit or delete them.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Edit Post               | High        | Post authors must be able to edit their posts to correct or update information. |
-|  US02        | Delete Post             | High        | Post authors must be able to delete their posts permanently. |
-|  US03        | Manage Post Visibility  | Medium      | Post authors must be able to control the visibility of their posts (public, private, or restricted). |
-|  US04        | Tag Friends in Post     | Medium      | Post authors should be able to tag friends in their posts. |
-|  US05        | Add Media to Post       | Low         | Post authors should be able to add media (images, videos) to their posts. |
+|  US01        | Edit Post              | High        | As a post author, I want to edit my posts, so that I can update or correct the information. |
+|  US02        | Delete Post            | High        | As a post author, I want to delete my posts, so that I can remove content permanently. |
+|  US03        | Manage Post Visibility | Medium      | As a post author, I want to manage the visibility of my posts, so that I can control who sees my content. |
+|  US04        | Tag Friends in Post    | Low      | As a post author, I want to tag friends in my posts, so that I can engage them in my content. |
+|  US05        | Add Media to Post      | Low         | As a post author, I want to add media to my posts, so that I can enrich the content with images or videos. |
 
 ---
 
@@ -167,13 +168,13 @@ Below, you can see the description of each actor
 
 - **Comment Author**: Edits or deletes their own comments.
 
-| Identifier   | Name                   | Priority    | Description                                                             |
+| Identifier   | Name                   | Priority    | User Story                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Edit Comment            | High        | Comment authors must be able to edit their comments. |
-|  US02        | Delete Comment          | High        | Comment authors must be able to delete their comments permanently. |
-|  US03        | Reply to Comment        | Medium      | Comment authors should be able to reply to comments to engage in discussions. |
-|  US04        | Like Comment            | Low         | Users should be able to like comments to show agreement or appreciation. |
-|  US05        | Tag Friends in Comment  | Low         | Comment authors should be able to tag friends in their comments. |
+|  US01        | Edit Comment           | High        | As a comment author, I want to edit my comments, so that I can update or correct them. |
+|  US02        | Delete Comment         | High        | As a comment author, I want to delete my comments, so that I can remove them permanently. |
+|  US03        | Reply to Comment       | Medium      | As a comment author, I want to reply to comments, so that I can engage in discussions. |
+|  US04        | Like Comment           | Low         | As a comment author, I want to like comments, so that I can show agreement or appreciation. |
+|  US05        | Tag Friends in Comment | Low         | As a comment author, I want to tag friends in my comments, so that I can involve them in the conversation. |
 
 
 ### 3. Supplementary Requirements
