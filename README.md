@@ -186,30 +186,34 @@ Below, you can see the description of each actor
 
 #### 3.1. Business rules
 
-| **Identifier** | **Name**                                     | **Description**                                                                                                                                                                                                 |
-|----------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| BR01           | User Voting/Commenting/Reviewing on Own Stories/Answers | A user can vote, comment, and view their own posts and comments.                                                                                                                                               |
-| BR02           | Content Ownership and Deletion               | When a user is deleted or removes their account, their content (posts, comments, groups, messages) remains visible. The profile will indicate that the user is deleted, preventing others from interacting further. |
-| BR03           | Group Ownership Transfer upon Deletion or Exit| If a group owner deletes their account, ownership is transferred to another member. If no member is eligible, the group is deleted.                                                                             |
-| BR04           | Date Validations (Entry Date/Exit Date)       | Exit dates associated with user activities (e.g., joining/leaving a group) must be greater than or equal to the entry date.                                                                                     |
-| BR05           | Mandatory Profile Completion for Engagement Features | Users must complete a minimum percentage of their profile before they can engage in features like sending friend requests, joining groups, posting content, or matching with others.                            |
-| BR06           | Account Creation and Log In                  | Only FEUP students can create accounts. All account-related actions (login, sign-in, change password) must be done using the student’s institutional email.                                                      |
+| **Identifier**  | **Name**                                      | **Description**                                                                                                                                                                                                     |
+|-------------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BR01        | User Voting/Commenting/Reviewing on Own Stories/Answers | A user can vote, comment, and view their own posts and comments.                                                                                                                                               |
+| BR02        | Content Ownership and Deletion            | When a user is deleted or removes their account, their content (posts, comments, groups, messages) remains visible but anonymous. The profile will indicate that the user is deleted, preventing further interaction. |
+| BR03        | Group Ownership Transfer upon Deletion or Exit | If a group owner deletes their account, ownership is transferred to another member. If no member is eligible, the group is deleted.                                                                             |
+| BR04        | Date Validations (Entry Date/Exit Date)   | Exit dates associated with user activities (e.g., joining/leaving a group) must be greater than or equal to the entry date.                                                                                     |
+| BR05        | Mandatory Profile Completion for Engagement Features | Users must complete a minimum percentage of their profile before they can engage in features like sending friend requests, joining groups, posting content, or matching with others.                            |
+| BR06        | Account Creation and Log In               | Only FEUP students can create accounts. All account-related actions (login, sign-in, change password) must be done using the student’s institutional email.                                                      |
+| BR101       | Profile Privacy Settings                  | Profiles can be public or private. Private profiles are only visible to friends.                                                                                                                                |
 
 
 #### 3.2. Technical requirements
 
-| Identifier | Name                                    | Justification                                                                                                                                               |
-|------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **TR01**       | **Secure User Authentication**              | To prevent outsiders from accessing the platform, maintaining the safety and exclusivity of the TinderFEUP network.                                          |
-| TR02       | Scalable Architecture for Real-Time Interaction | Given the platform’s nature as a social network, users expect immediate responses for messages, notifications, and other interactions.                       |
-| **TR03**       | **Data Encryption and Privacy**             | To ensure compliance with data protection laws (e.g., GDPR) and protect users’ personal data from unauthorized access.                                       |
-| TR04       | Rate Limiting and Anti-Spam Measures    | Helps to prevent abuse, spam, and resource exhaustion, ensuring a positive user experience and preventing overload on the platform’s infrastructure.         |
-| TR05       | Responsive Design and Accessibility     | Ensures that the platform is accessible to all users, regardless of device or ability, promoting inclusivity and a consistent experience across devices.      |
-
+| **Identifier** | **Name**                                        | **Justification**                                                                                                                                               |
+|----------------|-------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **TR01**       | **Secure User Authentication**                  | To prevent outsiders from accessing the platform, maintaining the safety and exclusivity of the TinderFEUP network.                                              |
+| TR02       | Scalable Architecture for Real-Time Interaction | Given the platform’s nature as a social network, users expect immediate responses for messages, notifications, and other interactions.                           |
+| **TR03**       | **Data Encryption and Privacy**                 | To ensure compliance with data protection laws (e.g., GDPR) and protect users’ personal data from unauthorized access.                                           |
+| TR04       | Rate Limiting and Anti-Spam Measures        | Helps to prevent abuse, spam, and resource exhaustion, ensuring a positive user experience and preventing overload on the platform’s infrastructure.             |
+| TR05       | Responsive Design and Accessibility         | Ensures that the platform is accessible to all users, regardless of device or ability, promoting inclusivity and a consistent experience across devices.          |
+| TR06       | System Response Times (< 2s)                | Ensures a smooth user experience by keeping response times under 2 seconds, helping maintain user engagement and attention.                                       |
+| TR07       | Robustness (Error Handling)                 | The system must be able to handle runtime errors gracefully and continue operating without major service disruption.                                              |
+| TR08       | Scalability                                 | The system must be designed to accommodate growth in the number of users and their interactions without degradation in performance.                              |
+| TR09       | Accessibility for All Users                 | The platform should be designed to be fully accessible, ensuring usability for all users regardless of any disabilities or the web browser they use.              |
 
 #### 3.3. Restrictions
 
-| Identifier | Name                              | Description                                                                                                                                    |
+| **Identifier** | **Name**                              | **Description**                                                                                                                                    |
 |------------|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | R01        | Age Restriction                   | Only users who are 18 years or older may use the platform, as the platform may deal with dating and sensitive social interactions.               |
 | R02        | Content Moderation and Offensive Behavior | All posts, comments, and interactions must comply with the platform’s code of conduct. Offensive content will be flagged, and repeat offenders banned. |
