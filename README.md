@@ -76,14 +76,10 @@ Below, you can see the description of each actor
 
 | Identifier   | Name                   | Priority    | Description                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Edit Profile            | High        | Users must be able to edit personal profile information to keep it up to date. |
-|  US02        | Change Password         | Medium      | Users should be able to change their account password for enhanced security. |
-|  US03        | Delete Account          | Low         | Users should have the option to delete their account and remove their data from the platform. |
-|  US04        | Update Profile Picture  | Medium      | Users should be able to upload and change their profile picture. |
-|  US05        | Set Profile Visibility  | Medium      | Users must be able to control their profile's visibility (public/private). |
-|  US06        | Recover Password        | High        | Users should be able to recover a lost or forgotten password. |
-|  US07        | Manage Notifications    | Medium      | Users should have the option to manage notification preferences. |
-|  US08    | Log Out                | High        | Users must be able to log out of their account securely, ensuring their session is ended and data is protected. |
+|  US01        | Browse Public Profiles  | Medium      | Visitors should be able to browse public profiles before registering or logging in. |
+|  US02        | Browse Public Profiles  | Medium      | Visitors should be able to browse public profiles before registering or logging in. |
+|  US03        | View About Page         | Low         | Visitors should be able to view an "About" page with information about the platform’s mission and goals. |
+|  US04        | View Contact Page       | Low         | Visitors should be able to view contact information to reach out to platform administrators. |
 
 ---
 
@@ -95,10 +91,6 @@ Below, you can see the description of each actor
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
 |  US01        | Register Account        | High        | Visitors must be able to register a new account to access platform features. |
 |  US02        | Log In                  | High        | Visitors must be able to log in to an existing account. |
-|  US03        | Browse Public Profiles  | Medium      | Visitors should be able to browse public profiles before registering or logging in. |
-|  US04        | Recover Password        | Medium      | Visitors must have the ability to recover a forgotten password. |
-|  US05        | View About Page         | Low         | Visitors should be able to view an "About" page with information about the platform’s mission and goals. |
-|  US06        | View Contact Page       | Low         | Visitors should be able to view contact information to reach out to platform administrators. |
 
 ---
 
@@ -108,15 +100,23 @@ Below, you can see the description of each actor
 
 | Identifier   | Name                   | Priority    | Description                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Create Post             | High        | Authenticated users should be able to create posts to share content with other users. |
-|  US02        | Comment on Post         | High        | Authenticated users must be able to comment on posts to participate in discussions. |
-|  US03        | Send Friend Request     | Medium      | Authenticated users should be able to send friend requests to other users. |
-|  US04        | Join Group              | Medium      | Authenticated users should be able to join groups to interact with like-minded people. |
-|  US05        | Like Post               | Low         | Users should be able to like posts to show appreciation or agreement. |
-|  US06        | Manage Friend List      | Medium      | Users must be able to manage their friends list by adding or removing friends. |
-|  US07        | View Notifications      | Medium      | Users should be able to view notifications about interactions related to their profile and posts. |
-|  US08        | Edit Group Post         | Low         | Users should be able to edit posts within a group. |
-|  US09    | Search Posts/Users/Groups/Tasks    | High        | Authenticated users must be able to search for posts, users, groups, and tasks using keywords or filters. |
+|  US01        | Edit Profile            | High        | Authenticated users must be able to edit personal profile information to keep it up to date. |
+|  US02        | Change Password         | Medium      | Authenticated users should be able to change their account password for enhanced security. |
+|  US03        | Delete Account          | Medium         | Authenticated users should have the option to delete their account and remove their data from the platform. |
+|  US04        | Update Profile Picture  | Medium      | Authenticated users should be able to upload and change their profile picture. |
+|  US05        | Set Profile Visibility  | Medium      | Authenticated users must be able to control their profile's visibility (public/private). |
+|  US06        | Recover Password        | High        | Authenticated users should be able to recover a lost or forgotten password. |
+|  US07        | Manage Notifications    | Medium      | Authenticated users should have the option to manage notification preferences. |
+|  US08    | Log Out                | High        | Authenticated users must be able to log out of their account securely, ensuring their session is ended and data is protected. |
+|  US09        | Create Post             | High        | Authenticated users should be able to create posts to share content with other users. |
+|  US010        | Comment on Post         | High        | Authenticated users must be able to comment on posts to participate in discussions. |
+|  US011        | Send Friend Request     | Medium      | Authenticated users should be able to send friend requests to other users. |
+|  US012        | Join Group              | Medium      | Authenticated users should be able to join groups to interact with like-minded people. |
+|  US013        | Like Post               | Low         | Users should be able to like posts to show appreciation or agreement. |
+|  US014        | Manage Friend List      | Medium      | Users must be able to manage their friends list by adding or removing friends. |
+|  US015        | View Notifications      | Medium      | Users should be able to view notifications about interactions related to their profile and posts. |
+|  US016        | Edit Group Post         | Low         | Users should be able to edit posts within a group. |
+|  US017    | Search Posts/Users/Groups/Tasks    | High        | Authenticated users must be able to search for posts, users, groups, and tasks using keywords or filters. |
 ---
 
 #### 2.5 Group Member
