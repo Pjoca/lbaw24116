@@ -4,16 +4,9 @@
 
 ## A1 - ConnectFEUP
 
-### Context and Motivation
-
 The project's goal is to develop a social network platform specifically designed for FEUP students, addressing the problem of making genuine connections in a large university setting. The motivation for this platform is the need for a safe and trustworthy environment, where students can form friendships and romantic relationships, especially for those who may be shy or introverted. This platform will help students meet people compatible with them, allowing them to make meaningful and unique connections.
 
-### Goals and Objectives
-
 The main objective of the project is to help relationships among students, whether personal, romantic, or professional. A crucial aspect is ensuring that only verified FEUP students can access the platform, thereby safeguarding personal data and maintaining user privacy. With an intuitive, user-friendly interface, the platform will incorporate Tinder-like features, ensuring it is fully compatible across all devices.
-
-### Features
-
 
 The site will provide a variety of features for users. It will allow new users to register easily with their FEUP credentials, login in and logout, and recover forgotten passwords. Users will have the ability to view public profiles, edit their personal information, and even delete their accounts if they choose to leave the platform.
 
