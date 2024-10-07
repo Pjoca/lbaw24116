@@ -76,10 +76,10 @@ Below, you can see the description of each actor
 
 | Identifier   | Name                   | Priority    | Description                                                             |
 | ------------ | ---------------------- | ----------- | ----------------------------------------------------------------------- |
-|  US01        | Browse Public Profiles  | Medium      | Visitors should be able to browse public profiles before registering or logging in. |
-|  US02        | Browse Public Profiles  | Medium      | Visitors should be able to browse public profiles before registering or logging in. |
-|  US03        | View About Page         | Low         | Visitors should be able to view an "About" page with information about the platform’s mission and goals. |
-|  US04        | View Contact Page       | Low         | Visitors should be able to view contact information to reach out to platform administrators. |
+|  US01        | View Public Timeline  | High     | Users should be able to view the public timeline in order to keep up with whats happening |
+|  US02        | Browse Public Profiles  | Medium      | Users should be able to browse public profiles before registering or logging in. |
+|  US03        | View About Page         | Low         | Users should be able to view an "About" page with information about the platform’s mission and goals. |
+|  US04        | View Contact Page       | Low         | Users should be able to view contact information to reach out to platform administrators. |
 
 ---
 
