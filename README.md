@@ -90,6 +90,7 @@ Below, you can see the description of each actor
 |  US05        | Set Profile Visibility  | Medium      | Users must be able to control their profile's visibility (public/private). |
 |  US06        | Recover Password        | High        | Users should be able to recover a lost or forgotten password. |
 |  US07        | Manage Notifications    | Medium      | Users should have the option to manage notification preferences. |
+|  **US08**    | Log Out                | High        | Users must be able to log out of their account securely, ensuring their session is ended and data is protected. |
 
 ---
 
@@ -122,7 +123,7 @@ Below, you can see the description of each actor
 |  US06        | Manage Friend List      | Medium      | Users must be able to manage their friends list by adding or removing friends. |
 |  US07        | View Notifications      | Medium      | Users should be able to view notifications about interactions related to their profile and posts. |
 |  US08        | Edit Group Post         | Low         | Users should be able to edit posts within a group. |
-
+|  **US09**    | Search Posts/Users/Groups/Tasks    | High        | Authenticated users must be able to search for posts, users, groups, and tasks using keywords or filters. |
 ---
 
 #### 2.5 Group Member
