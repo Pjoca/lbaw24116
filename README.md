@@ -41,7 +41,7 @@ Below, you can see the description of each actor
 | ----------------------- | --------- | 
 |  Administrator          | The administrator has the power to remove messages, block and unblock people. |
 |  User                   | Normal User. |
-|  Guest                  | Unauthenticated users can view public information, register or log in. |
+|  Visitor                  | Unauthenticated users can view public information, register or log in. |
 |  Autenticated User      | Authenticated users can view information, comment on other people's posts, send and receive messages with other people or groups. |
 |  Group Member           | Members of a group can participate, chat and post in a group, but do not have special permissions. |
 |  Group Owner            | Group owners not only have the same permissions as a member, but can also edit the group name, description, add/remove members and edit the permissions of other participants. |
