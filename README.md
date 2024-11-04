@@ -245,6 +245,10 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 ## A4: Conceptual Data Model
 
 
+---
+
+## A5: Relational Schema
+
 ### Relational Model
 
 | Identifier                  | Notation                                                                                                   |
@@ -274,7 +278,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 |--------|-------------|
 | **TODAY** | DATE DEFAULT CURRENT_DATE |
 | **visibility_type** | ENUM('public', 'private', 'group') |
-| **account_status_type** | ENUM('active', 'deleted', 'blocked') |
+| **account_status_type** | ENUM('active', 'offline', 'deleted', 'blocked') |
 | **friendship_status_type** | ENUM('pending', 'accepted', 'rejected') |
 | **report_status_type** | ENUM('pending', 'reviewed', 'resolved') |
 | **user_notification_type** | ENUM('received_friend_request', 'accepted_friend_request', 'match') |
@@ -283,6 +287,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | **post_notification_type** | ENUM('tagged_post') |
 | **like_notification_type** | ENUM('liked_comment', 'liked_post') |
 | **message_notification_type** | ENUM('received_message') |
+| **group_membership_status** | ENUM('pending', 'accepted', 'rejected') |
 
 
 ### Schema Validation
@@ -294,6 +299,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | **R01**      | `user`              |
 | **Functional Dependencies** | {id} → {username, email, name, password, visibility, account_status, last_login} |
 | **Normal Form**            | BCNF                |
+
 
 
 #### friendship_connection:
@@ -417,6 +423,118 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | **Normal Form**            | BCNF                |
 
 
+## A6: Indexes, triggers, transactions and database population
+
+> Brief presentation of the artifact goals.
+
+### 1. Database Workload
+ 
+> A study of the predicted system load (database load).
+> Estimate of tuples at each relation.
+
+| **Relation reference** | **Relation Name**         | **Order of magnitude**          | **Estimated growth**       |
+|------------------------|--------------------------|---------------------------------|----------------------------|
+| R01                    | `user`                   | thousands                       | hundreds per month         |
+| R02                    | `friendship_connection`  | hundreds                        | dozens per day             |
+| R03                    | `group`                  | hundreds                        | dozens per month           |
+| R04                    | `group_membership`       | thousands                       | hundreds per month         |
+| R05                    | `post`                   | thousands                       | thousands per month        |
+| R06                    | `comment`                | thousands                       | thousands per month        |
+| R07                    | `like`                   | thousands                       | thousands per month        |
+| R08                    | `report`                 | hundreds                        | dozens per month           |
+| R09                    | `notification`           | thousands                       | hundreds per month         |
+| R10                    | `user_notification`      | hundreds                        | dozens per month           |
+| R11                    | `comment_notification`    | hundreds                        | dozens per month           |
+| R12                    | `group_notification`     | hundreds                        | dozens per month           |
+| R13                    | `post_notification`      | hundreds                        | dozens per month           |
+| R14                    | `like_notification`      | hundreds                        | dozens per month           |
+| R15                    | `message_notification`    | hundreds                        | dozens per month           |
+| R16                    | `admin`                  | tens                           | no growth                  |
+
+
+
+### 2. Proposed Indices
+
+#### 2.1. Performance Indices
+ 
+> Indices proposed to improve performance of the identified queries.
+
+| **Index**           | IDX01                                  |
+| ---                 | ---                                    |
+| **Relation**        | Relation where the index is applied    |
+| **Attribute**       | Attribute where the index is applied   |
+| **Type**            | B-tree, Hash, GiST or GIN              |
+| **Cardinality**     | Attribute cardinality: low/medium/high |
+| **Clustering**      | Clustering of the index                |
+| **Justification**   | Justification for the proposed index   |
+| `SQL code`                                                  ||
+
+
+#### 2.2. Full-text Search Indices 
+
+> The system being developed must provide full-text search features supported by PostgreSQL. Thus, it is necessary to specify the fields where full-text search will be available and the associated setup, namely all necessary configurations, indexes definitions and other relevant details.  
+
+| **Index**           | IDX01                                  |
+| ---                 | ---                                    |
+| **Relation**        | Relation where the index is applied    |
+| **Attribute**       | Attribute where the index is applied   |
+| **Type**            | B-tree, Hash, GiST or GIN              |
+| **Clustering**      | Clustering of the index                |
+| **Justification**   | Justification for the proposed index   |
+| `SQL code`                                                  ||
+
+
+### 3. Triggers
+ 
+> User-defined functions and trigger procedures that add control structures to the SQL language or perform complex computations, are identified and described to be trusted by the database server. Every kind of function (SQL functions, Stored procedures, Trigger procedures) can take base types, composite types, or combinations of these as arguments (parameters). In addition, every kind of function can return a base type or a composite type. Functions can also be defined to return sets of base or composite values.  
+
+| **Trigger**      | TRIGGER01                              |
+| ---              | ---                                    |
+| **Description**  | Trigger description, including reference to the business rules involved |
+| `SQL code`                                             ||
+
+### 4. Transactions
+ 
+> Transactions needed to assure the integrity of the data.  
+
+| SQL Reference   | Transaction Name                    |
+| --------------- | ----------------------------------- |
+| Justification   | Users should  |
+| Isolation level | Read Commited |
+| `Complete SQL Code`                                   |
+
+
+| SQL Reference   | Transaction Name                    |
+| --------------- | ----------------------------------- |
+| Justification   | Justification for the transaction.  |
+| Isolation level | Isolation level of the transaction. |
+| `Complete SQL Code`                                   |
+
+
+| SQL Reference   | Transaction Name                    |
+| --------------- | ----------------------------------- |
+| Justification   | Justification for the transaction.  |
+| Isolation level | Isolation level of the transaction. |
+| `Complete SQL Code`                                   |
+
+
+## Annex A. SQL Code
+
+> The database scripts are included in this annex to the EBD component.
+> 
+> The database creation script and the population script should be presented as separate elements.
+> The creation script includes the code necessary to build (and rebuild) the database.
+> The population script includes an amount of tuples suitable for testing and with plausible values for the fields of the database.
+>
+> The complete code of each script must be included in the group's git repository and links added here.
+
+### A.1. Database schema
+
+> The complete database creation must be included here and also as a script in the repository.
+
+### A.2. Database population
+
+> Only a sample of the database population script may be included here, e.g. the first 10 lines. The full script must be available in the repository.
 
 ***
 GROUP24116, 01/10/2024

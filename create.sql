@@ -31,10 +31,13 @@ DROP TYPE IF EXISTS group_notification_type CASCADE;
 DROP TYPE IF EXISTS post_notification_type CASCADE;
 DROP TYPE IF EXISTS like_notification_type CASCADE;
 DROP TYPE IF EXISTS message_notification_type CASCADE;
+DROP TYPE IF EXISTS group_status_type CASCADE;
 
 -- Create types
+
+CREATE TYPE group_membership_type AS ENUM ('pending', 'accepted', 'rejected');
 CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group');
-CREATE TYPE account_status_type AS ENUM ('active', 'deleted', 'blocked');
+CREATE TYPE account_status_type AS ENUM ('active', 'offline', 'deleted', 'blocked');
 CREATE TYPE friendship_status_type AS ENUM ('pending', 'accepted', 'rejected');
 CREATE TYPE report_status_type AS ENUM ('pending', 'reviewed', 'resolved');
 CREATE TYPE user_notification_type AS ENUM ('received_friend_request', 'accepted_friend_request', 'match');
@@ -51,7 +54,7 @@ CREATE TABLE "user" (
     email VARCHAR(100) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    visibility visibility_type NOT NULL,
+    visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
     account_status account_status_type NOT NULL,
     last_login DATE DEFAULT CURRENT_DATE
 );
@@ -77,15 +80,15 @@ CREATE TABLE group_membership (
     id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
     joined_at DATE DEFAULT CURRENT_DATE,
-    status visibility_type NOT NULL,
     PRIMARY KEY (id_user, id_group)
+    group_status group_membership_type NOT NULL DEFAULT 'pending'
 );
 
 CREATE TABLE post (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
     edited_at DATE DEFAULT CURRENT_DATE,
-    visibility visibility_type NOT NULL DEFAULT 'public',  -- Set default visibility to 'public'
+    visibility visibility_type NOT NULL DEFAULT 'public', 
     id_user INT REFERENCES "user"(id) NOT NULL,
     id_group INT REFERENCES "group"(id)
 );
@@ -176,29 +179,30 @@ CREATE TABLE admin (
 
 
 
-
+----------------------------------
 -- Triggers
-
+----------------------------------
 
 CREATE OR REPLACE FUNCTION trg_no_self_report_func()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Check if the user is trying to report their own post
     IF NEW.id_user = (SELECT id_user FROM post WHERE id = NEW.id_reported_post) THEN
         RAISE EXCEPTION 'User cannot report their own post';
     END IF;
 
-    RETURN NEW;  -- Return the new row to allow the insert
+    RETURN NEW; 
 END;
 
 
 $$ LANGUAGE plpgsql;
 
--- Now, create the trigger using the function
 CREATE TRIGGER trg_no_self_report
 BEFORE INSERT ON report
 FOR EACH ROW
 EXECUTE FUNCTION trg_no_self_report_func();
+
+-------------------------------------
+
 
 CREATE OR REPLACE FUNCTION trg_friend_request_notification_func()
 RETURNS TRIGGER AS $$
@@ -207,7 +211,7 @@ BEGIN
         INSERT INTO notification (id_user, seen, created_at)
         VALUES (NEW.id_user2, FALSE, CURRENT_TIMESTAMP);
     END IF;
-    RETURN NEW;  -- Ensure to return the new row
+    RETURN NEW;  -- 
 END;
 $$ LANGUAGE plpgsql;
 
@@ -216,19 +220,39 @@ AFTER INSERT ON friendship_connection
 FOR EACH ROW
 EXECUTE FUNCTION trg_friend_request_notification_func();
 
+------------------------------------
+
+-- Create a trigger function to create a notification when a user receives a message
+CREATE OR REPLACE FUNCTION trg_message_notification_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO notification (id_user, seen, created_at)
+    VALUES (NEW.id_receiver, FALSE, CURRENT_TIMESTAMP);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger function to transfer group ownership or delete the group
+CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
+RETURNS TRIGGER AS $$
+DECLARE
+    new_owner_id INT;
+BEGIN
+    SELECT id INTO new_owner_id FROM "user" WHERE id != OLD.id LIMIT 1;
+    IF new_owner_id IS NOT NULL THEN
+        UPDATE "group" SET id_owner = new_owner_id WHERE id_owner = OLD.id;
+    ELSE
+        DELETE FROM "group" WHERE id_owner = OLD.id;
+    END IF;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_delete
+BEFORE DELETE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_transfer_or_delete_group();
+
+
 -- TEST TRIGGERS
-
--- Insert sample users
-INSERT INTO "user" (username, email, name, password, visibility, account_status)
-VALUES 
-('user1', 'user1@example.com', 'User One', 'password1', 'public', 'active'),
-('user2', 'user2@example.com', 'User Two', 'password2', 'public', 'active');
-
--- Insert sample posts (assuming you have a post table)
-INSERT INTO post (content, visibility, id_user) 
-VALUES 
-('This is a post by User One', 'public', 1),  -- Post by User One
-('This is a post by User Two', 'public', 2);  -- Post by User Two
-
-INSERT INTO friendship_connection (id_user1, id_user2, status) 
-VALUES (1, 2, 'pending');  -- This should create a notification for user2
