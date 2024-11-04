@@ -142,37 +142,37 @@ CREATE TABLE message (
 
 
 CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type user_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type comment_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type group_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type post_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type like_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
     type message_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
