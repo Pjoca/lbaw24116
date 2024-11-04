@@ -239,7 +239,184 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 <p style="text-align:center;"><b> Figura 4: User Matchmaking (UI08) wireframe. </b></p>
 <br>
 
----
+
+----
+
+## A4: Conceptual Data Model
+
+
+### Relational Model
+
+| Identifier                  | Notation                                                                                                   |
+|-----------------------------|------------------------------------------------------------------------------------------------------------|
+| **R01**                     | user(<ins>id</ins> , username **UK NN**, email **UK NN**, name **NN**, password **NN**, visibility **CK** visibility **IN** visibility_type, account_status **CK** account_status **IN** account_status_type, last_login **DF** TODAY) |
+| **R02**                     | friendship_connection(<ins>id_user1</ins> -> user, <ins>id_user2</ins> -> user, status **CK** status **IN** friendship_status_type, created_at DF TODAY, visibility **CK** visibility **IN** visibility_type) |
+| **R03**                     | group(<ins>id</ins>, name **NN**, description, visibility **CK** visibility **IN** (public, private), created_at **DF** TODAY, id_owner -> user **NN**) |
+| **R04**                     | group_membership(<ins>id_user</ins> -> user, id_group -> group, joined_at **DF** TODAY, status **CK** status **IN** visibility_type) |
+| **R05**                     | post(<ins>id</ins>, content NN, edited_at DF TODAY, visibility CK visibility IN visibility_type, id_user -> user NN, id_group -> group) |
+| **R06**                     | comment(<ins>id</ins>, content **NN**, edited_at **DF** TODAY, deleted_at **CK** deleted_at >= TODAY, id_user -> user **NN**, id_post -> post **NN**) |
+| **R07**                     | like(<ins>id</ins>, created_at **DF** TODAY, id_user -> user **NN**, id_post -> post)                                         |
+| **R08**                     | report(<ins>id</ins>, description **NN**, status **CK** status **IN** report_status_type, id_user -> user **NN**, id_reported_post -> post, id_reported_comment -> comment) |
+| **R09**                     | notification(<ins>id</ins>, seen **DF** FALSE, id_user -> user **NN**, id_related_post -> post, id_related_comment -> comment, id_related_group -> group) |
+| **R10**                     | user_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** user_notification_type) |
+| **R11**                     | comment_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** comment_notification_type) |
+| **R12**                     | group_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** group_notification_type)                 |
+| **R13**                     | post_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** post_notification_type)                       |
+| **R14**                     | like_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** like_notification_type)         |
+| **R15**                     | message_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** message_notification_type)            |
+| **R16** | admin(<ins>id</ins>->users) |
+
+
+
+### Domains
+
+| Domain | Description |
+|--------|-------------|
+| **TODAY** | DATE DEFAULT CURRENT_DATE |
+| **visibility_type** | ENUM('public', 'private', 'group') |
+| **account_status_type** | ENUM('active', 'deleted', 'blocked') |
+| **friendship_status_type** | ENUM('pending', 'accepted', 'rejected') |
+| **report_status_type** | ENUM('pending', 'reviewed', 'resolved') |
+| **user_notification_type** | ENUM('received_friend_request', 'accepted_friend_request', 'match') |
+| **comment_notification_type** | ENUM('replied_to_comment', 'commented_on_post', 'tagged_comment') |
+| **group_notification_type** | ENUM('invited_to_group') |
+| **post_notification_type** | ENUM('tagged_post') |
+| **like_notification_type** | ENUM('liked_comment', 'liked_post') |
+| **message_notification_type** | ENUM('received_message') |
+
+
+### Schema Validation
+
+#### user:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R01**      | `user`              |
+| **Functional Dependencies** | {id} → {username, email, name, password, visibility, account_status, last_login} |
+| **Normal Form**            | BCNF                |
+
+
+#### friendship_connection:
+
+| Identifier   | Relation Name             |
+|--------------|---------------------------|
+| **R02**      | `friendship_connection`   |
+| **Functional Dependencies** | {id_user1, id_user2} → {status, created_at, visibility} |
+| **Normal Form**            | BCNF                |
+
+#### group:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R03**      | `group`             |
+| **Functional Dependencies** | {id} → {name, description, visibility, created_at, id_owner} |
+| **Normal Form**            | BCNF                |
+
+#### group_membership:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R04**      | `group_membership`  |
+| **Functional Dependencies** | {id_user, id_group} → {joined_at, status} |
+| **Normal Form**            | BCNF                |
+
+#### post:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R05**      | `post`              |
+| **Functional Dependencies** | {id} → {content, edited_at, visibility, id_user, id_group} |
+| **Normal Form**            | BCNF                |
+
+#### comment:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R06**      | `comment`           |
+| **Functional Dependencies** | {id} → {content, edited_at, deleted_at, id_user, id_post} |
+| **Normal Form**            | BCNF                |
+
+#### like:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R07**      | `like`              |
+| **Functional Dependencies** | {id} → {created_at, id_user, id_post} |
+| **Normal Form**            | BCNF                |
+
+#### report:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R08**      | `report`            |
+| **Functional Dependencies** | {id} → {description, status, id_user, id_reported_post, id_reported_comment} |
+| **Normal Form**            | BCNF                |
+
+#### notification:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R09**      | `notification`      |
+| **Functional Dependencies** | {id} → {seen, id_user, id_related_post, id_related_comment, id_related_group} |
+| **Normal Form**            | BCNF                |
+
+#### user_notification:
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R10**      | `user_notification`   |
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+#### comment_notification:
+
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R11**      | `comment_notification`|
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+#### group_notification:
+
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R12**      | `group_notification`  |
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+#### post_notification:
+
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R13**      | `post_notification`   |
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+#### like_notification:
+
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R14**      | `like_notification`   |
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+
+#### message_notification:
+
+| Identifier   | Relation Name         |
+|--------------|-----------------------|
+| **R15**      | `message_notification`|
+| **Functional Dependencies** | {id_notification} → {type} |
+| **Normal Form**            | BCNF                |
+
+#### admin:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R16**      | `admin`             |
+| **Functional Dependencies** | {id} → {} |
+| **Normal Form**            | BCNF                |
+
+
 
 ***
 GROUP24116, 01/10/2024
