@@ -255,11 +255,11 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 |-----------------------------|------------------------------------------------------------------------------------------------------------|
 | **R01**                     | user(<ins>id</ins> , username **UK NN**, email **UK NN**, name **NN**, password **NN**, visibility **CK** visibility **IN** visibility_type, account_status **CK** account_status **IN** account_status_type, last_login **DF** TODAY) |
 | **R02**                     | friendship_connection(<ins>id_user1</ins> -> user, <ins>id_user2</ins> -> user, status **CK** status **IN** friendship_status_type, created_at DF TODAY, visibility **CK** visibility **IN** visibility_type) |
-| **R03**                     | group(<ins>id</ins>, name **NN**, description, visibility **CK** visibility **IN** (public, private), created_at **DF** TODAY, id_owner -> user **NN**) |
-| **R04**                     | group_membership(<ins>id_user</ins> -> user, id_group -> group, joined_at **DF** TODAY, status **CK** status **IN** visibility_type) |
-| **R05**                     | post(<ins>id</ins>, content NN, edited_at DF TODAY, visibility CK visibility IN visibility_type, id_user -> user NN, id_group -> group) |
-| **R06**                     | comment(<ins>id</ins>, content **NN**, edited_at **DF** TODAY, deleted_at **CK** deleted_at >= TODAY, id_user -> user **NN**, id_post -> post **NN**) |
-| **R07**                     | like(<ins>id</ins>, created_at **DF** TODAY, id_user -> user **NN**, id_post -> post)                                         |
+| **R03**                     | group(<ins>id</ins>, name **NN**, description, visibility **CK** visibility **IN** visibility_type, created_at **DF** TODAY, id_owner -> user **NN**) |
+| **R04**                     | group_membership(<ins>id_user</ins> -> user, id_group -> group, joined_at **DF** TODAY, status **CK** status **IN** group_membership_status) |
+| **R05**                     | post(<ins>id</ins>, content NN, edited_at DF TODAY, visibility **CK** visibility IN visibility_type, id_user -> user NN, id_group -> group) |
+| **R06**                     | comment(<ins>id</ins>, content **NN**, edited_at **DF** TODAY, deleted_at **CK** deleted_at >= TODAY, visibility **CK** visibility **IN** visibility_type, id_user -> user **NN**, id_post -> post **NN**) |
+| **R07**                     | like(<ins>id</ins>, created_at **DF** TODAY, id_user -> user **NN**, id_post -> post, visibility **CK** visibility **IN** visibility_type)                                         |
 | **R08**                     | report(<ins>id</ins>, description **NN**, status **CK** status **IN** report_status_type, id_user -> user **NN**, id_reported_post -> post, id_reported_comment -> comment) |
 | **R09**                     | notification(<ins>id</ins>, seen **DF** FALSE, id_user -> user **NN**, id_related_post -> post, id_related_comment -> comment, id_related_group -> group) |
 | **R10**                     | user_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** user_notification_type) |
@@ -269,6 +269,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | **R14**                     | like_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** like_notification_type)         |
 | **R15**                     | message_notification(<ins>id_notification</ins> -> notification **NN**, type **CK** type **IN** message_notification_type)            |
 | **R16** | admin(<ins>id</ins>->users) |
+| **R17** | message(<ins>id</ins>, content **NN**, created_at **DF** TODAY, id_sender -> user **NN**, id_receiver -> user **NN**, visibility **CK** visibility **IN** visibility_type) |
 
 
 
@@ -307,7 +308,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | Identifier   | Relation Name             |
 |--------------|---------------------------|
 | **R02**      | `friendship_connection`   |
-| **Functional Dependencies** | {id_user1, id_user2} → {status, created_at, visibility} |
+| **Functional Dependencies** | {id_user1, id_user2} → {status, created_at} |
 | **Normal Form**            | BCNF                |
 
 #### group:
@@ -339,7 +340,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | Identifier   | Relation Name       |
 |--------------|---------------------|
 | **R06**      | `comment`           |
-| **Functional Dependencies** | {id} → {content, edited_at, deleted_at, id_user, id_post} |
+| **Functional Dependencies** | {id} → {content, edited_at, deleted_at, id_user, id_post, visibility} |
 | **Normal Form**            | BCNF                |
 
 #### like:
@@ -347,7 +348,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | Identifier   | Relation Name       |
 |--------------|---------------------|
 | **R07**      | `like`              |
-| **Functional Dependencies** | {id} → {created_at, id_user, id_post} |
+| **Functional Dependencies** | {id} → {created_at, id_user, id_post, visibility} |
 | **Normal Form**            | BCNF                |
 
 #### report:
@@ -422,6 +423,14 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | **Functional Dependencies** | {id} → {} |
 | **Normal Form**            | BCNF                |
 
+#### message:
+
+| Identifier   | Relation Name       |
+|--------------|---------------------|
+| **R17**      | `message`           |
+| **Functional Dependencies** | {id} → {content, created_at, id_sender, id_receiver, visibility} |
+| **Normal Form**            | BCNF                |
+
 
 ## A6: Indexes, triggers, transactions and database population
 
@@ -450,7 +459,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 | R14                    | `like_notification`      | hundreds                        | dozens per month           |
 | R15                    | `message_notification`    | hundreds                        | dozens per month           |
 | R16                    | `admin`                  | tens                           | no growth                  |
-
+| R17                    | `message`                | thousands                       | thousands per month        |
 
 
 ### 2. Proposed Indices
@@ -495,7 +504,7 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 #### SQL code:                                         
 
  ```sql
-CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group(
+CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
 RETURNS TRIGGER AS $$
 DECLARE
     new_owner_id INT;
@@ -573,7 +582,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE TRIGGER before_like_insert
 BEFORE INSERT ON "like"
 FOR EACH ROW
@@ -581,30 +589,152 @@ EXECUTE FUNCTION trg_check_unique_like();
 ```
 
 
+| **Trigger**      | TRIGGER04                              |
+| ---              | ---                                    |
+| **Description**  | Delete main notification on subtype notification deletion |
 
+#### SQL code:                                         
+
+ ```sql
+
+ -- Create the trigger function to delete related notifications
+CREATE OR REPLACE FUNCTION trg_delete_related_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM notification WHERE id = OLD.id_notification;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_user_notification_delete
+AFTER DELETE ON user_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_comment_notification_delete
+AFTER DELETE ON comment_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_group_notification_delete
+AFTER DELETE ON group_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_post_notification_delete
+AFTER DELETE ON post_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_like_notification_delete
+AFTER DELETE ON like_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_message_notification_delete
+AFTER DELETE ON message_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+```
+
+| **Trigger**      | TRIGGER05                              |
+| ---              | ---                                    |
+| **Description**  | A user should utilize a @up.pt email to register (BR06) |
+
+#### SQL code:                                         
+
+ ```sql
+
+-- Create the trigger function to enforce email domain
+CREATE OR REPLACE FUNCTION trg_check_feup_email()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.email !~* '^[^@]+@up\.pt$' THEN
+        RAISE EXCEPTION 'Email must be a FEUP institutional email (@up.pt)';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_insert_or_update
+BEFORE INSERT OR UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_feup_email();
+```
+
+| **Trigger**      | TRIGGER05                              |
+| ---              | ---                                    |
+| **Description**  | The last login field in the user should be update upon change to status "active" |
+
+
+#### SQL code:
+    
+```sql
+
+CREATE OR REPLACE FUNCTION trg_update_last_login_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.account_status = 'active' THEN
+        NEW.last_login := CURRENT_TIMESTAMP; 
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_last_login
+BEFORE UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_update_last_login_func();
+```
 ### 4. Transactions
  
-> Transactions needed to assure the integrity of the data.  
 
-| SQL Reference   | Transaction Name                    |
+| SQL Reference   | User Account Deletion                    |
 | --------------- | ----------------------------------- |
-| Justification   | Users should  |
-| Isolation level | Read Commited |
-| `Complete SQL Code`                                   |
+| Justification   | Using the highest isolation level, SERIALIZABLE, ensures that no other transaction can modify or read inconsistent data related to this user during the deletion.   |
+| Isolation level | Serializable |
+
+It must be reminded that there are already triggers in place to handle the deletion of related data when a user is deleted. Which makes transaction code smaller, since these operations are also performed.
+#### SQL code:                                         
+
+ ```sql
+ BEGIN;
+
+DELETE FROM post WHERE id_user = <user_id>;
+DELETE FROM comment WHERE id_user = <user_id>;
+DELETE FROM group_membership WHERE id_user = <user_id>;
+DELETE FROM "user" WHERE id = <user_id>; -- Will also trigger group ownership trigger
+
+COMMIT;
+ ```
+
+
+| SQL Reference   | Creation of Post                   |
+| --------------- | ----------------------------------- |
+| Justification   | Avoids partial deletions and ensures that no related data remains when a user account is removed.  |
+| Isolation level | Repeatable Read |
+
+#### SQL code:                                         
+
+ ```sql
+ BEGIN;
+
+INSERT INTO post (content, visibility, id_user, id_group)
+VALUES (:content, :visibility, :user_id, :group_id)
+RETURNING id INTO :post_id;
+
+COMMIT;
+```
+
 
 
 | SQL Reference   | Transaction Name                    |
 | --------------- | ----------------------------------- |
 | Justification   | Justification for the transaction.  |
 | Isolation level | Isolation level of the transaction. |
-| `Complete SQL Code`                                   |
 
 
-| SQL Reference   | Transaction Name                    |
-| --------------- | ----------------------------------- |
-| Justification   | Justification for the transaction.  |
-| Isolation level | Isolation level of the transaction. |
-| `Complete SQL Code`                                   |
 
 
 ## Annex A. SQL Code

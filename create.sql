@@ -207,6 +207,103 @@ EXECUTE FUNCTION trg_no_self_report_func();
 
 -----------------------
 
+CREATE OR REPLACE FUNCTION trg_friend_request_notification_func()
+RETURNS TRIGGER AS $$
+DECLARE
+    notification_id INT; 
+BEGIN
+    INSERT INTO notification (seen, created_at, id_user)
+    VALUES (FALSE, CURRENT_TIMESTAMP, NEW.id_user2) 
+    RETURNING id INTO notification_id;
+
+    INSERT INTO user_notification (id_notification, type)
+    VALUES (notification_id, 'received_friend_request'); 
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_friend_request_notification
+AFTER INSERT ON friendship_connection
+FOR EACH ROW
+EXECUTE FUNCTION trg_friend_request_notification_func();
+
+
+-----------------------
+
+CREATE OR REPLACE FUNCTION trg_update_last_login_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.account_status = 'active' THEN
+        NEW.last_login := CURRENT_TIMESTAMP; 
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_last_login
+BEFORE UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_update_last_login_func();
+
+-----------------------
+
+CREATE OR REPLACE FUNCTION trg_reply_to_comment_notification_func()
+RETURNS TRIGGER AS $$
+DECLARE
+    parent_comment_owner INT;
+BEGIN
+    SELECT id_user INTO parent_comment_owner 
+    FROM comment 
+    WHERE id = NEW.id_post;
+
+    IF parent_comment_owner IS NOT NULL AND parent_comment_owner <> NEW.id_user THEN
+        INSERT INTO notification (id_user, id_related_comment, seen, created_at)
+        VALUES (parent_comment_owner, NEW.id, FALSE, CURRENT_TIMESTAMP);
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_reply_to_comment_notification
+AFTER INSERT ON comment
+FOR EACH ROW
+EXECUTE FUNCTION trg_reply_to_comment_notification_func();
+
+
+----------------------
+
+CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
+RETURNS TRIGGER AS $$
+DECLARE
+    post_owner INT;
+    notification_id INT;
+BEGIN
+    SELECT id_user INTO post_owner FROM post WHERE id = NEW.id_post;
+
+    IF post_owner IS NOT NULL AND post_owner <> NEW.id_user THEN
+        INSERT INTO notification (id_user, id_related_post, id_related_comment, seen, created_at)
+        VALUES (post_owner, NEW.id_post, NEW.id, FALSE, CURRENT_TIMESTAMP)
+        RETURNING id INTO notification_id; 
+
+        INSERT INTO comment_notification (id_notification, type)
+        VALUES (notification_id, 'commented_on_post'); 
+    END IF;
+
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_comment_on_post_notification
+AFTER INSERT ON comment
+FOR EACH ROW
+EXECUTE FUNCTION trg_comment_on_post_notification_func();
+
+
+----------------------
+
 -- Create the trigger function to transfer group ownership or delete the group
 CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
 RETURNS TRIGGER AS $$
@@ -250,7 +347,6 @@ EXECUTE FUNCTION trg_check_feup_email();
 
 ------------
 
-
 -- Create the trigger function to enforce unique likes
 CREATE OR REPLACE FUNCTION trg_check_unique_like()
 RETURNS TRIGGER AS $$
@@ -278,6 +374,7 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_like();
 
 --------------------------------
+
 -- Create the trigger function to delete related notifications
 CREATE OR REPLACE FUNCTION trg_delete_related_notification()
 RETURNS TRIGGER AS $$
@@ -318,3 +415,4 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_delete_related_notification();
 
 -----------------------------------------------
+
