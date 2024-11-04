@@ -280,31 +280,6 @@ EXECUTE FUNCTION trg_check_unique_like();
 
 --------------------------------
 
--- Create the trigger function to handle user deletion
-CREATE OR REPLACE FUNCTION trg_handle_user_deletion()
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE post
-    SET id_user = NULL, visibility = 'anonymous'
-    WHERE id_user = OLD.id;
-
-    UPDATE comment
-    SET id_user = NULL, visibility = 'anonymous'
-    WHERE id_user = OLD.id;
-
-    UPDATE "like"
-    SET id_user = NULL
-    WHERE id_user = OLD.id;
-
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_user_delete
-BEFORE DELETE ON "user"
-FOR EACH ROW
-EXECUTE FUNCTION trg_handle_user_deletion();
-
 --------------------------------
 -- TEST TRIGGERS
 
