@@ -108,7 +108,7 @@ CREATE TABLE "like" (
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id),
     id_post INT REFERENCES post(id),
-	id_comment INT REFERENCES comment(id)
+	id_comment INT REFERENCES comment(id),
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
