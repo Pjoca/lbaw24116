@@ -486,12 +486,101 @@ The ConnectFEUP system is organized into five main areas: the Static Pages, whic
 
 ### 3. Triggers
  
-> User-defined functions and trigger procedures that add control structures to the SQL language or perform complex computations, are identified and described to be trusted by the database server. Every kind of function (SQL functions, Stored procedures, Trigger procedures) can take base types, composite types, or combinations of these as arguments (parameters). In addition, every kind of function can return a base type or a composite type. Functions can also be defined to return sets of base or composite values.  
+
 
 | **Trigger**      | TRIGGER01                              |
 | ---              | ---                                    |
-| **Description**  | Trigger description, including reference to the business rules involved |
-| `SQL code`                                             ||
+| **Description**  | (BR03) If a group owner deletes their account, ownership is transferred to another member. If no member is eligible, the group is deleted. 
+
+#### SQL code:                                         
+
+ ```sql
+CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group(
+RETURNS TRIGGER AS $$
+DECLARE
+    new_owner_id INT;
+BEGIN
+    SELECT id INTO new_owner_id FROM "user" WHERE id != OLD.id LIMIT 1;
+    IF new_owner_id IS NOT NULL THEN
+        UPDATE "group" SET id_owner = new_owner_id WHERE id_owner = OLD.id;
+    ELSE
+        DELETE FROM "group" WHERE id_owner = OLD.id;
+    END IF;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_delete
+BEFORE DELETE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_transfer_or_delete_group();
+``` 
+
+
+| **Trigger**      | TRIGGER02                              |
+| ---              | ---                                    |
+| **Description**  | A user should not be able to report itself
+
+
+#### SQL code:                                         
+
+ ```sql
+    CREATE OR REPLACE FUNCTION trg_no_self_report_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id_user = (SELECT id_user FROM post WHERE id = NEW.id_reported_post) THEN
+        RAISE EXCEPTION 'User cannot report their own post';
+    END IF;
+
+    RETURN NEW; 
+END;
+
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_no_self_report
+BEFORE INSERT ON report
+FOR EACH ROW
+EXECUTE FUNCTION trg_no_self_report_func();
+ ```
+
+
+| **Trigger**      | TRIGGER03                              |
+| ---              | ---                                    |
+| **Description**  | A user should only be able to like comments or posts once |
+
+#### SQL code:                                         
+
+ ```sql
+
+ CREATE OR REPLACE FUNCTION trg_check_unique_like()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id_post IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_post = NEW.id_post) THEN
+            RAISE EXCEPTION 'User has already liked this post';
+        END IF;
+    END IF;
+
+    IF NEW.id_comment IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_comment = NEW.id_comment) THEN
+            RAISE EXCEPTION 'User has already liked this comment';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER before_like_insert
+BEFORE INSERT ON "like"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_like();
+```
+
+
 
 ### 4. Transactions
  

@@ -31,7 +31,7 @@ DROP TYPE IF EXISTS group_notification_type CASCADE;
 DROP TYPE IF EXISTS post_notification_type CASCADE;
 DROP TYPE IF EXISTS like_notification_type CASCADE;
 DROP TYPE IF EXISTS message_notification_type CASCADE;
-DROP TYPE IF EXISTS group_status_type CASCADE;
+DROP TYPE IF EXISTS group_membership_type CASCADE;
 
 -- Create types
 
@@ -80,7 +80,7 @@ CREATE TABLE group_membership (
     id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
     joined_at DATE DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id_user, id_group)
+    PRIMARY KEY (id_user, id_group),
     group_status group_membership_type NOT NULL DEFAULT 'pending'
 );
 
@@ -106,7 +106,8 @@ CREATE TABLE "like" (
     id SERIAL PRIMARY KEY,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_post INT REFERENCES post(id)
+    id_post INT REFERENCES post(id),
+	id_comment INT REFERENCES comment(id)
 );
 
 CREATE TABLE report (
@@ -201,36 +202,7 @@ BEFORE INSERT ON report
 FOR EACH ROW
 EXECUTE FUNCTION trg_no_self_report_func();
 
--------------------------------------
-
-
-CREATE OR REPLACE FUNCTION trg_friend_request_notification_func()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.status = 'pending' THEN
-        INSERT INTO notification (id_user, seen, created_at)
-        VALUES (NEW.id_user2, FALSE, CURRENT_TIMESTAMP);
-    END IF;
-    RETURN NEW;  -- 
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_friend_request_notification
-AFTER INSERT ON friendship_connection
-FOR EACH ROW
-EXECUTE FUNCTION trg_friend_request_notification_func();
-
-------------------------------------
-
--- Create a trigger function to create a notification when a user receives a message
-CREATE OR REPLACE FUNCTION trg_message_notification_func()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO notification (id_user, seen, created_at)
-    VALUES (NEW.id_receiver, FALSE, CURRENT_TIMESTAMP);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-----------------------
 
 -- Create the trigger function to transfer group ownership or delete the group
 CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
@@ -254,5 +226,58 @@ BEFORE DELETE ON "user"
 FOR EACH ROW
 EXECUTE FUNCTION trg_transfer_or_delete_group();
 
+--------
 
+
+-- Create the trigger function to enforce email domain
+CREATE OR REPLACE FUNCTION trg_check_feup_email()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.email !~* '^[^@]+@up\.pt$' THEN
+        RAISE EXCEPTION 'Email must be a FEUP institutional email (@up.pt)';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_insert_or_update
+BEFORE INSERT OR UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_feup_email();
+
+
+------------
+
+
+-- Create the trigger function to enforce unique likes
+CREATE OR REPLACE FUNCTION trg_check_unique_like()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id_post IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_post = NEW.id_post) THEN
+            RAISE EXCEPTION 'User has already liked this post';
+        END IF;
+    END IF;
+
+    IF NEW.id_comment IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_comment = NEW.id_comment) THEN
+            RAISE EXCEPTION 'User has already liked this comment';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER before_like_insert
+BEFORE INSERT ON "like"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_like();
+
+--------------------------------
 -- TEST TRIGGERS
+
+-- Create a user
+INSERT INTO "user" (username, email, name, password, visibility, account_status)
+VALUES ('student1', 'student1@up.pt', 'Student One', 'password', 'public', 'active');
