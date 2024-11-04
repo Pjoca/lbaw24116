@@ -279,8 +279,54 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_like();
 
 --------------------------------
+
+-- Create the trigger function to handle user deletion
+CREATE OR REPLACE FUNCTION trg_handle_user_deletion()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE post
+    SET id_user = NULL, visibility = 'anonymous'
+    WHERE id_user = OLD.id;
+
+    UPDATE comment
+    SET id_user = NULL, visibility = 'anonymous'
+    WHERE id_user = OLD.id;
+
+    UPDATE "like"
+    SET id_user = NULL
+    WHERE id_user = OLD.id;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_user_delete
+BEFORE DELETE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_handle_user_deletion();
+
+--------------------------------
 -- TEST TRIGGERS
 
 -- Create a user
 INSERT INTO "user" (username, email, name, password, visibility, account_status)
 VALUES ('student1', 'student1@up.pt', 'Student One', 'password', 'public', 'active');
+
+-- Create a post by the user
+INSERT INTO post (content, id_user, id_group)
+VALUES ('This is a test post by student1', 1, NULL);
+
+-- Create a comment by the user on the post
+INSERT INTO comment (content, id_user, id_post)
+VALUES ('This is a test comment by student1', 1, 1);
+
+-- Create a like by the user on the post
+INSERT INTO "like" (id_user, id_post, id_comment)
+VALUES (1, 1, NULL);
+
+-- Create a like by the user on the comment
+INSERT INTO "like" (id_user, id_post, id_comment)
+VALUES (1, NULL, 1);
+
+-- Delete the user
+DELETE FROM "user" WHERE id = 1;
