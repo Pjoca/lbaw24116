@@ -36,7 +36,7 @@ DROP TYPE IF EXISTS group_membership_type CASCADE;
 -- Create types
 
 CREATE TYPE group_membership_type AS ENUM ('pending', 'accepted', 'rejected');
-CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group');
+CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group', 'anonymous');
 CREATE TYPE account_status_type AS ENUM ('active', 'offline', 'deleted', 'blocked');
 CREATE TYPE friendship_status_type AS ENUM ('pending', 'accepted', 'rejected');
 CREATE TYPE report_status_type AS ENUM ('pending', 'reviewed', 'resolved');
@@ -89,7 +89,7 @@ CREATE TABLE post (
     content TEXT NOT NULL,
     edited_at DATE DEFAULT CURRENT_DATE,
     visibility visibility_type NOT NULL DEFAULT 'public', 
-    id_user INT REFERENCES "user"(id) NOT NULL,
+    id_user INT REFERENCES "user"(id),
     id_group INT REFERENCES "group"(id)
 );
 
@@ -98,16 +98,18 @@ CREATE TABLE comment (
     content TEXT NOT NULL,
     edited_at DATE DEFAULT CURRENT_DATE,
     deleted_at DATE CHECK (deleted_at >= CURRENT_DATE),
-    id_user INT REFERENCES "user"(id) NOT NULL,
+    visibility visibility_type NOT NULL DEFAULT 'public',
+    id_user INT REFERENCES "user"(id),
     id_post INT REFERENCES post(id) NOT NULL
 );
 
 CREATE TABLE "like" (
     id SERIAL PRIMARY KEY,
     created_at DATE DEFAULT CURRENT_DATE,
-    id_user INT REFERENCES "user"(id) NOT NULL,
+    id_user INT REFERENCES "user"(id),
     id_post INT REFERENCES post(id),
 	id_comment INT REFERENCES comment(id)
+    visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
 CREATE TABLE report (
