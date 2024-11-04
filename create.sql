@@ -182,6 +182,15 @@ CREATE TABLE admin (
 );
 
 
+----------------------------------
+-- Indexes
+----------------------------------
+
+CREATE INDEX idx_user_username_email ON "user" (username, email);
+
+CREATE INDEX idx_friendship_user1_user2_status ON friendship_connection (id_user1, id_user2, status);
+
+CREATE INDEX idx_notification_user_seen_created_at ON notification (id_user, seen, created_at);
 
 ----------------------------------
 -- Triggers
