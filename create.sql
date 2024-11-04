@@ -207,30 +207,6 @@ EXECUTE FUNCTION trg_no_self_report_func();
 
 -----------------------
 
-CREATE OR REPLACE FUNCTION trg_friend_request_notification_func()
-RETURNS TRIGGER AS $$
-DECLARE
-    notification_id INT; 
-BEGIN
-    INSERT INTO notification (seen, created_at, id_user)
-    VALUES (FALSE, CURRENT_TIMESTAMP, NEW.id_user2) 
-    RETURNING id INTO notification_id;
-
-    INSERT INTO user_notification (id_notification, type)
-    VALUES (notification_id, 'received_friend_request'); 
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_friend_request_notification
-AFTER INSERT ON friendship_connection
-FOR EACH ROW
-EXECUTE FUNCTION trg_friend_request_notification_func();
-
-
------------------------
-
 CREATE OR REPLACE FUNCTION trg_update_last_login_func()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -249,31 +225,6 @@ EXECUTE FUNCTION trg_update_last_login_func();
 
 -----------------------
 
-CREATE OR REPLACE FUNCTION trg_reply_to_comment_notification_func()
-RETURNS TRIGGER AS $$
-DECLARE
-    parent_comment_owner INT;
-BEGIN
-    SELECT id_user INTO parent_comment_owner 
-    FROM comment 
-    WHERE id = NEW.id_post;
-
-    IF parent_comment_owner IS NOT NULL AND parent_comment_owner <> NEW.id_user THEN
-        INSERT INTO notification (id_user, id_related_comment, seen, created_at)
-        VALUES (parent_comment_owner, NEW.id, FALSE, CURRENT_TIMESTAMP);
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_reply_to_comment_notification
-AFTER INSERT ON comment
-FOR EACH ROW
-EXECUTE FUNCTION trg_reply_to_comment_notification_func();
-
-
-----------------------
 
 CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
 RETURNS TRIGGER AS $$

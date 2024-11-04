@@ -662,7 +662,7 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_check_feup_email();
 ```
 
-| **Trigger**      | TRIGGER05                              |
+| **Trigger**      | TRIGGER06                              |
 | ---              | ---                                    |
 | **Description**  | The last login field in the user should be update upon change to status "active" |
 
@@ -687,6 +687,43 @@ BEFORE UPDATE ON "user"
 FOR EACH ROW
 EXECUTE FUNCTION trg_update_last_login_func();
 ```
+
+
+| **Trigger**      | TRIGGER07                             |
+| ---              | ---                                    |
+| **Description**  | Add notification on comments (Since we didnt consider this vital to the database integrity we included it as a transaction instead of a transaction) |
+
+#### SQL code:                                         
+
+ ```sql
+
+CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
+RETURNS TRIGGER AS $$
+DECLARE
+    post_owner INT;
+    notification_id INT;
+BEGIN
+    SELECT id_user INTO post_owner FROM post WHERE id = NEW.id_post;
+
+    IF post_owner IS NOT NULL AND post_owner <> NEW.id_user THEN
+        INSERT INTO notification (id_user, id_related_post, id_related_comment, seen, created_at)
+        VALUES (post_owner, NEW.id_post, NEW.id, FALSE, CURRENT_TIMESTAMP)
+        RETURNING id INTO notification_id; 
+
+        INSERT INTO comment_notification (id_notification, type)
+        VALUES (notification_id, 'commented_on_post'); 
+    END IF;
+
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_comment_on_post_notification
+AFTER INSERT ON comment
+FOR EACH ROW
+EXECUTE FUNCTION trg_comment_on_post_notification_func();
+```
+
 ### 4. Transactions
  
 
@@ -729,13 +766,106 @@ COMMIT;
 
 
 
-| SQL Reference   | Transaction Name                    |
+| SQL Reference   | Send Friend Request                   |
 | --------------- | ----------------------------------- |
-| Justification   | Justification for the transaction.  |
-| Isolation level | Isolation level of the transaction. |
+| Justification   | This operation can proceed without interfering with other operations. We want to ensure that the data being read (existing user friendships) is committed and visible, avoiding potential conflicts from concurrent inserts or updates.  |
+| Isolation level | Read Commited |
+
+#### SQL code:                                         
+
+ ```sql
+
+ BEGIN;
+
+INSERT INTO friendship_connection (id_user1, id_user2, status)
+VALUES (:user_id1, :user_id2, 'pending')
+RETURNING id INTO :connection_id;
+
+INSERT INTO notification (id_user, seen, created_at)
+VALUES (:user_id2, FALSE, CURRENT_TIMESTAMP)
+RETURNING id INTO :notification_id;
+
+INSERT INTO user_notification (id_notification, type)
+VALUES (:notification_id, 'received_friend_request');
+
+COMMIT;
+```
+
+| SQL Reference   | Accept Friend Request                  |
+| --------------- | ----------------------------------- |
+| Justification   | Accepting a friend request involves updating the status of a friendship connection. Using Serializable ensures that no other transactions can modify the friendship status concurrently, which could lead to inconsistencies, such as accepting a request that has already been canceled. It guarantees complete isolation from other transactions.  |
+| Isolation level | Serializable |
+
+#### SQL code:                                         
+
+ ```sql
+
+ BEGIN;
+
+UPDATE friendship_connection
+SET status = 'accepted'
+WHERE id_user1 = :user_id2 AND id_user2 = :user_id1 AND status = 'pending';
+
+INSERT INTO notification (id_user, seen, created_at)
+VALUES (:user_id1, FALSE, CURRENT_TIMESTAMP)
+RETURNING id INTO :notification_id;
+
+INSERT INTO user_notification (id_notification, type)
+VALUES (:notification_id, 'accepted_friend_request');
+
+COMMIT;
+```
 
 
+| SQL Reference   | Accept Friend Request                  |
+| --------------- | ----------------------------------- |
+| Justification   | Similar to accepting a friendship, removing a friendship can affect multiple records (both ways in the friendship connection). Using Serializable prevents race conditions and ensures that no other transaction can modify the friendship connections between the two users during this operation, maintaining integrity.  |
+| Isolation level | Serializable |
 
+#### SQL code:                                         
+
+ ```sql
+
+ BEGIN;
+
+DELETE FROM friendship_connection
+WHERE (id_user1 = :user_id1 AND id_user2 = :user_id2) OR
+      (id_user1 = :user_id2 AND id_user2 = :user_id1);
+
+
+INSERT INTO notification (id_user, seen, created_at)
+VALUES (:other_user_id, FALSE, CURRENT_TIMESTAMP)
+RETURNING id INTO :notification_id;
+
+INSERT INTO user_notification (id_notification, type)
+VALUES (:notification_id, 'removed_friend');
+
+COMMIT;
+```
+
+
+| SQL Reference   | Accept Friend Request                  |
+| --------------- | ----------------------------------- |
+| Justification   | Deleting a post and its associated likes and comments involves multiple deletions across different tables, and there is a risk of concurrent transactions modifying the same data. Using the Serializable isolation level prevents anomalies such as phantom reads and ensures that no other transaction can insert or modify likes or comments related to the post during this operation. This guarantees that the entire operation executes in isolation, maintaining data integrity.  |
+| Isolation level | Serializable |
+
+#### SQL code:                                         
+
+ ```sql
+
+BEGIN;
+
+DELETE FROM "like"
+WHERE id_post = :post_id;
+
+DELETE FROM comment
+WHERE id_post = :post_id;
+
+DELETE FROM post
+WHERE id = :post_id;
+
+COMMIT;
+```
 
 ## Annex A. SQL Code
 
