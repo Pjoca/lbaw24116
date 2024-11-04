@@ -142,37 +142,37 @@ CREATE TABLE message (
 
 
 CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type user_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type comment_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type group_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type post_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type like_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE NOT NULL,
     type message_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
@@ -231,7 +231,6 @@ EXECUTE FUNCTION trg_transfer_or_delete_group();
 
 --------
 
-
 -- Create the trigger function to enforce email domain
 CREATE OR REPLACE FUNCTION trg_check_feup_email()
 RETURNS TRIGGER AS $$
@@ -279,29 +278,43 @@ FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_like();
 
 --------------------------------
+-- Create the trigger function to delete related notifications
+CREATE OR REPLACE FUNCTION trg_delete_related_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM notification WHERE id = OLD.id_notification;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
 
---------------------------------
--- TEST TRIGGERS
+CREATE TRIGGER after_user_notification_delete
+AFTER DELETE ON user_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Create a user
-INSERT INTO "user" (username, email, name, password, visibility, account_status)
-VALUES ('student1', 'student1@up.pt', 'Student One', 'password', 'public', 'active');
+CREATE TRIGGER after_comment_notification_delete
+AFTER DELETE ON comment_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Create a post by the user
-INSERT INTO post (content, id_user, id_group)
-VALUES ('This is a test post by student1', 1, NULL);
+CREATE TRIGGER after_group_notification_delete
+AFTER DELETE ON group_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Create a comment by the user on the post
-INSERT INTO comment (content, id_user, id_post)
-VALUES ('This is a test comment by student1', 1, 1);
+CREATE TRIGGER after_post_notification_delete
+AFTER DELETE ON post_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Create a like by the user on the post
-INSERT INTO "like" (id_user, id_post, id_comment)
-VALUES (1, 1, NULL);
+CREATE TRIGGER after_like_notification_delete
+AFTER DELETE ON like_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Create a like by the user on the comment
-INSERT INTO "like" (id_user, id_post, id_comment)
-VALUES (1, NULL, 1);
+CREATE TRIGGER after_message_notification_delete
+AFTER DELETE ON message_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
 
--- Delete the user
-DELETE FROM "user" WHERE id = 1;
+-----------------------------------------------
