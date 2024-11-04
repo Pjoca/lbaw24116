@@ -135,8 +135,9 @@ CREATE TABLE message (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE,
-    id_sender INT REFERENCES "user"(id) NOT NULL,
-    id_receiver INT REFERENCES "user"(id) NOT NULL
+    id_sender INT REFERENCES "user"(id),
+    id_receiver INT REFERENCES "user"(id),
+    visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
 
