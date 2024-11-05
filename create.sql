@@ -182,6 +182,68 @@ CREATE TABLE admin (
 );
 
 
+----------------------------------
+-- Indexes
+----------------------------------
+
+CREATE INDEX idx_user_username_email ON "user" (username, email);
+
+----------------------------------
+
+CREATE INDEX idx_friendship_user1_user2_status ON friendship_connection (id_user1, id_user2, status);
+
+----------------------------------
+
+CREATE INDEX idx_notification_user_seen_created_at ON notification (id_user, seen, created_at);
+
+----------------------------------
+
+ALTER TABLE "user" 
+ADD COLUMN user_search_tsv tsvector;
+
+UPDATE "user" 
+SET user_search_tsv = to_tsvector('english', username || ' ' || name);
+
+CREATE INDEX idx_user_search 
+ON "user" USING GIN (user_search_tsv);
+
+CREATE TRIGGER trg_user_search_update 
+BEFORE INSERT OR UPDATE ON "user" 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(user_search_tsv, 'pg_catalog.english', username, name);
+
+----------------------------------
+
+ALTER TABLE post 
+ADD COLUMN post_content_tsv tsvector;
+
+UPDATE post 
+SET post_content_tsv = to_tsvector('english', content);
+
+CREATE INDEX idx_post_content_search 
+ON post USING GIN (post_content_tsv);
+
+CREATE TRIGGER trg_post_content_update 
+BEFORE INSERT OR UPDATE ON post 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(post_content_tsv, 'pg_catalog.english', content);
+
+----------------------------------
+
+ALTER TABLE comment 
+ADD COLUMN comment_content_tsv tsvector;
+
+UPDATE comment 
+SET comment_content_tsv = to_tsvector('english', content);
+
+CREATE INDEX idx_comment_content_search 
+ON comment USING GIN (comment_content_tsv);
+
+CREATE TRIGGER trg_comment_content_update 
+BEFORE INSERT OR UPDATE ON comment 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(comment_content_tsv, 'pg_catalog.english', content);
+
 
 ----------------------------------
 -- Triggers
