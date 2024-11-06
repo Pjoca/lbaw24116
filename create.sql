@@ -1,6 +1,3 @@
--- Set search path to the ebd schema
-SET search_path TO ebd;
-
 -- Drop tables that depend on the types
 DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS friendship_connection CASCADE;
