@@ -244,6 +244,25 @@ BEFORE INSERT OR UPDATE ON comment
 FOR EACH ROW EXECUTE FUNCTION 
 tsvector_update_trigger(comment_content_tsv, 'pg_catalog.english', content);
 
+----------------------------------
+
+ALTER TABLE "group" 
+ADD COLUMN group_content_tsv tsvector;
+
+
+UPDATE "group" 
+SET group_content_tsv = to_tsvector('english', name || ' ' || description);
+
+
+CREATE INDEX idx_group_content_search 
+ON "group" USING GIN (group_content_tsv);
+
+
+CREATE TRIGGER trg_group_content_update 
+BEFORE INSERT OR UPDATE ON "group" 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(group_content_tsv, 'pg_catalog.english', name, description);
+
 
 ----------------------------------
 -- Triggers
