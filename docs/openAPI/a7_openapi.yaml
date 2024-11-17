@@ -4,7 +4,7 @@ info:
   title: 'Platform API'
   description: 'API for core platform functionalities including authentication, profile management, search, timelines, and posts.'
 servers:
-  - url: https://platform.example.com
+  - url: https/lbaw.fe.up.pt
     description: Production Server
 
 tags:
@@ -25,7 +25,7 @@ paths:
   /auth/login:
     post:
       summary: "Login"
-      description: "Authenticate a user and create a session"
+      description: "Authenticate a user and create a session. Acess: PUB"
       tags: 
         - "Authentication"
       requestBody:
@@ -54,7 +54,7 @@ paths:
   /auth/logout:
     post:
       summary: "Logout"
-      description: "End the user session"
+      description: "End the user session. Acess: USR"
       tags: 
         - "Authentication"
       responses:
@@ -64,7 +64,7 @@ paths:
   /auth/register:
     post:
       summary: "Register"
-      description: "Register a new user"
+      description: "Register a new user. Acess: PUB"
       tags: 
         - "Authentication"
       requestBody:
@@ -97,7 +97,7 @@ paths:
   /profile/{id}:
     get:
       summary: "View Profile"
-      description: "Retrieve the profile information of a user"
+      description: "Retrieve the profile information of a user. Acess: USR"
       tags: 
         - "Profile"
       parameters:
@@ -115,7 +115,7 @@ paths:
 
     put:
       summary: "Edit Profile"
-      description: "Update profile information of the authenticated user"
+      description: "Update profile information of the authenticated user. Acess: OWN"
       tags: 
         - "Profile"
       requestBody:
@@ -145,7 +145,7 @@ paths:
   /search/exact:
     get:
       summary: "Exact Match Search"
-      description: "Search for users with exact match criteria"
+      description: "Search for users with exact match criteria. Acess: USR"
       tags: 
         - "Search"
       parameters:
@@ -164,7 +164,7 @@ paths:
   /search/fulltext:
     get:
       summary: "Full-Text Search"
-      description: "Perform a full-text search across users and content"
+      description: "Perform a full-text search across users and content. Acess: USR"
       tags: 
         - "Search"
       parameters:
@@ -182,7 +182,7 @@ paths:
 
   /admin/users:
     get:
-      summary: "Administer User Accounts"
+      summary: "Administer User Accounts. Acess: ADM"
       description: "View and search user accounts"
       tags: 
         - "Admin"
@@ -200,7 +200,7 @@ paths:
 
     post:
       summary: "Create User"
-      description: "Create a new user account"
+      description: "Create a new user account. Acess: ADM"
       tags: 
         - "Admin"
       requestBody:
@@ -230,7 +230,7 @@ paths:
   /timeline/public:
     get:
       summary: "View Public Timeline"
-      description: "Retrieve the public timeline of posts"
+      description: "Retrieve the public timeline of posts. Acess: PUB"
       tags: 
         - "Timeline"
       responses:
@@ -240,7 +240,7 @@ paths:
   /timeline/personalized:
     get:
       summary: "View Personalized Timeline"
-      description: "Retrieve the personalized timeline for the authenticated user"
+      description: "Retrieve the personalized timeline for the authenticated user. Acess: USR"
       tags: 
         - "Timeline"
       responses:
@@ -252,7 +252,7 @@ paths:
   /post:
     post:
       summary: "Create Post"
-      description: "Create a new post by an authenticated user"
+      description: "Create a new post by an authenticated user. Acess: USR"
       tags: 
         - "Post"
       requestBody:
@@ -280,7 +280,7 @@ paths:
   /post/{id}:
     put:
       summary: "Edit Post"
-      description: "Edit an existing post by the authenticated user"
+      description: "Edit an existing post by the authenticated user. Acess: OWN"
       tags: 
         - "Post"
       parameters:
@@ -318,7 +318,7 @@ paths:
 
     delete:
       summary: "Delete Post"
-      description: "Delete an existing post by the authenticated user"
+      description: "Delete an existing post by the authenticated user. Acess: OWN"
       tags: 
         - "Post"
       parameters:
