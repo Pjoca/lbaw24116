@@ -299,3 +299,137 @@ paths:
           description: "Unauthorized action"
         '404':
           description: "Post not found"
+    
+    /admin/users:
+    get:
+      summary: "Search Users"
+      description: "View and search user accounts. Access: ADM"
+      tags:
+        - "Admin"
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: "Search term for user accounts (e.g., username or email)"
+      responses:
+        '200':
+          description: "User accounts retrieved successfully"
+        '400':
+          description: "Invalid search query"
+
+    post:
+      summary: "Create User"
+      description: "Create a new user account. Access: ADM"
+      tags:
+        - "Admin"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: "New user's username"
+                email:
+                  type: string
+                  format: email
+                  description: "New user's email"
+                name:
+                  type: string
+                  description: "New user's full name"
+                role:
+                  type: string
+                  description: "Role of the user (e.g., admin, user)"
+                password:
+                  type: string
+                  description: "New user's password"
+              required:
+                - username
+                - email
+                - name
+                - role
+                - password
+      responses:
+        '201':
+          description: "User account created successfully"
+        '400':
+          description: "Invalid input data"
+
+  /admin/users/{id}:
+    get:
+      summary: "View User Details"
+      description: "View detailed information of a specific user. Access: ADM"
+      tags:
+        - "Admin"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      responses:
+        '200':
+          description: "User details retrieved successfully"
+        '404':
+          description: "User not found"
+
+    put:
+      summary: "Edit User"
+      description: "Edit a specific user's account details. Access: ADM"
+      tags:
+        - "Admin"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: "Updated email address"
+                name:
+                  type: string
+                  description: "Updated full name"
+                role:
+                  type: string
+                  description: "Updated role of the user (e.g., admin, user)"
+                account_status:
+                  type: string
+                  enum: ["active", "blocked", "deleted"]
+                  description: "Updated account status"
+              required:
+                - email
+                - name
+                - role
+                - account_status
+      responses:
+        '200':
+          description: "User details updated successfully"
+        '400':
+          description: "Invalid input data"
+        '404':
+          description: "User not found"
+
+    delete:
+      summary: "Delete User"
+      description: "Delete a specific user account. Access: ADM"
+      tags:
+        - "Admin"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user to delete"
+      responses:
+        '200':
+          description: "User account deleted successfully"
+        '404':
+          description: "User not found"
