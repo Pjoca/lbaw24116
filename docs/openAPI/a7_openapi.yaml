@@ -1,0 +1,337 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: 'Platform API'
+  description: 'API for core platform functionalities including authentication, profile management, search, timelines, and posts.'
+servers:
+  - url: https://platform.example.com
+    description: Production Server
+
+tags:
+  - name: "Authentication"
+    description: "Endpoints for user authentication"
+  - name: "Profile"
+    description: "Endpoints for profile management"
+  - name: "Search"
+    description: "Endpoints for search functionalities"
+  - name: "Admin"
+    description: "Endpoints for administrative actions"
+  - name: "Timeline"
+    description: "Endpoints for timeline viewing"
+  - name: "Post"
+    description: "Endpoints for creating, editing, and deleting posts"
+
+paths:
+  /auth/login:
+    post:
+      summary: "Login"
+      description: "Authenticate a user and create a session"
+      tags: 
+        - "Authentication"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: "User's email address"
+                password:
+                  type: string
+                  description: "User's password"
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: "Login successful, returns session token"
+        '401':
+          description: "Invalid credentials"
+
+  /auth/logout:
+    post:
+      summary: "Logout"
+      description: "End the user session"
+      tags: 
+        - "Authentication"
+      responses:
+        '200':
+          description: "Logout successful"
+
+  /auth/register:
+    post:
+      summary: "Register"
+      description: "Register a new user"
+      tags: 
+        - "Authentication"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "User's full name"
+                email:
+                  type: string
+                  format: email
+                  description: "User's email address"
+                password:
+                  type: string
+                  description: "User's password"
+              required:
+                - name
+                - email
+                - password
+      responses:
+        '201':
+          description: "User registered successfully"
+        '400':
+          description: "Invalid input data"
+
+  /profile/{id}:
+    get:
+      summary: "View Profile"
+      description: "Retrieve the profile information of a user"
+      tags: 
+        - "Profile"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      responses:
+        '200':
+          description: "Profile retrieved successfully"
+        '404':
+          description: "Profile not found"
+
+    put:
+      summary: "Edit Profile"
+      description: "Update profile information of the authenticated user"
+      tags: 
+        - "Profile"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "Updated full name"
+                email:
+                  type: string
+                  format: email
+                  description: "Updated email address"
+                picture:
+                  type: string
+                  format: binary
+                  description: "Updated profile picture"
+      responses:
+        '200':
+          description: "Profile updated successfully"
+        '400':
+          description: "Invalid input data"
+
+  /search/exact:
+    get:
+      summary: "Exact Match Search"
+      description: "Search for users with exact match criteria"
+      tags: 
+        - "Search"
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Exact match search query"
+      responses:
+        '200':
+          description: "Search results returned successfully"
+        '400':
+          description: "Invalid query"
+
+  /search/fulltext:
+    get:
+      summary: "Full-Text Search"
+      description: "Perform a full-text search across users and content"
+      tags: 
+        - "Search"
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Full-text search query"
+      responses:
+        '200':
+          description: "Search results returned successfully"
+        '400':
+          description: "Invalid query"
+
+  /admin/users:
+    get:
+      summary: "Administer User Accounts"
+      description: "View and search user accounts"
+      tags: 
+        - "Admin"
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: "Search term for user accounts"
+      responses:
+        '200':
+          description: "User accounts retrieved successfully"
+        '400':
+          description: "Invalid search query"
+
+    post:
+      summary: "Create User"
+      description: "Create a new user account"
+      tags: 
+        - "Admin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "New user's name"
+                email:
+                  type: string
+                  format: email
+                  description: "New user's email"
+                role:
+                  type: string
+                  description: "Role of the user (e.g., admin, user)"
+              required:
+                - name
+                - email
+      responses:
+        '201':
+          description: "User account created successfully"
+
+  /timeline/public:
+    get:
+      summary: "View Public Timeline"
+      description: "Retrieve the public timeline of posts"
+      tags: 
+        - "Timeline"
+      responses:
+        '200':
+          description: "Timeline retrieved successfully"
+
+  /timeline/personalized:
+    get:
+      summary: "View Personalized Timeline"
+      description: "Retrieve the personalized timeline for the authenticated user"
+      tags: 
+        - "Timeline"
+      responses:
+        '200':
+          description: "Timeline retrieved successfully"
+        '401':
+          description: "Unauthorized access"
+
+  /post:
+    post:
+      summary: "Create Post"
+      description: "Create a new post by an authenticated user"
+      tags: 
+        - "Post"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: "Title of the post"
+                content:
+                  type: string
+                  description: "Content of the post"
+              required:
+                - title
+                - content
+      responses:
+        '201':
+          description: "Post created successfully"
+        '400':
+          description: "Invalid input data"
+
+  /post/{id}:
+    put:
+      summary: "Edit Post"
+      description: "Edit an existing post by the authenticated user"
+      tags: 
+        - "Post"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the post to edit"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: "Updated title of the post"
+                content:
+                  type: string
+                  description: "Updated content of the post"
+              required:
+                - title
+                - content
+      responses:
+        '200':
+          description: "Post updated successfully"
+        '400':
+          description: "Invalid input data"
+        '403':
+          description: "Unauthorized action"
+        '404':
+          description: "Post not found"
+
+    delete:
+      summary: "Delete Post"
+      description: "Delete an existing post by the authenticated user"
+      tags: 
+        - "Post"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the post to delete"
+      responses:
+        '200':
+          description: "Post deleted successfully"
+        '403':
+          description: "Unauthorized action"
+        '404':
+          description: "Post not found"
