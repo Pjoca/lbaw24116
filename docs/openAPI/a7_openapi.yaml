@@ -4,7 +4,7 @@ info:
   title: 'Platform API'
   description: 'API for core platform functionalities including authentication, profile management, search, timelines, and posts.'
 servers:
-  - url: https/lbaw.fe.up.pt
+  - url: https://lbaw.fe.up.pt
     description: Production Server
 
 tags:
@@ -25,8 +25,8 @@ paths:
   /auth/login:
     post:
       summary: "Login"
-      description: "Authenticate a user and create a session. Acess: PUB"
-      tags: 
+      description: "Authenticate a user and create a session. Access: PUB"
+      tags:
         - "Authentication"
       requestBody:
         required: true
@@ -54,8 +54,8 @@ paths:
   /auth/logout:
     post:
       summary: "Logout"
-      description: "End the user session. Acess: USR"
-      tags: 
+      description: "End the user session. Access: USR"
+      tags:
         - "Authentication"
       responses:
         '200':
@@ -64,8 +64,8 @@ paths:
   /auth/register:
     post:
       summary: "Register"
-      description: "Register a new user. Acess: PUB"
-      tags: 
+      description: "Register a new user. Access: PUB"
+      tags:
         - "Authentication"
       requestBody:
         required: true
@@ -74,20 +74,24 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                username:
                   type: string
-                  description: "User's full name"
+                  description: "Unique username for the user"
                 email:
                   type: string
                   format: email
-                  description: "User's email address"
+                  description: "FEUP institutional email (@up.pt)"
                 password:
                   type: string
                   description: "User's password"
+                name:
+                  type: string
+                  description: "Full name of the user"
               required:
-                - name
+                - username
                 - email
                 - password
+                - name
       responses:
         '201':
           description: "User registered successfully"
@@ -97,8 +101,8 @@ paths:
   /profile/{id}:
     get:
       summary: "View Profile"
-      description: "Retrieve the profile information of a user. Acess: USR"
-      tags: 
+      description: "Retrieve the profile information of a user. Access: USR"
+      tags:
         - "Profile"
       parameters:
         - name: id
@@ -115,8 +119,8 @@ paths:
 
     put:
       summary: "Edit Profile"
-      description: "Update profile information of the authenticated user. Acess: OWN"
-      tags: 
+      description: "Update profile information of the authenticated user. Access: OWN"
+      tags:
         - "Profile"
       requestBody:
         required: true
@@ -132,10 +136,14 @@ paths:
                   type: string
                   format: email
                   description: "Updated email address"
-                picture:
+                visibility:
                   type: string
-                  format: binary
-                  description: "Updated profile picture"
+                  enum: ["public", "private"]
+                  description: "Updated visibility of the user"
+              required:
+                - name
+                - email
+                - visibility
       responses:
         '200':
           description: "Profile updated successfully"
@@ -145,16 +153,16 @@ paths:
   /search/exact:
     get:
       summary: "Exact Match Search"
-      description: "Search for users with exact match criteria. Acess: USR"
-      tags: 
+      description: "Search for users with exact match criteria. Access: USR"
+      tags:
         - "Search"
       parameters:
-        - name: query
+        - name: username
           in: query
           required: true
           schema:
             type: string
-          description: "Exact match search query"
+          description: "Exact username to search for"
       responses:
         '200':
           description: "Search results returned successfully"
@@ -164,8 +172,8 @@ paths:
   /search/fulltext:
     get:
       summary: "Full-Text Search"
-      description: "Perform a full-text search across users and content. Acess: USR"
-      tags: 
+      description: "Perform a full-text search across users and content. Access: USR"
+      tags:
         - "Search"
       parameters:
         - name: query
@@ -180,58 +188,11 @@ paths:
         '400':
           description: "Invalid query"
 
-  /admin/users:
-    get:
-      summary: "Administer User Accounts. Acess: ADM"
-      description: "View and search user accounts"
-      tags: 
-        - "Admin"
-      parameters:
-        - name: search
-          in: query
-          schema:
-            type: string
-          description: "Search term for user accounts"
-      responses:
-        '200':
-          description: "User accounts retrieved successfully"
-        '400':
-          description: "Invalid search query"
-
-    post:
-      summary: "Create User"
-      description: "Create a new user account. Acess: ADM"
-      tags: 
-        - "Admin"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: "New user's name"
-                email:
-                  type: string
-                  format: email
-                  description: "New user's email"
-                role:
-                  type: string
-                  description: "Role of the user (e.g., admin, user)"
-              required:
-                - name
-                - email
-      responses:
-        '201':
-          description: "User account created successfully"
-
   /timeline/public:
     get:
       summary: "View Public Timeline"
-      description: "Retrieve the public timeline of posts. Acess: PUB"
-      tags: 
+      description: "Retrieve the public timeline of posts. Access: PUB"
+      tags:
         - "Timeline"
       responses:
         '200':
@@ -240,8 +201,8 @@ paths:
   /timeline/personalized:
     get:
       summary: "View Personalized Timeline"
-      description: "Retrieve the personalized timeline for the authenticated user. Acess: USR"
-      tags: 
+      description: "Retrieve the personalized timeline for the authenticated user. Access: USR"
+      tags:
         - "Timeline"
       responses:
         '200':
@@ -252,8 +213,8 @@ paths:
   /post:
     post:
       summary: "Create Post"
-      description: "Create a new post by an authenticated user. Acess: USR"
-      tags: 
+      description: "Create a new post by an authenticated user. Access: USR"
+      tags:
         - "Post"
       requestBody:
         required: true
@@ -262,14 +223,17 @@ paths:
             schema:
               type: object
               properties:
-                title:
-                  type: string
-                  description: "Title of the post"
                 content:
                   type: string
                   description: "Content of the post"
+                visibility:
+                  type: string
+                  enum: ["public", "private", "group"]
+                  description: "Visibility of the post"
+                id_group:
+                  type: integer
+                  description: "ID of the group where the post is created (optional)"
               required:
-                - title
                 - content
       responses:
         '201':
@@ -280,8 +244,8 @@ paths:
   /post/{id}:
     put:
       summary: "Edit Post"
-      description: "Edit an existing post by the authenticated user. Acess: OWN"
-      tags: 
+      description: "Edit an existing post by the authenticated user. Access: OWN"
+      tags:
         - "Post"
       parameters:
         - name: id
@@ -297,14 +261,14 @@ paths:
             schema:
               type: object
               properties:
-                title:
-                  type: string
-                  description: "Updated title of the post"
                 content:
                   type: string
                   description: "Updated content of the post"
+                visibility:
+                  type: string
+                  enum: ["public", "private", "group"]
+                  description: "Updated visibility of the post"
               required:
-                - title
                 - content
       responses:
         '200':
@@ -318,8 +282,8 @@ paths:
 
     delete:
       summary: "Delete Post"
-      description: "Delete an existing post by the authenticated user. Acess: OWN"
-      tags: 
+      description: "Delete an existing post by the authenticated user. Access: OWN"
+      tags:
         - "Post"
       parameters:
         - name: id
