@@ -51,6 +51,16 @@ paths:
         '401':
           description: "Invalid credentials"
 
+  /auth/logout:
+    post:
+      summary: "Logout"
+      description: "End the user session. Access: USR"
+      tags:
+        - "Authentication"
+      responses:
+        '200':
+          description: "Logout successful"
+
   /auth/register:
     post:
       summary: "Register"
@@ -89,6 +99,24 @@ paths:
           description: "Invalid input data"
 
   /profile/{id}:
+    get:
+      summary: "View Profile"
+      description: "Retrieve the profile information of a user. Access: USR"
+      tags:
+        - "Profile"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
+      responses:
+        '200':
+          description: "Profile retrieved successfully"
+        '404':
+          description: "Profile not found"
+
     put:
       summary: "Edit Profile"
       description: "Update profile information of the authenticated user. Access: OWN"
@@ -121,6 +149,66 @@ paths:
           description: "Profile updated successfully"
         '400':
           description: "Invalid input data"
+
+  /search/exact:
+    get:
+      summary: "Exact Match Search"
+      description: "Search for users with exact match criteria. Access: USR"
+      tags:
+        - "Search"
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Exact username to search for"
+      responses:
+        '200':
+          description: "Search results returned successfully"
+        '400':
+          description: "Invalid query"
+
+  /search/fulltext:
+    get:
+      summary: "Full-Text Search"
+      description: "Perform a full-text search across users and content. Access: USR"
+      tags:
+        - "Search"
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          description: "Full-text search query"
+      responses:
+        '200':
+          description: "Search results returned successfully"
+        '400':
+          description: "Invalid query"
+
+  /timeline/public:
+    get:
+      summary: "View Public Timeline"
+      description: "Retrieve the public timeline of posts. Access: PUB"
+      tags:
+        - "Timeline"
+      responses:
+        '200':
+          description: "Timeline retrieved successfully"
+
+  /timeline/personalized:
+    get:
+      summary: "View Personalized Timeline"
+      description: "Retrieve the personalized timeline for the authenticated user. Access: USR"
+      tags:
+        - "Timeline"
+      responses:
+        '200':
+          description: "Timeline retrieved successfully"
+        '401':
+          description: "Unauthorized access"
 
   /post:
     post:
@@ -159,6 +247,13 @@ paths:
       description: "Edit an existing post by the authenticated user. Access: OWN"
       tags:
         - "Post"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the post to edit"
       requestBody:
         required: true
         content:
