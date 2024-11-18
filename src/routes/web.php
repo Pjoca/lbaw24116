@@ -8,6 +8,8 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
+use App\Http\Controllers\UserController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,6 +23,11 @@ use App\Http\Controllers\Auth\RegisterController;
 
 // Home
 Route::redirect('/', '/login');
+
+// Independent Home Route
+Route::get('/home', function () {
+    return view('home'); // Ensure a corresponding 'home.blade.php' exists
+})->name('home');
 
 // Cards
 Route::controller(CardController::class)->group(function () {
@@ -52,4 +59,10 @@ Route::controller(LoginController::class)->group(function () {
 Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'showRegistrationForm')->name('register');
     Route::post('/register', 'register');
+});
+
+// Profile
+Route::controller(UserController::class)->middleware('auth')->group(function () {
+    Route::get('/profile/{id}', 'show')->name('profile.show'); // View Profile
+    Route::put('/profile/{id}', 'update')->name('profile.update'); // Edit Profile
 });

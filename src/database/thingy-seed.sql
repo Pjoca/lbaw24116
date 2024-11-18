@@ -1,56 +1,673 @@
---
--- Use a specific schema and set it as default - thingy.
---
 DROP SCHEMA IF EXISTS thingy CASCADE;
-CREATE SCHEMA IF NOT EXISTS thingy;
+CREATE SCHEMA thingy;
 SET search_path TO thingy;
 
---
--- Drop any existing tables.
---
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS cards CASCADE;
-DROP TABLE IF EXISTS items CASCADE;
 
---
--- Create tables.
---
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
-  password VARCHAR NOT NULL,
-  remember_token VARCHAR
+-- Drop tables that depend on the types
+DROP TABLE IF EXISTS "user" CASCADE;
+DROP TABLE IF EXISTS friendship_connection CASCADE;
+DROP TABLE IF EXISTS "group" CASCADE;
+DROP TABLE IF EXISTS group_membership CASCADE;
+DROP TABLE IF EXISTS post CASCADE;
+DROP TABLE IF EXISTS comment CASCADE;
+DROP TABLE IF EXISTS "like" CASCADE;
+DROP TABLE IF EXISTS report CASCADE;
+DROP TABLE IF EXISTS notification CASCADE;
+DROP TABLE IF EXISTS user_notification CASCADE;
+DROP TABLE IF EXISTS comment_notification CASCADE;
+DROP TABLE IF EXISTS group_notification CASCADE;
+DROP TABLE IF EXISTS post_notification CASCADE;
+DROP TABLE IF EXISTS like_notification CASCADE;
+DROP TABLE IF EXISTS message_notification CASCADE;
+DROP TABLE IF EXISTS admin CASCADE;
+DROP TABLE IF EXISTS message CASCADE;
+
+-- Drop existing types if they exist
+DROP TYPE IF EXISTS visibility_type CASCADE;
+DROP TYPE IF EXISTS account_status_type CASCADE;
+DROP TYPE IF EXISTS friendship_status_type CASCADE;
+DROP TYPE IF EXISTS report_status_type CASCADE;
+DROP TYPE IF EXISTS user_notification_type CASCADE;
+DROP TYPE IF EXISTS comment_notification_type CASCADE;
+DROP TYPE IF EXISTS group_notification_type CASCADE;
+DROP TYPE IF EXISTS post_notification_type CASCADE;
+DROP TYPE IF EXISTS like_notification_type CASCADE;
+DROP TYPE IF EXISTS message_notification_type CASCADE;
+DROP TYPE IF EXISTS group_membership_type CASCADE;
+
+-- Create types
+
+CREATE TYPE group_membership_type AS ENUM ('pending', 'accepted', 'rejected');
+CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group', 'anonymous');
+CREATE TYPE account_status_type AS ENUM ('active', 'offline', 'deleted', 'blocked');
+CREATE TYPE friendship_status_type AS ENUM ('pending', 'accepted', 'rejected');
+CREATE TYPE report_status_type AS ENUM ('pending', 'reviewed', 'resolved');
+CREATE TYPE user_notification_type AS ENUM ('received_friend_request', 'accepted_friend_request', 'match');
+CREATE TYPE comment_notification_type AS ENUM ('replied_to_comment', 'commented_on_post', 'tagged_comment');
+CREATE TYPE group_notification_type AS ENUM ('invited_to_group');
+CREATE TYPE post_notification_type AS ENUM ('tagged_post');
+CREATE TYPE like_notification_type AS ENUM ('liked_comment', 'liked_post');
+CREATE TYPE message_notification_type AS ENUM ('received_message');
+
+-- Create tables
+CREATE TABLE "user" (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
+    account_status account_status_type NOT NULL,
+    last_login DATE DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE cards (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  user_id INTEGER REFERENCES users NOT NULL
+CREATE TABLE friendship_connection (
+    id_user1 INT REFERENCES "user"(id) ON DELETE CASCADE,
+    id_user2 INT REFERENCES "user"(id) ON DELETE CASCADE,
+    status friendship_status_type NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE,
+    PRIMARY KEY (id_user1, id_user2)
 );
 
-CREATE TABLE items (
-  id SERIAL PRIMARY KEY,
-  card_id INTEGER NOT NULL REFERENCES cards ON DELETE CASCADE,
-  description VARCHAR NOT NULL,
-  done BOOLEAN NOT NULL DEFAULT FALSE
+CREATE TABLE "group" (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE,
+    id_owner INT REFERENCES "user"(id) NOT NULL
 );
 
---
--- Insert value.
---
+CREATE TABLE group_membership (
+    id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
+    id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
+    joined_at DATE DEFAULT CURRENT_DATE,
+    PRIMARY KEY (id_user, id_group),
+    group_status group_membership_type NOT NULL DEFAULT 'pending'
+);
 
-INSERT INTO users VALUES (
-  DEFAULT,
-  'John Doe',
-  'admin@example.com',
-  '$2y$10$HfzIhGCCaxqyaIdGgjARSuOKAcm1Uy82YfLuNaajn6JrjLWy9Sj/W'
-); -- Password is 1234. Generated using Hash::make('1234')
+CREATE TABLE post (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    edited_at DATE DEFAULT CURRENT_DATE,
+    visibility visibility_type NOT NULL DEFAULT 'public', 
+    id_user INT REFERENCES "user"(id),
+    id_group INT REFERENCES "group"(id)
+);
 
-INSERT INTO cards VALUES (DEFAULT, 'Things to do', 1);
-INSERT INTO items VALUES (DEFAULT, 1, 'Buy milk');
-INSERT INTO items VALUES (DEFAULT, 1, 'Walk the dog', true);
+CREATE TABLE comment (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    edited_at DATE DEFAULT CURRENT_DATE,
+    deleted_at DATE CHECK (deleted_at >= CURRENT_DATE),
+    visibility visibility_type NOT NULL DEFAULT 'public',
+    id_user INT REFERENCES "user"(id),
+    id_post INT REFERENCES post(id) NOT NULL
+);
 
-INSERT INTO cards VALUES (DEFAULT, 'Things not to do', 1);
-INSERT INTO items VALUES (DEFAULT, 2, 'Break a leg');
-INSERT INTO items VALUES (DEFAULT, 2, 'Crash the car');
+CREATE TABLE "like" (
+    id SERIAL PRIMARY KEY,
+    created_at DATE DEFAULT CURRENT_DATE,
+    id_user INT REFERENCES "user"(id),
+    id_post INT REFERENCES post(id),
+	id_comment INT REFERENCES comment(id),
+    visibility visibility_type NOT NULL DEFAULT 'public'
+);
+
+CREATE TABLE report (
+    id SERIAL PRIMARY KEY,
+    description TEXT NOT NULL,
+    status report_status_type NOT NULL DEFAULT 'pending',
+    id_user INT REFERENCES "user"(id) NOT NULL,
+    id_reported_post INT REFERENCES post(id),
+    id_reported_comment INT REFERENCES comment(id)
+);
+
+CREATE TABLE notification (
+    id SERIAL PRIMARY KEY,
+    seen BOOLEAN DEFAULT FALSE,
+    created_at DATE DEFAULT CURRENT_DATE,
+    id_user INT REFERENCES "user"(id) NOT NULL,
+    id_related_post INT REFERENCES post(id),
+    id_related_comment INT REFERENCES comment(id),
+    id_related_group INT REFERENCES "group"(id)
+);
+
+CREATE TABLE message (
+    id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE,
+    id_sender INT REFERENCES "user"(id),
+    id_receiver INT REFERENCES "user"(id),
+    visibility visibility_type NOT NULL DEFAULT 'public'
+);
+
+
+CREATE TABLE user_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type user_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE comment_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type comment_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE group_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type group_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE post_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type post_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE like_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type like_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE message_notification (
+    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    type message_notification_type NOT NULL,
+    PRIMARY KEY (id_notification)
+);
+
+CREATE TABLE admin (
+    id INT REFERENCES "user"(id) PRIMARY KEY
+);
+
+
+----------------------------------
+-- Indexes
+----------------------------------
+
+CREATE INDEX idx_user_username_email ON "user" (username, email);
+
+----------------------------------
+
+CREATE INDEX idx_friendship_user1_user2_status ON friendship_connection (id_user1, id_user2, status);
+
+----------------------------------
+
+CREATE INDEX idx_notification_user_seen_created_at ON notification (id_user, seen, created_at);
+
+----------------------------------
+
+ALTER TABLE "user" 
+ADD COLUMN user_search_tsv tsvector;
+
+UPDATE "user" 
+SET user_search_tsv = to_tsvector('english', username || ' ' || name);
+
+CREATE INDEX idx_user_search 
+ON "user" USING GIN (user_search_tsv);
+
+CREATE TRIGGER trg_user_search_update 
+BEFORE INSERT OR UPDATE ON "user" 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(user_search_tsv, 'pg_catalog.english', username, name);
+
+----------------------------------
+
+ALTER TABLE post 
+ADD COLUMN post_content_tsv tsvector;
+
+UPDATE post 
+SET post_content_tsv = to_tsvector('english', content);
+
+CREATE INDEX idx_post_content_search 
+ON post USING GIN (post_content_tsv);
+
+CREATE TRIGGER trg_post_content_update 
+BEFORE INSERT OR UPDATE ON post 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(post_content_tsv, 'pg_catalog.english', content);
+
+----------------------------------
+
+ALTER TABLE comment 
+ADD COLUMN comment_content_tsv tsvector;
+
+UPDATE comment 
+SET comment_content_tsv = to_tsvector('english', content);
+
+CREATE INDEX idx_comment_content_search 
+ON comment USING GIN (comment_content_tsv);
+
+CREATE TRIGGER trg_comment_content_update 
+BEFORE INSERT OR UPDATE ON comment 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(comment_content_tsv, 'pg_catalog.english', content);
+
+----------------------------------
+
+ALTER TABLE "group" 
+ADD COLUMN group_content_tsv tsvector;
+
+
+UPDATE "group" 
+SET group_content_tsv = to_tsvector('english', name || ' ' || description);
+
+
+CREATE INDEX idx_group_content_search 
+ON "group" USING GIN (group_content_tsv);
+
+
+CREATE TRIGGER trg_group_content_update 
+BEFORE INSERT OR UPDATE ON "group" 
+FOR EACH ROW EXECUTE FUNCTION 
+tsvector_update_trigger(group_content_tsv, 'pg_catalog.english', name, description);
+
+
+----------------------------------
+-- Triggers
+----------------------------------
+
+CREATE OR REPLACE FUNCTION trg_no_self_report_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id_user = (SELECT id_user FROM post WHERE id = NEW.id_reported_post) THEN
+        RAISE EXCEPTION 'User cannot report their own post';
+    END IF;
+
+    RETURN NEW; 
+END;
+
+
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_no_self_report
+BEFORE INSERT ON report
+FOR EACH ROW
+EXECUTE FUNCTION trg_no_self_report_func();
+
+-----------------------
+
+CREATE OR REPLACE FUNCTION trg_update_last_login_func()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.account_status = 'active' THEN
+        NEW.last_login := CURRENT_TIMESTAMP; 
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_last_login
+BEFORE UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_update_last_login_func();
+
+-----------------------
+
+
+CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
+RETURNS TRIGGER AS $$
+DECLARE
+    post_owner INT;
+    notification_id INT;
+BEGIN
+    SELECT id_user INTO post_owner FROM post WHERE id = NEW.id_post;
+
+    IF post_owner IS NOT NULL AND post_owner <> NEW.id_user THEN
+        INSERT INTO notification (id_user, id_related_post, id_related_comment, seen, created_at)
+        VALUES (post_owner, NEW.id_post, NEW.id, FALSE, CURRENT_TIMESTAMP)
+        RETURNING id INTO notification_id; 
+
+        INSERT INTO comment_notification (id_notification, type)
+        VALUES (notification_id, 'commented_on_post'); 
+    END IF;
+
+    RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_comment_on_post_notification
+AFTER INSERT ON comment
+FOR EACH ROW
+EXECUTE FUNCTION trg_comment_on_post_notification_func();
+
+
+----------------------
+
+-- Create the trigger function to transfer group ownership or delete the group
+CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
+RETURNS TRIGGER AS $$
+DECLARE
+    new_owner_id INT;
+BEGIN
+    SELECT id INTO new_owner_id FROM "user" WHERE id != OLD.id LIMIT 1;
+    IF new_owner_id IS NOT NULL THEN
+        UPDATE "group" SET id_owner = new_owner_id WHERE id_owner = OLD.id;
+    ELSE
+        DELETE FROM "group" WHERE id_owner = OLD.id;
+    END IF;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_delete
+BEFORE DELETE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_transfer_or_delete_group();
+
+--------
+
+-- Create the trigger function to enforce email domain
+CREATE OR REPLACE FUNCTION trg_check_feup_email()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.email !~* '^[^@]+@up\.pt$' THEN
+        RAISE EXCEPTION 'Email must be a FEUP institutional email (@up.pt)';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_user_insert_or_update
+BEFORE INSERT OR UPDATE ON "user"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_feup_email();
+
+
+------------
+
+-- Create the trigger function to enforce unique likes
+CREATE OR REPLACE FUNCTION trg_check_unique_like()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.id_post IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_post = NEW.id_post) THEN
+            RAISE EXCEPTION 'User has already liked this post';
+        END IF;
+    END IF;
+
+    IF NEW.id_comment IS NOT NULL THEN
+        IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_comment = NEW.id_comment) THEN
+            RAISE EXCEPTION 'User has already liked this comment';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER before_like_insert
+BEFORE INSERT ON "like"
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_like();
+
+--------------------------------
+
+-- Create the trigger function to delete related notifications
+CREATE OR REPLACE FUNCTION trg_delete_related_notification()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM notification WHERE id = OLD.id_notification;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_user_notification_delete
+AFTER DELETE ON user_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_comment_notification_delete
+AFTER DELETE ON comment_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_group_notification_delete
+AFTER DELETE ON group_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_post_notification_delete
+AFTER DELETE ON post_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_like_notification_delete
+AFTER DELETE ON like_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+CREATE TRIGGER after_message_notification_delete
+AFTER DELETE ON message_notification
+FOR EACH ROW
+EXECUTE FUNCTION trg_delete_related_notification();
+
+-----------------------------------------------
+
+-- Truncate tables
+TRUNCATE "like" CASCADE;
+TRUNCATE comment CASCADE;
+TRUNCATE post CASCADE;
+TRUNCATE group_membership CASCADE;
+TRUNCATE "group" CASCADE;
+TRUNCATE friendship_connection CASCADE;
+TRUNCATE report CASCADE;
+TRUNCATE notification CASCADE;
+TRUNCATE user_notification CASCADE;
+TRUNCATE comment_notification CASCADE;
+TRUNCATE group_notification CASCADE;
+TRUNCATE post_notification CASCADE;
+TRUNCATE like_notification CASCADE;
+TRUNCATE message_notification CASCADE;
+TRUNCATE message CASCADE;
+TRUNCATE admin CASCADE;
+TRUNCATE "user" CASCADE;
+
+-- Reset sequences
+ALTER SEQUENCE user_id_seq RESTART WITH 1;
+ALTER SEQUENCE group_id_seq RESTART WITH 1;
+ALTER SEQUENCE post_id_seq RESTART WITH 1;
+ALTER SEQUENCE comment_id_seq RESTART WITH 1;
+ALTER SEQUENCE like_id_seq RESTART WITH 1;
+ALTER SEQUENCE report_id_seq RESTART WITH 1;
+ALTER SEQUENCE notification_id_seq RESTART WITH 1;
+ALTER SEQUENCE message_id_seq RESTART WITH 1;
+
+-- Insert users
+INSERT INTO "user" (username, email, name, password, visibility, account_status)
+VALUES 
+('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active'),
+('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active'),
+('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline'),
+('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active'),
+('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active'),
+('dave_black', 'dave.black@up.pt', 'Dave Black', 'hashed_password6', 'public', 'active'),
+('eve_green', 'eve.green@up.pt', 'Eve Green', 'hashed_password7', 'private', 'offline'),
+('frank_blue', 'frank.blue@up.pt', 'Frank Blue', 'hashed_password8', 'public', 'deleted'),
+('grace_yellow', 'grace.yellow@up.pt', 'Grace Yellow', 'hashed_password9', 'public', 'active'),
+('hank_red', 'hank.red@up.pt', 'Hank Red', 'hashed_password10', 'private', 'blocked'),
+('maria_purple', 'maria.p@up.pt', 'Maria Purple', 'hashed_password11', 'public', 'active'),
+('joao_orange', 'joao.o@up.pt', 'Joao Orange', 'hashed_password12', 'public', 'active'),
+('ana_brown', 'ana.brown@up.pt', 'Ana Brown', 'hashed_password13', 'public', 'active'),
+('francisco_madureira', 'macaco.super_dragoes@up.pt', 'Francisco Madureira', 'hashed_password14', 'public', 'active'),
+('marcelo_rebelo_sousa', 'mrs@up.pt', 'Marcelo Rebelo Sousa', 'hashed_password15', 'public', 'active'),
+('antonio_costa', 'ac@up.pt', 'Antonio Costa', 'hashed_password16', 'public', 'active');
+
+
+-- Insert groups
+INSERT INTO "group" (name, description, visibility, id_owner)
+VALUES 
+('Hiking Enthusiasts', 'A group for people who love hiking.', 'public', 1),
+('Book Club', 'Discussing our favorite books.', 'private', 2),
+('Music Lovers', 'Sharing music recommendations.', 'public', 3),
+('Movie Buffs', 'Discussing favorite movies.', 'public', 4),
+('Photography Club', 'Sharing photography tips.', 'private', 5),
+('Cooking Club', 'Sharing recipes and cooking tips.', 'public', 6),
+('Travel Buddies', 'Planning trips together.', 'private', 7),
+('Tech Geeks', 'Discussing latest in tech.', 'public', 8),
+('Gaming Squad', 'Playing and discussing games.', 'private', 9),
+('Art Enthusiasts', 'Discussing art and exhibitions.', 'public', 10),
+('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14);
+
+-- Insert group memberships
+INSERT INTO group_membership (id_user, id_group, group_status)
+VALUES 
+(1, 1, 'accepted'),
+(2, 1, 'pending'),
+(3, 2, 'accepted'),
+(4, 3, 'accepted'),
+(5, 4, 'accepted'),
+(6, 5, 'pending'),
+(7, 6, 'accepted'),
+(8, 7, 'accepted'),
+(9, 8, 'accepted'),
+(10, 9, 'pending'),
+(11, 10, 'accepted'),
+(12, 11, 'accepted'),
+(13, 11, 'accepted'),
+(14, 11, 'accepted'),
+(15, 11, 'accepted'),
+(16, 11, 'accepted');
+
+-- Insert posts
+INSERT INTO post (content, visibility, id_user, id_group)
+VALUES 
+('Looking forward to our next hike!', 'public', 1, 1),
+('Has anyone read the latest mystery novel?', 'private', 2, 2),
+('What is your favorite band?', 'public', 3, 3),
+('Best movie of the year?', 'public', 4, 4),
+('Tips for beginner photographers?', 'private', 5, 5),
+('Best recipes for quick meals?', 'public', 6, 6),
+('Planning a trip to the mountains.', 'private', 7, 7),
+('Latest tech trends for 2024.', 'public', 8, 8),
+('Best multiplayer games this year.', 'private', 9, 9),
+('Art exhibitions worth visiting.', 'public', 10, 10),
+('Vamos ganhar!', 'public', 14, 11);
+
+-- Insert comments
+INSERT INTO comment (content, visibility, id_user, id_post)
+VALUES 
+('Count me in!', 'public', 2, 1),
+('I loved it!', 'private', 1, 2),
+('My favorite band is XYZ!', 'public', 3, 3),
+('The best movie is ABC!', 'public', 4, 4),
+('Try using natural light.', 'private', 5, 5),
+('I recommend quick pasta.', 'public', 6, 6),
+('Let’s plan for next weekend.', 'private', 7, 7),
+('AI is taking over!', 'public', 8, 8),
+('Let’s play together!', 'private', 9, 9),
+('The modern art exhibition is amazing!', 'public', 10, 10),
+('Vamos ganhar!', 'public', 14, 11);
+
+-- Insert likes
+INSERT INTO "like" (id_user, id_post)
+VALUES 
+(2, 1),
+(1, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10),
+(11,10),
+(12,10);
+
+-- Insert reports
+INSERT INTO report (description, status, id_user, id_reported_post)
+VALUES 
+('Inappropriate content', 'pending', 3, 1),
+('Spam', 'reviewed', 4, 2),
+('Hate speech', 'resolved', 5, 3),
+('Harassment', 'pending', 6, 4),
+('Misinformation', 'pending', 7, 5),
+('Inappropriate image', 'reviewed', 8, 6),
+('Phishing attempt', 'resolved', 9, 7),
+('Copyright infringement', 'pending', 10, 8),
+('Fake news', 'reviewed', 1, 9),
+('Offensive language', 'resolved', 2, 10);
+
+-- Insert admin
+INSERT INTO admin (id)
+VALUES 
+(1),
+(2),
+(3);
+
+-- Insert messages
+INSERT INTO message (content, id_sender, id_receiver, visibility)
+VALUES 
+('Hello, how are you?', 1, 2, 'public'),
+('What’s up?', 2, 3, 'public'),
+('Long time no see!', 3, 4, 'public'),
+('Let’s catch up!', 4, 5, 'public'),
+('How’s it going?', 5, 6, 'public'),
+('Any plans for the weekend?', 6, 7, 'public'),
+('Are you coming to the party?', 7, 8, 'public'),
+('Happy Birthday!', 8, 9, 'public'),
+('Congrats on your new job!', 9, 10, 'public'),
+('See you soon!', 10, 1, 'public'),
+('Se houver penalti contra o benfica amanhã pago um jantar a todos os membros do grupo', 14, 11, 'public');
+
+
+INSERT INTO notification (id_user, id_related_post, id_related_comment, id_related_group, seen)
+VALUES 
+(1, 1, NULL, 1, FALSE),
+(2, 2, 1, NULL, FALSE),
+(3, NULL, NULL, NULL, TRUE),
+(4, 2, NULL, 2, FALSE),
+(5, NULL, 2, NULL, FALSE),
+(6, 5, NULL, 5, FALSE),
+(7, 6, NULL, 6, FALSE),
+(8, 7, NULL, 7, FALSE),
+(9, 8, NULL, 8, FALSE),
+(10, 9, NULL, 9, FALSE),
+(11, 10, NULL, 10, FALSE),
+(14, 11, NULL, 11, FALSE);
+
+-- Insert specific user notifications
+INSERT INTO user_notification (id_notification, type)
+VALUES 
+(1, 'received_friend_request'),
+(3, 'match');
+
+-- Insert specific comment notifications
+INSERT INTO comment_notification (id_notification, type)
+VALUES 
+(5, 'commented_on_post');
+
+
+-- Insert specific group notifications
+INSERT INTO group_notification (id_notification, type)
+VALUES 
+(6, 'invited_to_group');
+
+-- Insert Friendships
+INSERT INTO friendship_connection (id_user1, id_user2, status)
+VALUES 
+(1, 2, 'pending'),
+(1, 3, 'accepted'),
+(1, 4, 'accepted'),
+(1, 5, 'accepted'),
+(1, 6, 'accepted'),
+(1, 7, 'accepted'),
+(1, 8, 'accepted'),
+(1, 9, 'accepted'),
+(1, 10, 'accepted'),
+(1, 11, 'accepted'),
+(1, 12, 'accepted'),
+(1, 13, 'accepted'),
+(1, 14, 'accepted'),
+(1, 15, 'accepted'),
+(1, 16, 'accepted');
+
+
+-------
