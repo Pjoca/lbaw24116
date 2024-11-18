@@ -15,15 +15,31 @@ class UserController extends Controller
     {
         // Find the user by ID or return a 404 response
         $user = User::findOrFail($id);
-
+    
         // Authorize viewing the profile
         $this->authorize('view', $user);
+    
+        // Check if the authenticated user is viewing their own profile
+        $isOwnProfile = Auth::id() === $user->id;
+    
+        // Prepare the user data for the response
+        $userData = [
+            'id' => $user->id,
+            'username'=> $user->username,
+            'name' => $user->name,
+            'last_login' => $user->last_login,
 
+        ];
+    
+        // Include email if it's the authenticated user's own profile
+        if ($isOwnProfile) {
+            $userData['email'] = $user->email;
+        }
+    
         // Return the user profile
-        return response()->json([
-            'message' => 'Profile retrieved successfully',
-            'data' => $user,
-        ], 200);
+        return view('pages.profile', [
+            'user' => $userData,
+        ]);
     }
 
     /**

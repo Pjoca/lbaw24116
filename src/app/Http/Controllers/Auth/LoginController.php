@@ -41,10 +41,10 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Log successful login
-            Log::info('User logged in:', ['email' => $credentials['email']]);
+            Log::info('User logged in:',['email' => $credentials['email']]);
 
             // Redirect to the intended page or default to cards
-            return redirect()->intended('/cards');
+            return redirect()->intended('/home');
         }
 
         // Log failed login attempt
