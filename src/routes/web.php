@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Http\Controllers\UserController;
 
+use App\Http\Controllers\PostController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -66,3 +68,22 @@ Route::controller(UserController::class)->middleware('auth')->group(function () 
     Route::get('/profile/{id}', 'show')->name('profile.show'); // View Profile
     Route::put('/profile/{id}', 'update')->name('profile.update'); // Edit Profile
 });
+
+// Posts
+Route::controller(PostController::class)->middleware('auth')->group(function () {
+    Route::get('/timeline/public', 'publicTimeline')->name('timeline.public'); // View Public Timeline
+    Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
+    Route::post('/post', 'create')->name('post.create'); // Create Post
+    Route::put('/post/{id}', 'update')->name('post.update'); // Edit Post
+    Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
+});
+
+
+Route::get('/test-post', function () {
+    return view('tests.post');
+});
+
+Route::get('/test-updatePost', function () {
+    return view('tests.update_post');
+});
+

@@ -89,6 +89,7 @@ CREATE TABLE group_membership (
 CREATE TABLE post (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
+    created_at DATE DEFAULT CURRENT_DATE,
     edited_at DATE DEFAULT CURRENT_DATE,
     visibility visibility_type NOT NULL DEFAULT 'public', 
     id_user INT REFERENCES "user"(id),
