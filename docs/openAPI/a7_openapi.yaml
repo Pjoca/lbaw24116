@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: '1.0'
   title: 'Platform API'
-  description: 'API for core platform functionalities including authentication, profile management, search, timelines, and posts.'
+  description: 'API for core platform functionalities including authentication, profile management, search, timelines, posts, and administrative actions.'
 servers:
   - url: https://lbaw.fe.up.pt
     description: Production Server
@@ -14,10 +14,10 @@ tags:
     description: "Endpoints for profile management"
   - name: "Search"
     description: "Endpoints for search functionalities"
-  - name: "Admin"
-    description: "Endpoints for administrative actions"
   - name: "Post"
     description: "Endpoints for viewing, creating, editing, and deleting posts"
+  - name: "Admin"
+    description: "Endpoints for administrative actions"
 
 paths:
   /auth/login:
@@ -59,12 +59,29 @@ paths:
         '200':
           description: "Logout successful"
 
-  /auth/register:
-    post:
-      summary: "Register"
-      description: "Register a new user. Access: PUB"
+  /admin/users:
+    get:
+      summary: "Search Users"
+      description: "View and search user accounts. Access: ADM"
       tags:
-        - "Authentication"
+        - "Admin"
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: "Search term for user accounts (e.g., username or email)"
+      responses:
+        '200':
+          description: "User accounts retrieved successfully"
+        '400':
+          description: "Invalid search query"
+
+    post:
+      summary: "Create User"
+      description: "Create a new user account. Access: ADM"
+      tags:
+        - "Admin"
       requestBody:
         required: true
         content:
@@ -74,34 +91,44 @@ paths:
               properties:
                 username:
                   type: string
-                  description: "Unique username for the user"
+                  description: "New user's username"
                 email:
                   type: string
                   format: email
-                  description: "FEUP institutional email (@up.pt)"
-                password:
-                  type: string
-                  description: "User's password"
+                  description: "New user's email"
                 name:
                   type: string
-                  description: "Full name of the user"
+                  description: "New user's full name"
+                password:
+                  type: string
+                  description: "New user's password"
+                visibility:
+                  type: string
+                  enum: ["public", "private"]
+                  description: "User visibility status"
+                account_status:
+                  type: string
+                  enum: ["active", "blocked", "deleted", "offline"]
+                  description: "Account status"
               required:
                 - username
                 - email
-                - password
                 - name
+                - password
+                - visibility
+                - account_status
       responses:
         '201':
-          description: "User registered successfully"
+          description: "User account created successfully"
         '400':
           description: "Invalid input data"
 
-  /profile/{id}:
+  /admin/users/{id}:
     get:
-      summary: "View Profile"
-      description: "Retrieve the profile information of a user. Access: USR"
+      summary: "View User Details"
+      description: "View detailed information of a specific user. Access: ADM"
       tags:
-        - "Profile"
+        - "Admin"
       parameters:
         - name: id
           in: path
@@ -111,15 +138,15 @@ paths:
           description: "ID of the user"
       responses:
         '200':
-          description: "Profile retrieved successfully"
+          description: "User details retrieved successfully"
         '404':
-          description: "Profile not found"
+          description: "User not found"
 
     put:
-      summary: "Edit Profile"
-      description: "Update profile information of the authenticated user. Access: OWN"
+      summary: "Edit User"
+      description: "Edit a specific user's account details. Access: ADM"
       tags:
-        - "Profile"
+        - "Admin"
       requestBody:
         required: true
         content:
@@ -127,318 +154,52 @@ paths:
             schema:
               type: object
               properties:
-                name:
-                  type: string
-                  description: "Updated full name"
                 email:
                   type: string
                   format: email
                   description: "Updated email address"
+                name:
+                  type: string
+                  description: "Updated full name"
+                username:
+                  type: string
+                  description: "Updated username"
                 visibility:
                   type: string
                   enum: ["public", "private"]
-                  description: "Updated visibility of the user"
+                  description: "Updated visibility status"
+                account_status:
+                  type: string
+                  enum: ["active", "blocked", "deleted", "offline"]
+                  description: "Updated account status"
               required:
-                - name
                 - email
+                - name
+                - username
                 - visibility
+                - account_status
       responses:
         '200':
-          description: "Profile updated successfully"
+          description: "User details updated successfully"
         '400':
           description: "Invalid input data"
-
-  /search/exact:
-    get:
-      summary: "Exact Match Search"
-      description: "Search for users with exact match criteria. Access: USR"
-      tags:
-        - "Search"
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-          description: "Exact username to search for"
-      responses:
-        '200':
-          description: "Search results returned successfully"
-        '400':
-          description: "Invalid query"
-
-  /search/fulltext:
-    get:
-      summary: "Full-Text Search"
-      description: "Perform a full-text search across users and content. Access: USR"
-      tags:
-        - "Search"
-      parameters:
-        - name: query
-          in: query
-          required: true
-          schema:
-            type: string
-          description: "Full-text search query"
-      responses:
-        '200':
-          description: "Search results returned successfully"
-        '400':
-          description: "Invalid query"
-
-  /timeline/public:
-    get:
-      summary: "View Public Timeline"
-      description: "Retrieve the public timeline of posts. Access: PUB"
-      tags:
-        - "Post"
-      responses:
-        '200':
-          description: "Timeline retrieved successfully"
-
-  /timeline/personalized:
-    get:
-      summary: "View Personalized Timeline"
-      description: "Retrieve the personalized timeline for the authenticated user. Access: USR"
-      tags:
-        - "Post"
-      responses:
-        '200':
-          description: "Timeline retrieved successfully"
-        '401':
-          description: "Unauthorized access"
-
-  /post:
-    post:
-      summary: "Create Post"
-      description: "Create a new post by an authenticated user. Access: USR"
-      tags:
-        - "Post"
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                content:
-                  type: string
-                  description: "Content of the post"
-                visibility:
-                  type: string
-                  enum: ["public", "private", "group"]
-                  description: "Visibility of the post"
-                id_group:
-                  type: integer
-                  description: "ID of the group where the post is created (optional)"
-              required:
-                - content
-      responses:
-        '201':
-          description: "Post created successfully"
-        '400':
-          description: "Invalid input data"
-
-  /post/{id}:
-    put:
-      summary: "Edit Post"
-      description: "Edit an existing post by the authenticated user. Access: OWN"
-      tags:
-        - "Post"
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: "ID of the post to edit"
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                content:
-                  type: string
-                  description: "Updated content of the post"
-                visibility:
-                  type: string
-                  enum: ["public", "private", "group"]
-                  description: "Updated visibility of the post"
-              required:
-                - content
-      responses:
-        '200':
-          description: "Post updated successfully"
-        '400':
-          description: "Invalid input data"
-        '403':
-          description: "Unauthorized action"
         '404':
-          description: "Post not found"
+          description: "User not found"
 
     delete:
-      summary: "Delete Post"
-      description: "Delete an existing post by the authenticated user. Access: OWN"
+      summary: "Delete User"
+      description: "Delete a specific user account. Access: ADM"
       tags:
-        - "Post"
+        - "Admin"
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: integer
-          description: "ID of the post to delete"
+          description: "ID of the user to delete"
       responses:
         '200':
-          description: "Post deleted successfully"
-        '403':
-          description: "Unauthorized action"
+          description: "User account deleted successfully"
         '404':
-          description: "Post not found"
-    
-    /admin/users:
-  get:
-    summary: "Search Users"
-    description: "View and search user accounts. Access: ADM"
-    tags:
-      - "Admin"
-    parameters:
-      - name: search
-        in: query
-        schema:
-          type: string
-        description: "Search term for user accounts (e.g., username or email)"
-    responses:
-      '200':
-        description: "User accounts retrieved successfully"
-      '400':
-        description: "Invalid search query"
-
-  post:
-    summary: "Create User"
-    description: "Create a new user account. Access: ADM"
-    tags:
-      - "Admin"
-    requestBody:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            type: object
-            properties:
-              username:
-                type: string
-                description: "New user's username"
-              email:
-                type: string
-                format: email
-                description: "New user's email"
-              name:
-                type: string
-                description: "New user's full name"
-              password:
-                type: string
-                description: "New user's password"
-              visibility:
-                type: string
-                enum: ["public", "private"]
-                description: "User visibility status"
-              account_status:
-                type: string
-                enum: ["active", "blocked", "deleted", "offline"]
-                description: "Account status"
-            required:
-              - username
-              - email
-              - name
-              - password
-              - visibility
-              - account_status
-    responses:
-      '201':
-        description: "User account created successfully"
-      '400':
-        description: "Invalid input data"
-
-/admin/users/{id}:
-  get:
-    summary: "View User Details"
-    description: "View detailed information of a specific user. Access: ADM"
-    tags:
-      - "Admin"
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: "ID of the user"
-    responses:
-      '200':
-        description: "User details retrieved successfully"
-      '404':
-        description: "User not found"
-
-  put:
-    summary: "Edit User"
-    description: "Edit a specific user's account details. Access: ADM"
-    tags:
-      - "Admin"
-    requestBody:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            type: object
-            properties:
-              email:
-                type: string
-                format: email
-                description: "Updated email address"
-              name:
-                type: string
-                description: "Updated full name"
-              username:
-                type: string
-                description: "Updated username"
-              visibility:
-                type: string
-                enum: ["public", "private"]
-                description: "Updated visibility status"
-              account_status:
-                type: string
-                enum: ["active", "blocked", "deleted", "offline"]
-                description: "Updated account status"
-            required:
-              - email
-              - name
-              - username
-              - visibility
-              - account_status
-    responses:
-      '200':
-        description: "User details updated successfully"
-      '400':
-        description: "Invalid input data"
-      '404':
-        description: "User not found"
-
-  delete:
-    summary: "Delete User"
-    description: "Delete a specific user account. Access: ADM"
-    tags:
-      - "Admin"
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: "ID of the user to delete"
-    responses:
-      '200':
-        description: "User account deleted successfully"
-      '404':
-        description: "User not found"
+          description: "User not found"
