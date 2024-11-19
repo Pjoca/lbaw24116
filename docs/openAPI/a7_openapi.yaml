@@ -362,83 +362,83 @@ paths:
       '400':
         description: "Invalid input data"
 
-/admin/users/{id}:
-  get:
-    summary: "View User Details"
-    description: "View detailed information of a specific user. Access: ADM"
-    tags:
-      - "Admin"
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-        description: "ID of the user"
-    responses:
-      '200':
-        description: "User details retrieved successfully"
-      '404':
-        description: "User not found"
-
-  put:
-    summary: "Edit User"
-    description: "Edit a specific user's account details. Access: ADM"
-    tags:
-      - "Admin"
-    requestBody:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
+  /admin/users/{id}:
+    get:
+      summary: "View User Details"
+      description: "View detailed information of a specific user. Access: ADM"
+      tags:
+        - "Admin"
+      parameters:
+        - name: id
+          in: path
+          required: true
           schema:
-            type: object
-            properties:
-              email:
-                type: string
-                format: email
-                description: "Updated email address"
-              name:
-                type: string
-                description: "Updated full name"
-              username:
-                type: string
-                description: "Updated username"
-              visibility:
-                type: string
-                enum: ["public", "private"]
-                description: "Updated visibility status"
-              account_status:
-                type: string
-                enum: ["active", "blocked", "deleted", "offline"]
-                description: "Updated account status"
-            required:
-              - email
-              - name
-              - username
-              - visibility
-              - account_status
-    responses:
-      '200':
-        description: "User details updated successfully"
-      '400':
-        description: "Invalid input data"
-      '404':
-        description: "User not found"
+            type: integer
+          description: "ID of the user"
+      responses:
+        '200':
+          description: "User details retrieved successfully"
+        '404':
+          description: "User not found"
 
-  delete:
-    summary: "Delete User"
-    description: "Delete a specific user account. Access: ADM"
-    tags:
-      - "Admin"
-    parameters:
-      - name: id
-        in: path
+    put:
+      summary: "Edit User"
+      description: "Edit a specific user's account details. Access: ADM"
+      tags:
+        - "Admin"
+      requestBody:
         required: true
-        schema:
-          type: integer
-        description: "ID of the user to delete"
-    responses:
-      '200':
-        description: "User account deleted successfully"
-      '404':
-        description: "User not found"
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: "Updated email address"
+                name:
+                  type: string
+                  description: "Updated full name"
+                username:
+                  type: string
+                  description: "Updated username"
+                visibility:
+                  type: string
+                  enum: ["public", "private"]
+                  description: "Updated visibility status"
+                account_status:
+                  type: string
+                  enum: ["active", "blocked", "deleted", "offline"]
+                  description: "Updated account status"
+              required:
+                - email
+                - name
+                - username
+                - visibility
+                - account_status
+      responses:
+        '200':
+          description: "User details updated successfully"
+        '400':
+          description: "Invalid input data"
+        '404':
+          description: "User not found"
+
+    delete:
+      summary: "Delete User"
+      description: "Delete a specific user account. Access: ADM"
+      tags:
+        - "Admin"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user to delete"
+      responses:
+        '200':
+          description: "User account deleted successfully"
+        '404':
+          description: "User not found"
