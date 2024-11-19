@@ -8,6 +8,8 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
+use App\Http\Controllers\AdminController;
+
 use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
@@ -78,6 +80,15 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
 });
 
+Route::controller(AdminController::class)->middleware('auth')->group(function () {
+    Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
+    Route::get('/admin/users/{id}', 'showUser')->name('admin.users.show'); // View User
+    Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.editUser');
+    Route::put('/admin/update-user/{id}', [AdminController::class, 'updateUser'])->name('admin.updateUser');
+    Route::get('/admin/create-user', 'createUser')->name('admin.createUser'); // Page to create a user
+    Route::post('/admin/store-user', 'storeUser')->name('admin.storeUser');   // Submit user creation form
+    
+});
 
 Route::get('/test-post', function () {
     return view('tests.post');
@@ -85,5 +96,9 @@ Route::get('/test-post', function () {
 
 Route::get('/test-updatePost', function () {
     return view('tests.update_post');
+});
+
+Route::get('/test-adminUpdate', function () {
+    return view('tests.adminUpdate');
 });
 

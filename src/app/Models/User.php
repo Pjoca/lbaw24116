@@ -58,4 +58,18 @@ class User extends Authenticatable
      * Relationships
      */
 
+     public function posts(): HasMany
+     {
+         return $this->hasMany(Post::class, 'id_user');
+     }
+    
+     public function admin()
+     {
+        return $this->hasOne(Admin::class, 'id');
+     }
+
+     public function isAdmin()
+     {
+        return $this->admin !== null;
+     }   
 }
