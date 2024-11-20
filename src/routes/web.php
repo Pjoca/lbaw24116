@@ -101,3 +101,12 @@ Route::get('/test-updatePost', function () {
 Route::get('/test-adminUpdate', function () {
     return view('tests.adminUpdate');
 });
+
+
+Route::get('/pages/create-post', [PostController::class, 'showCreateForm'])->name('posts.create'); // Rota para mostrar o formulário de criação
+
+Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); // Rota para enviar o post
+
+
+
+

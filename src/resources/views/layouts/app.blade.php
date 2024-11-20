@@ -15,17 +15,12 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-blue-600 text-white p-4 rounded-lg mb-6">
                 <h1>
-                    <a href="{{ url('/home') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
+                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
                         ConnectFeup
                     </a>
                 </h1>
                 <nav>
                     <ul class="flex gap-4 mt-4 md:mt-0">
-                        <li>
-                            <a href="{{ url('/home') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
-                                Homepage
-                            </a>
-                        </li>
                         <li>
                             <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
                                 Matchmaking
