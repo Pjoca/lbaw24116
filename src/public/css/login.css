@@ -50,10 +50,13 @@ form::before {
     width: 80px;
     height: 80px;
     margin: -4em auto 1em;
-    background: linear-gradient(145deg, #58d5d3, #2a66a1);
+    background: white;
     border-radius: 50%;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     border: 4px solid #ffffff;
+    background-image: url('/images/LOGO_CONNECT_FEUP.png');
+    background-size: cover;
+    background-position: center;
 }
 
 label {
