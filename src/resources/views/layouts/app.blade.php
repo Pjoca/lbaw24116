@@ -12,22 +12,43 @@
 
         <!-- Styles -->
         <link href="{{ url('css/milligram.min.css') }}" rel="stylesheet">
-        <link href="{{ url('css/app.css') }}" rel="stylesheet">
+        <link href="{{ url('css/layout.css') }}" rel="stylesheet">
         <script type="text/javascript">
             // Fix for Firefox autofocus CSS bug
             // See: http://stackoverflow.com/questions/18943276/html-5-autofocus-messes-up-css-loading/18945951#18945951
         </script>
-        <script type="text/javascript" src={{ url('js/app.js') }} defer>
-        </script>
+        <script type="text/javascript" src="{{ url('js/app.js') }}" defer></script>
     </head>
     <body>
         <main>
-            <header>
-                <h1><a href="{{ url('/cards') }}">Thingy!</a></h1>
-                @if (Auth::check())
-                    <a class="button" href="{{ url('/logout') }}"> Logout </a> <span>{{ Auth::user()->name }}</span>
-                @endif
-            </header>
+        <header>
+    <h1><a href="{{ url('/home') }}">ConnectFeup</a></h1>
+    <nav>
+        <ul>
+            <li><a href="{{ url('/home') }}">Homepage</a></li>
+            <li><a href="{{ url('/matchmaking') }}">Matchmaking</a></li>
+            <li><a href="{{ url('/search') }}">Search</a></li>
+            <li><a href="{{ url('/messages') }}">Messages</a></li>
+            <li><a href="{{ url('/post') }}">Post</a></li>
+        </ul>
+    </nav>
+    
+    @if (Auth::check())
+        <div class="user-info">
+            <span>{{ Auth::user()->name }}</span>
+            <a class="button" href="{{ url('/logout') }}">Logout</a>
+        </div>
+    @endif
+
+    {{-- Condicional para exibir elementos específicos por página --}}
+    @if (Request::is('login'))
+        <div class="search-bar">
+            <input type="text" placeholder="Search in feed...">
+            <button type="submit">Search</button>
+        </div>
+    @endif
+</header>
+
             <section id="content">
                 @yield('content')
             </section>
