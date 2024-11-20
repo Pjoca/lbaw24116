@@ -53,7 +53,7 @@ class RegisterController extends Controller
         Log::info('New user registered and logged in:', ['username' => $user->username]);
 
         // Redirect to the home page
-        return redirect()->route('home')
+        return redirect()->intended('/timeline/public')
             ->with('success', 'You have successfully registered and logged in!');
     }
 }
