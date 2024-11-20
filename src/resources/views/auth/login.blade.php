@@ -20,6 +20,7 @@
         </script>
 </head>
 <body>
+<a class="logo-link" href="{{ route('login') }}"> <img src="{{ asset('images/LOGO_CONNECT_FEUP.png') }}" alt="Logo" class="logo"></a>    
 <form method="POST" action="{{ route('login') }}">
     {{ csrf_field() }}
 
