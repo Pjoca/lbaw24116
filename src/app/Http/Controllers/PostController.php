@@ -16,10 +16,7 @@ class PostController extends Controller
     {
         $posts = Post::where('visibility', 'public')->latest()->get();
 
-        return response()->json([
-            'message' => 'Public timeline retrieved successfully',
-            'data' => $posts,
-        ], 200);
+        return view('pages.timeline', compact('posts'));
     }
 
     /**
