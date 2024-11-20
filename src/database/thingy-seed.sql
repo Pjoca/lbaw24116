@@ -88,6 +88,7 @@ CREATE TABLE group_membership (
 
 CREATE TABLE post (
     id SERIAL PRIMARY KEY,
+    image_url TEXT,
     content TEXT NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE,
     edited_at DATE DEFAULT CURRENT_DATE,
@@ -537,19 +538,20 @@ VALUES
 (16, 11, 'accepted');
 
 -- Insert posts
-INSERT INTO post (content, visibility, id_user, id_group)
+INSERT INTO post (content, visibility, id_user, id_group, image_url)
 VALUES 
-('Looking forward to our next hike!', 'public', 1, 1),
-('Has anyone read the latest mystery novel?', 'private', 2, 2),
-('What is your favorite band?', 'public', 3, 3),
-('Best movie of the year?', 'public', 4, 4),
-('Tips for beginner photographers?', 'private', 5, 5),
-('Best recipes for quick meals?', 'public', 6, 6),
-('Planning a trip to the mountains.', 'private', 7, 7),
-('Latest tech trends for 2024.', 'public', 8, 8),
-('Best multiplayer games this year.', 'private', 9, 9),
-('Art exhibitions worth visiting.', 'public', 10, 10),
-('Vamos ganhar!', 'public', 14, 11);
+('Looking forward to our next hike!', 'public', 1, 1, 'https://picsum.photos/600/400?random=1'),
+('Has anyone read the latest mystery novel?', 'private', 2, 2, 'https://picsum.photos/600/400?random=2'),
+('What is your favorite band?', 'public', 3, 3, 'https://picsum.photos/600/400?random=3'),
+('Best movie of the year?', 'public', 4, 4, 'https://picsum.photos/600/400?random=4'),
+('Tips for beginner photographers?', 'private', 5, 5, 'https://picsum.photos/600/400?random=5'),
+('Best recipes for quick meals?', 'public', 6, 6, 'https://picsum.photos/600/400?random=6'),
+('Planning a trip to the mountains.', 'private', 7, 7, 'https://picsum.photos/600/400?random=7'),
+('Latest tech trends for 2024.', 'public', 8, 8, 'https://picsum.photos/600/400?random=8'),
+('Best multiplayer games this year.', 'private', 9, 9, 'https://picsum.photos/600/400?random=9'),
+('Art exhibitions worth visiting.', 'public', 10, 10, 'https://picsum.photos/600/400?random=10'),
+('Vamos ganhar!', 'public', 14, 11, 'https://picsum.photos/600/400?random=11');
+
 
 -- Insert comments
 INSERT INTO comment (content, visibility, id_user, id_post)
