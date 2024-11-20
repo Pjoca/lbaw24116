@@ -26,14 +26,15 @@ class RegisterController extends Controller
     {
         // Validate the input
         $request->validate([
+            'username' => 'required|string|max:50|unique:user,username', // Validate unique username
             'name' => 'required|string|max:250',
-            'email' => 'required|email|max:250|unique:user,email', // Adjusted for table name
+            'email' => 'required|email|max:250|unique:user,email', // Validate unique email
             'password' => 'required|min:8|confirmed',
         ]);
 
         // Create the user
         $user = User::create([
-            'username' => $request->name, // Assuming username = name
+            'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -49,7 +50,7 @@ class RegisterController extends Controller
         $request->session()->regenerate();
 
         // Log the successful registration
-        Log::info('New user registered and logged in:', ['email' => $user->email]);
+        Log::info('New user registered and logged in:', ['username' => $user->username]);
 
         // Redirect to the home page
         return redirect()->route('home')
