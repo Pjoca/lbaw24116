@@ -101,4 +101,3 @@ Route::get('/test-updatePost', function () {
 Route::get('/test-adminUpdate', function () {
     return view('tests.adminUpdate');
 });
-
