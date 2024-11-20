@@ -4,20 +4,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
-use Illuminate\View\View;
-
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 
 class RegisterController extends Controller
 {
     /**
-     * Display a login form.
+     * Display the registration form.
      */
-    public function showRegistrationForm(): View
+    public function showRegistrationForm()
     {
         return view('auth.register');
     }
@@ -27,22 +24,36 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
+        // Validate the input
         $request->validate([
+            'username' => 'required|string|max:50|unique:user,username', // Validate unique username
             'name' => 'required|string|max:250',
-            'email' => 'required|email|max:250|unique:users',
-            'password' => 'required|min:8|confirmed'
+            'email' => 'required|email|max:250|unique:user,email', // Validate unique email
+            'password' => 'required|min:8|confirmed',
         ]);
 
-        User::create([
+        // Create the user
+        $user = User::create([
+            'username' => $request->username,
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'visibility' => 'public',
+            'account_status' => 'active',
+            'last_login' => now(),
         ]);
 
-        $credentials = $request->only('email', 'password');
-        Auth::attempt($credentials);
+        // Log in the user
+        Auth::login($user);
+
+        // Regenerate session to prevent session fixation attacks
         $request->session()->regenerate();
-        return redirect()->route('cards')
-            ->withSuccess('You have successfully registered & logged in!');
+
+        // Log the successful registration
+        Log::info('New user registered and logged in:', ['username' => $user->username]);
+
+        // Redirect to the home page
+        return redirect()->intended('/timeline/public')
+            ->with('success', 'You have successfully registered and logged in!');
     }
 }

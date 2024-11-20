@@ -9,26 +9,63 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @vite('resources/css/app.css')
         <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Styles -->
-        <link href="{{ url('css/milligram.min.css') }}" rel="stylesheet">
-        <link href="{{ url('css/app.css') }}" rel="stylesheet">
-        <script type="text/javascript">
-            // Fix for Firefox autofocus CSS bug
-            // See: http://stackoverflow.com/questions/18943276/html-5-autofocus-messes-up-css-loading/18945951#18945951
-        </script>
-        <script type="text/javascript" src={{ url('js/app.js') }} defer>
-        </script>
     </head>
-    <body>
-        <main>
-            <header>
-                <h1><a href="{{ url('/cards') }}">Thingy!</a></h1>
+    <body class="bg-gray-100 text-gray-800 font-sans">
+        <main class="p-4">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row justify-between items-center bg-blue-600 text-white p-4 rounded-lg mb-6">
+                <h1>
+                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
+                        ConnectFeup
+                    </a>
+                </h1>
+                <nav>
+                    <ul class="flex gap-4 mt-4 md:mt-0">
+                        <li>
+                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                                Matchmaking
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/search') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                                Search
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/messages') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                                Messages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('/post') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                                Post
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
                 @if (Auth::check())
-                    <a class="button" href="{{ url('/logout') }}"> Logout </a> <span>{{ Auth::user()->name }}</span>
+                    <div class="flex items-center gap-4 mt-4 md:mt-0">
+                        <span class="text-sm font-bold">{{ Auth::user()->name }}</span>
+                        <a href="{{ url('/logout') }}" class="bg-red-500 text-sm text-white py-2 px-3 rounded hover:bg-red-600 transition">
+                            Logout
+                        </a>
+                    </div>
+                @endif
+
+                <!-- Search bar for login page -->
+                @if (Request::is('login'))
+                    <div class="flex gap-2 mt-4 w-full md:w-auto">
+                        <input type="text" placeholder="Search in feed..." class="flex-1 border border-gray-300 rounded p-2 text-sm">
+                        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition">
+                            Search
+                        </button>
+                    </div>
                 @endif
             </header>
-            <section id="content">
+
+            <!-- Content Section -->
+            <section id="content" class="bg-white p-6 rounded-lg shadow-md">
                 @yield('content')
             </section>
         </main>
