@@ -17,7 +17,7 @@ class PostController extends Controller
 {
     $posts = Post::where('visibility', 'public')
         ->latest()
-        ->paginate(10); // 10 posts por página
+        ->paginate(30); // nesta opçao podem dizer quantos posts querem por pagina -> igual ao exemplo de baixo dos myposts
 
     return view('pages.timeline', compact('posts'));
 }
@@ -108,23 +108,29 @@ public function personalizedTimeline()
      * Edit an existing post by the authenticated user. Access: OWN
      */
     public function update(Request $request, Post $post)
-{
-    $this->authorize('update', $post);
-
-    $validated = $request->validate([
-        'content' => 'required|string',
-        'visibility' => 'required|in:public,private,group',
-        'id_group' => 'nullable|integer|exists:groups,id',
-        'image_url' => 'nullable|url',
-    ]);
-
-    $post->update($validated);
-
-    return response()->json([
-        'message' => 'Post updated successfully',
-        'data' => $post,
-    ], 200);
-}
+    {
+        $this->authorize('update', $post);
+        
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'visibility' => 'required|in:public,private,group',
+            'id_group' => 'nullable|integer|exists:groups,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+        
+        // Verificar se uma nova imagem foi enviada
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('posts/images', 'public');
+            $validated['image_url'] = $imagePath;
+        }
+        
+        $post->update($validated);
+        
+        // Redirecionar após a atualização
+        return redirect()->route('timeline.public')->with('success', 'Post atualizado com sucesso!');
+    }
+    
+    
 
 
 
@@ -148,5 +154,27 @@ public function personalizedTimeline()
 
     return view('pages.create-post');
 }
+
+public function userPosts()
+{
+    $user = Auth::user();
+    $posts = $user->posts()->latest()->paginate(10); 
+
+    return view('pages.user-posts', compact('posts'));
 }
+
+public function showEditForm(Post $post)
+{
+    $this->authorize('update', $post);
+
+    return view('pages.edit-post', compact('post'));
+}
+
+public function show(Post $post)
+{
+    return view('pages.show-post', compact('post'));
+}
+
+}
+
 

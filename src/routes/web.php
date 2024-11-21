@@ -107,6 +107,10 @@ Route::get('/pages/create-post', [PostController::class, 'showCreateForm'])->nam
 
 Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); // Rota para enviar o post
 
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+
+Route::get('/posts/{id}/edit', [PostController::class, 'showEditForm'])->name('posts.edit');
+
 
 
 
