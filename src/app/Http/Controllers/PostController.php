@@ -107,46 +107,28 @@ public function personalizedTimeline()
     /**
      * Edit an existing post by the authenticated user. Access: OWN
      */
-    public function update(Request $request, Post $post)
-    {
-        $this->authorize('update', $post);
-        
-        $validated = $request->validate([
-            'content' => 'required|string',
-            'visibility' => 'required|in:public,private,group',
-            'id_group' => 'nullable|integer|exists:groups,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-        
-        // Verificar se uma nova imagem foi enviada
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('posts/images', 'public');
-            $validated['image_url'] = $imagePath;
-        }
-        
-        $post->update($validated);
-        
-        // Redirecionar após a atualização
-        return redirect()->route('timeline.public')->with('success', 'Post atualizado com sucesso!');
-    }
-    
-    
+    public function update(Request $request, $id)
+{
+    $post = Post::findOrFail($id); // Encontra o post pelo ID
 
+    $validated = $request->validate([
+        'content' => 'required|string',
+        'visibility' => 'required|in:public,private,group',
+    ]);
 
+    // Atualiza o post com os dados validados
+    $post->update($validated);
 
-    /**
-     * Delete an existing post by the authenticated user. Access: OWN
-     */
-    public function delete(Post $post)
-    {
-        $this->authorize('delete', $post);
+    return redirect()->route('timeline.public')->with('success', 'Post atualizado com sucesso!');
+}
 
-        $post->delete();
+public function userPosts()
+{
+    $user = Auth::user();
+    $posts = $user->posts()->latest()->get(); 
 
-        return response()->json([
-            'message' => 'Post deleted successfully',
-        ], 200);
-    }
+    return view('pages.user-posts', compact('posts')); 
+}
 
     public function showCreateForm()
 {
@@ -155,25 +137,37 @@ public function personalizedTimeline()
     return view('pages.create-post');
 }
 
-public function userPosts()
+public function show(Post $post)
 {
-    $user = Auth::user();
-    $posts = $user->posts()->latest()->paginate(10); 
-
-    return view('pages.user-posts', compact('posts'));
-}
-
-public function showEditForm(Post $post)
-{
-    $this->authorize('update', $post);
-
     return view('pages.edit-post', compact('post'));
 }
 
-public function show(Post $post)
+public function showEditForm($id)
 {
-    return view('pages.show-post', compact('post'));
+    $post = Post::findOrFail($id); 
+    return view('pages.edit-post', compact('post'));
 }
+
+public function edit($id)
+{
+    $post = Post::findOrFail($id);
+    return view('pages.edit-post', compact('post'));
+}
+
+public function delete(Post $post)
+{
+    
+    $this->authorize('delete', $post);
+
+
+    $post->delete();
+
+   
+    return redirect()->route('posts.userPosts')
+                     ->with('success', 'Post excluído com sucesso!');
+}
+
+
 
 }
 
