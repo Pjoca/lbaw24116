@@ -10,14 +10,11 @@ class AdminController extends Controller
 {
     public function listUsers()
     {
-        // Check if the current user can list all users.
         $this->authorize('general', Admin::class);
 
-        // Get all users.
         $users = User::all();
 
-        // Use the pages.users template to display all users.
-        return response()->json($users);
+        return view('pages.admin', compact('users'));
     }
 
     public function showUser($id)
@@ -44,10 +41,8 @@ class AdminController extends Controller
 
     public function updateUser(Request $request, $id)
     {
-        // Authorize the action
         $this->authorize('general', Admin::class);
 
-        // Validate the incoming data
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:user,email,' . $id,
@@ -56,17 +51,16 @@ class AdminController extends Controller
             'account_status' => 'required|in:active,offline,deleted,blocked',
         ]);
 
-        // Find and update the user
         $user = User::findOrFail($id);
         $user->update($validated);
 
-        // Redirect back to the edit page with a success message
-        return redirect()->route('admin.editUser', ['id' => $id])->with('success', 'User updated successfully.');
-
+        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
     }
 
+
+
     public function createUser()
-    {
+    {     
         // Authorize the action
         $this->authorize('general', Admin::class);
 
@@ -76,38 +70,30 @@ class AdminController extends Controller
 
     public function storeUser(Request $request)
     {
-        // Authorize the action
         $this->authorize('general', Admin::class);
 
-        // Validate the incoming data
-        $validated = $request->validate([
-            'name' => 'required|string|max:250',
-            'email' => 'required|email|max:250|unique:user,email',
-            'username' => 'required|string|max:50|unique:user,username',
-            'password' => 'required|string|min:8|confirmed',
-            'visibility' => 'required|in:public,private',
-            'account_status' => 'required|in:active,offline,deleted,blocked',
-        ]);
-
-        // Hash the password
-        $validated['password'] = bcrypt($validated['password']);
-
-        // Create the user
         try {
-            // Create the user
-            $user = User::create($request->all());
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'Email must be a FEUP institutional email')) {
-                return back()->withErrors(['email' => 'The email must be a FEUP institutional email (@up.pt).']);
-            }
-        
-            // Re-throw the exception if it's not related to the email
-            throw $e;
-        }
-        
+            $validated = $request->validate([
+                'name' => 'required|string|max:250',
+                'email' => 'required|email|max:250|unique:user,email',
+                'username' => 'required|string|max:50|unique:user,username',
+                'password' => 'required|string|min:8|confirmed',
+                'visibility' => 'required|in:public,private',
+                'account_status' => 'required|in:active,offline,deleted,blocked',
+            ]);
 
-        // Redirect to the user list with a success message
-        return redirect()->route('admin.users')->with('success', 'User created successfully.');
+            // Hash the password
+            $validated['password'] = bcrypt($validated['password']);
+
+            // Create the user
+            $user = User::create($validated);
+
+            return redirect()->route('admin.users')->with('success', 'User created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            return back()->with('error', 'An unexpected error occurred.');
+        }
     }
 
 }

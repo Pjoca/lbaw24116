@@ -29,7 +29,7 @@
                     <!-- Form for delete action -->
                     <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este post?');" class="block px-4 py-2">
                         @csrf
-                        @method('DELETE') <!-- This simulates a DELETE request -->
+                        @method('DELETE')
                         <button type="submit" class="text-red-500 hover:text-red-700 w-full text-left">
                             <i class="fa fa-trash"></i> Delete
                         </button>

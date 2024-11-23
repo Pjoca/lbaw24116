@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -79,10 +80,15 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
     Route::post('/post', 'create')->name('post.create'); // Create Post
     Route::put('/post/{id}', 'update')->name('post.update'); // Edit Post
-    Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
+    Route::delete('/post/{id}', 'delete')->name('post.delete');
+
 });
 
+// Search
+Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
+
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
+    Route::get('/admin', 'listUsers')->name('admin.panel');
     Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
     Route::get('/admin/users/{id}', 'showUser')->name('admin.users.show'); // View User
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.editUser');
@@ -112,8 +118,6 @@ Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); /
 Route::get('/pages/{post}/edit', [PostController::class, 'edit'])->name('posts.edit'); // Formulário de 
 
 Route::put('/pages/{post}', [PostController::class, 'update'])->name('posts.update'); // Atualização do post
-
-Route::get('/user/posts', [PostController::class, 'userPosts'])->name('posts.userPosts')->middleware('auth');
 
 
 

@@ -16,20 +16,30 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-teal-400 text-white p-4 rounded-lg mb-6">
                 <h1>
-                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
+                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-teal-600 transition">
                         ConnectFeup
                     </a>
                 </h1>
                 <nav>
                     <ul class="flex gap-4 mt-4 md:mt-0">
                         <li>
-                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
-                                Matchmaking
-                            </a>
+                            <form action= "{{ route('users.search') }}" method="GET" class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    name="query" 
+                                    placeholder="Search" 
+                                    class="flex-1 border border-gray-300 rounded p-2 text-sm" 
+                                    style="color: #000; border: 1px solid #ccc; padding: 8px; border-radius: 4px;" 
+                                    required>
+                                <button 
+                                    type="submit" 
+                                    class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                                </button>
+                            </form>
                         </li>
                         <li>
-                            <a href="{{ url('/search') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
-                                Search
+                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
+                                Matchmaking
                             </a>
                         </li>
                         <li>

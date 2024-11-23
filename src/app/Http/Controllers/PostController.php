@@ -168,18 +168,28 @@ public function edit($id)
     return view('pages.edit-post', compact('post'));
 }
 
-public function delete(Post $post)
+public function delete($id)
 {
-    
+    // Find the post by ID
+    $post = Post::findOrFail($id);
+
+    // Log the retrieved post for debugging purposes
+    Log::info('Attempting to delete post:', [
+        'post_id' => $post->id,
+        'post_user_id' => $post->id_user,
+    ]);
+
+    // Authorize the action
     $this->authorize('delete', $post);
 
-
+    // Delete the post
     $post->delete();
 
-   
-    return redirect()->route('posts.userPosts')
-                     ->with('success', 'Post excluído com sucesso!');
+    // Redirect to the user's profile with a success message
+    return redirect()->route('profile.show', ['id' => $post->id_user])
+        ->with('success', 'Post deleted successfully!');
 }
+
 
 
 
