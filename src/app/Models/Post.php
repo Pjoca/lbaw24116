@@ -34,6 +34,7 @@ class Post extends Model
         'content',
         'visibility',
         'id_user',
+        'image_url',
     ];
 
     /**

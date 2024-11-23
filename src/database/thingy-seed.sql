@@ -541,17 +541,18 @@ VALUES
 -- Insert posts
 INSERT INTO post (content, visibility, id_user, id_group, image_url)
 VALUES 
-('Looking forward to our next hike!', 'public', 1, 1, 'https://picsum.photos/600/400?random=1'),
-('Has anyone read the latest mystery novel?', 'private', 2, 2, 'https://picsum.photos/600/400?random=2'),
-('What is your favorite band?', 'public', 3, 3, 'https://picsum.photos/600/400?random=3'),
-('Best movie of the year?', 'public', 4, 4, 'https://picsum.photos/600/400?random=4'),
-('Tips for beginner photographers?', 'private', 5, 5, 'https://picsum.photos/600/400?random=5'),
-('Best recipes for quick meals?', 'public', 6, 6, 'https://picsum.photos/600/400?random=6'),
-('Planning a trip to the mountains.', 'private', 7, 7, 'https://picsum.photos/600/400?random=7'),
-('Latest tech trends for 2024.', 'public', 8, 8, 'https://picsum.photos/600/400?random=8'),
-('Best multiplayer games this year.', 'private', 9, 9, 'https://picsum.photos/600/400?random=9'),
-('Art exhibitions worth visiting.', 'public', 10, 10, 'https://picsum.photos/600/400?random=10'),
-('Vamos ganhar!', 'public', 14, 11, 'https://picsum.photos/600/400?random=11');
+('Looking forward to our next hike!', 'public', 1, 1, 'posts/images/3fdH5IrFdTqI2FBiJaSS0w7QK36yr1hE5OFCyJuq.png'),
+('Has anyone read the latest mystery novel?', 'private', 2, 2, 'posts/images/5QuUoSbIPnAu5TkCm12ap0ruM51qkg2AjfFOUOLu.png'),
+('What is your favorite band?', 'public', 3, 3, 'posts/images/6GdnztpsMKDuEH8p0HWIWTBj4WpWHMnU6KrrIxr7.png'),
+('Best movie of the year?', 'public', 4, 4, 'posts/images/OuyVuADuyoExsAYSZ4dAqgjfJcMyRs2ZbC7X2npA.png'),
+('Tips for beginner photographers?', 'private', 5, 5, 'posts/images/ZQNwZHsGnVlyh0U05vzEMNxK4Vhg9vpOUFV6zuzU.png'),
+('Best recipes for quick meals?', 'public', 6, 6, 'posts/images/wHZwjj14zP8ElKgW3DACQug9DvfB2CIw6OW8tWgT.png'),
+('Planning a trip to the mountains.', 'private', 7, 7, 'posts/images/3fdH5IrFdTqI2FBiJaSS0w7QK36yr1hE5OFCyJuq.png'),
+('Latest tech trends for 2024.', 'public', 8, 8, 'posts/images/5QuUoSbIPnAu5TkCm12ap0ruM51qkg2AjfFOUOLu.png'),
+('Best multiplayer games this year.', 'private', 9, 9, 'posts/images/6GdnztpsMKDuEH8p0HWIWTBj4WpWHMnU6KrrIxr7.png'),
+('Art exhibitions worth visiting.', 'public', 10, 10, 'posts/images/OuyVuADuyoExsAYSZ4dAqgjfJcMyRs2ZbC7X2npA.png'),
+('Vamos ganhar!', 'public', 14, 11, 'posts/images/ZQNwZHsGnVlyh0U05vzEMNxK4Vhg9vpOUFV6zuzU.png');
+
 
 
 -- Insert comments

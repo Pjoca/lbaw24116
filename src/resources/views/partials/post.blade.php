@@ -38,10 +38,9 @@
 
     <!-- Image -->
     @if ($post->image_url)
-        <div class="mb-4">
-            <img src="{{ $post->image_url }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover">
-        </div>
+    <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover">
     @endif
+
 
     <!-- Content -->
     <p class="text-lg text-gray-800 mb-1">{{ $post->content }}</p>
