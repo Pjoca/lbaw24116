@@ -87,6 +87,7 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
 Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
 
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
+    Route::get('/admin', 'listUsers')->name('admin.panel');
     Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
     Route::get('/admin/users/{id}', 'showUser')->name('admin.users.show'); // View User
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.editUser');
