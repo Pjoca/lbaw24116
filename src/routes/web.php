@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -80,6 +81,9 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
 });
 
+// Search
+Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
+
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
     Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
     Route::get('/admin/users/{id}', 'showUser')->name('admin.users.show'); // View User
@@ -106,7 +110,4 @@ Route::get('/test-adminUpdate', function () {
 Route::get('/pages/create-post', [PostController::class, 'showCreateForm'])->name('posts.create'); // Rota para mostrar o formulário de criação
 
 Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); // Rota para enviar o post
-
-
-
 
