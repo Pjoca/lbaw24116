@@ -78,7 +78,8 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
     Route::post('/post', 'create')->name('post.create'); // Create Post
     Route::put('/post/{id}', 'update')->name('post.update'); // Edit Post
-    Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
+    Route::delete('/post/{id}', 'delete')->name('post.delete');
+
 });
 
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
@@ -111,8 +112,6 @@ Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); /
 Route::get('/pages/{post}/edit', [PostController::class, 'edit'])->name('posts.edit'); // Formulário de 
 
 Route::put('/pages/{post}', [PostController::class, 'update'])->name('posts.update'); // Atualização do post
-
-Route::get('/user/posts', [PostController::class, 'userPosts'])->name('posts.userPosts')->middleware('auth');
 
 
 

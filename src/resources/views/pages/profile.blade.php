@@ -21,10 +21,18 @@
         </div>
 
         <!-- User Posts Section -->
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 text-center">
             <h3 class="text-xl font-bold mb-4">Posts by {{ $user['name'] }}</h3>
             @if ($posts->isEmpty())
                 <p>No posts available.</p>
+                @if (Auth::id() === $user['id']) <!-- Only show for the profile owner -->
+                    <div class="mt-4">
+                        <a href="{{ route('posts.create') }}" 
+                           class="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition">
+                            Add Your First Post
+                        </a>
+                    </div>
+                @endif
             @else
                 <div class="space-y-4">
                     @foreach ($posts as $post)
