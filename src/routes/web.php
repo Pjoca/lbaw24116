@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -81,6 +82,9 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::delete('/post/{id}', 'delete')->name('post.delete');
 
 });
+
+// Search
+Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
 
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
     Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
