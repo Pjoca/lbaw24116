@@ -16,7 +16,7 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-teal-400 text-white p-4 rounded-lg mb-6">
                 <h1>
-                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
+                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-teal-600 transition">
                         ConnectFeup
                     </a>
                 </h1>
@@ -33,12 +33,12 @@
                                     required>
                                 <button 
                                     type="submit" 
-                                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition">
+                                    class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
                                 </button>
                             </form>
                         </li>
                         <li>
-                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
                                 Matchmaking
                             </a>
                         </li>
