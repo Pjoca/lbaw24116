@@ -43,6 +43,19 @@ class UserController extends Controller
     }
 
     /**
+     * Search users.
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+    
+        // Fetch users matching the query
+        $users = User::where('name', 'LIKE', "%$query%")->get();
+
+        return view('search.results', compact('users', 'query'));
+    }
+
+    /**
      * Update the profile information of the authenticated user.
      */
     public function update(Request $request, $id)

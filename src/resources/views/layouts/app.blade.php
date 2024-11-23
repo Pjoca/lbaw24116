@@ -22,13 +22,23 @@
                 <nav>
                     <ul class="flex gap-4 mt-4 md:mt-0">
                         <li>
-                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
-                                Matchmaking
-                            </a>
+                            <form action= "{{ route('users.search') }}" method="GET" class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    name="query" 
+                                    placeholder="Search" 
+                                    class="flex-1 border border-gray-300 rounded p-2 text-sm" 
+                                    style="color: #000; border: 1px solid #ccc; padding: 8px; border-radius: 4px;" 
+                                    required>
+                                <button 
+                                    type="submit" 
+                                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition">
+                                </button>
+                            </form>
                         </li>
                         <li>
-                            <a href="{{ url('/search') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
-                                Search
+                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                                Matchmaking
                             </a>
                         </li>
                         <li>
