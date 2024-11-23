@@ -60,11 +60,61 @@ class UserController extends Controller
     {
         $query = $request->input('query');
     
-        // Fetch users matching the query
-        $users = User::where('name', 'LIKE', "%$query%")->get();
-
+        $users = User::select('*')
+            ->selectRaw('
+                CASE
+                    WHEN LOWER(name) = ? THEN 1                         -- Exact match
+                    WHEN LOWER(name) LIKE ? THEN 2                      -- Starts with query
+                    WHEN LOWER(name) LIKE ? THEN 3                      -- Contains query
+                    ELSE 4                                              -- No match
+                END AS priority
+            ', [
+                strtolower($query),
+                strtolower($query) . '%', // Starts with query
+                '%' . strtolower($query) . '%', // Contains query
+            ])
+            ->where(function ($q) use ($query) {
+                $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
+                  ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
+                  ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
+            })
+            ->orderBy('priority')
+            ->orderBy('name') // Secondary ordering by name alphabetically
+            ->get();
+    
         return view('search.results', compact('users', 'query'));
     }
+    
+    
+
+    /*public function search(Request $request)
+    {
+        $query = $request->input('query');
+    
+        // Fetch exact matches
+        $exactMatches = User::where('name', $query)->get();
+    
+        // Fetch partial matches excluding exact matches
+        $partialMatches = User::where('name', 'ILIKE', "%$query%")
+                              ->whereNotIn('id', $exactMatches) // Exclude exact matches
+                              ->get();
+    
+        // Combine exact and partial matches with ordering
+        $users = User::select('*')
+                     ->selectRaw('
+                         CASE
+                             WHEN LOWER(name) = ? THEN 1
+                             ELSE 2
+                         END AS priority
+                     ', [strtolower($query)])
+                     ->orderBy('priority')
+                     ->orderBy('name')
+                     ->get();
+    
+        return view('search.results', compact('users', 'query'));
+    }*/
+    
+
 
     /**
      * Update the profile information of the authenticated user.
