@@ -74,6 +74,15 @@ Route::controller(UserController::class)->group(function () {
     
 });
 
+// Timeline Default Route
+Route::get('/timeline', function () {
+    if (auth()->check()) {
+        return redirect()->route('timeline.personalized');
+    }
+    return redirect()->route('timeline.public');
+})->name('timeline');
+
+
 // Posts
 Route::controller(PostController::class)->group(function () {
     Route::get('/timeline/public', 'publicTimeline')->name('timeline.public'); // View Public Timeline
@@ -99,17 +108,6 @@ Route::controller(AdminController::class)->middleware('auth')->group(function ()
     
 });
 
-Route::get('/test-post', function () {
-    return view('tests.post');
-});
-
-Route::get('/test-updatePost', function () {
-    return view('tests.update_post');
-});
-
-Route::get('/test-adminUpdate', function () {
-    return view('tests.adminUpdate');
-});
 
 
 Route::get('/pages/create-post', [PostController::class, 'showCreateForm'])->name('posts.create'); // Rota para mostrar o formulário de criação

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -73,4 +74,12 @@ class User extends Authenticatable
      {
         return $this->admin !== null;
      }   
+
+     public function friends()
+     {
+         return $this->belongsToMany(User::class, 'friendship', 'id_user1', 'id_user2')
+                     ->wherePivot('id_user1', Auth::id())
+                     ->orWherePivot('id_user2', Auth::id())
+                     ->distinct('user.id'); // Explicitly make the user ID distinct
+     }
 }

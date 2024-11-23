@@ -5,7 +5,8 @@ SET search_path TO thingy;
 
 -- Drop tables that depend on the types
 DROP TABLE IF EXISTS "user" CASCADE;
-DROP TABLE IF EXISTS friendship_connection CASCADE;
+DROP TABLE IF EXISTS friendship CASCADE;
+DROP TABLE IF EXISTS friendship_request CASCADE;
 DROP TABLE IF EXISTS "group" CASCADE;
 DROP TABLE IF EXISTS group_membership CASCADE;
 DROP TABLE IF EXISTS post CASCADE;
@@ -62,12 +63,20 @@ CREATE TABLE "user" (
     last_login DATE DEFAULT CURRENT_DATE
 );
 
-CREATE TABLE friendship_connection (
+CREATE TABLE friendship (
+    id SERIAL PRIMARY KEY,
     id_user1 INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_user2 INT REFERENCES "user"(id) ON DELETE CASCADE,
+    created_at DATE DEFAULT CURRENT_DATE
+);
+
+-- Friendship request table for pending or rejected requests
+CREATE TABLE friendship_request (
+    id SERIAL PRIMARY KEY,
+    id_sender INT REFERENCES "user"(id) ON DELETE CASCADE,
+    id_receiver INT REFERENCES "user"(id) ON DELETE CASCADE,
     status friendship_status_type NOT NULL,
-    created_at DATE DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id_user1, id_user2)
+    created_at DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE "group" (
@@ -196,7 +205,7 @@ CREATE INDEX idx_user_username_email ON "user" (username, email);
 
 ----------------------------------
 
-CREATE INDEX idx_friendship_user1_user2_status ON friendship_connection (id_user1, id_user2, status);
+CREATE INDEX idx_friendship_users ON friendship (id_user1, id_user2);
 
 ----------------------------------
 
@@ -382,6 +391,38 @@ BEFORE INSERT OR UPDATE ON "user"
 FOR EACH ROW
 EXECUTE FUNCTION trg_check_feup_email();
 
+------------
+
+CREATE OR REPLACE FUNCTION trg_check_unique_friendship_request()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Check if there's already a friendship
+    IF EXISTS (
+        SELECT 1 FROM friendship
+        WHERE (id_user1 = NEW.id_sender AND id_user2 = NEW.id_receiver)
+           OR (id_user1 = NEW.id_receiver AND id_user2 = NEW.id_sender)
+    ) THEN
+        RAISE EXCEPTION 'Friendship already exists between these users';
+    END IF;
+
+    -- Check if a similar request exists
+    IF EXISTS (
+        SELECT 1 FROM friendship_request
+        WHERE (id_sender = NEW.id_sender AND id_receiver = NEW.id_receiver)
+           OR (id_sender = NEW.id_receiver AND id_receiver = NEW.id_sender)
+    ) THEN
+        RAISE EXCEPTION 'Friendship request already exists between these users';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_friendship_request
+BEFORE INSERT ON friendship_request
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_friendship_request();
+
 
 ------------
 
@@ -460,7 +501,8 @@ TRUNCATE comment CASCADE;
 TRUNCATE post CASCADE;
 TRUNCATE group_membership CASCADE;
 TRUNCATE "group" CASCADE;
-TRUNCATE friendship_connection CASCADE;
+TRUNCATE friendship CASCADE;
+TRUNCATE friendship_request CASCADE;
 TRUNCATE report CASCADE;
 TRUNCATE notification CASCADE;
 TRUNCATE user_notification CASCADE;
@@ -655,24 +697,25 @@ INSERT INTO group_notification (id_notification, type)
 VALUES 
 (6, 'invited_to_group');
 
--- Insert Friendships
-INSERT INTO friendship_connection (id_user1, id_user2, status)
+
+INSERT INTO friendship (id_user1, id_user2, created_at)
 VALUES 
-(1, 2, 'pending'),
-(1, 3, 'accepted'),
-(1, 4, 'accepted'),
-(1, 5, 'accepted'),
-(1, 6, 'accepted'),
-(1, 7, 'accepted'),
-(1, 8, 'accepted'),
-(1, 9, 'accepted'),
-(1, 10, 'accepted'),
-(1, 11, 'accepted'),
-(1, 12, 'accepted'),
-(1, 13, 'accepted'),
-(1, 14, 'accepted'),
-(1, 15, 'accepted'),
-(1, 16, 'accepted');
+(1, 3, CURRENT_DATE),
+(1, 4, CURRENT_DATE),
+(1, 5, CURRENT_DATE),
+(1, 6, CURRENT_DATE),
+(1, 7, CURRENT_DATE),
+(1, 8, CURRENT_DATE),
+(1, 9, CURRENT_DATE),
+(1, 10, CURRENT_DATE),
+(1, 11, CURRENT_DATE),
+(1, 12, CURRENT_DATE),
+(1, 13, CURRENT_DATE),
+(1, 14, CURRENT_DATE),
+(1, 15, CURRENT_DATE),
+(1, 16, CURRENT_DATE);
 
-
+INSERT INTO friendship_request (id_sender, id_receiver, status, created_at)
+VALUES 
+(1, 2, 'pending', CURRENT_DATE);
 -------
