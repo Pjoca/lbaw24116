@@ -36,14 +36,20 @@
                                 Messages
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ url('/post') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                        <!-- Menu Suspenso para o "Post" -->
+                        <!-- <li class="relative group">
+                            <a href="#" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
                                 Post
                             </a>
-                        </li>
+                            Dropdown com opções de Criar ou Editar 
+                            <div class="absolute left-0 hidden bg-white shadow-lg rounded-lg mt-2 group-hover:block">
+                                <a href="{{ route('posts.create') }}" class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-100">Criar Post</a>
+                                Você pode adicionar lógica para o ID do post aqui 
+                                <a href="{{ route('posts.edit', 1) }}" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-100">Editar Post</a>
+                            </div>
+                        </li> -->
                     </ul>
                 </nav>
-
                 @if (Auth::check())
                     <div class="flex items-center gap-4 mt-4 md:mt-0">
                         <span class="text-sm font-bold">{{ Auth::user()->name }}</span>

@@ -33,4 +33,6 @@ class PostPolicy
     {
         return $user->id === $post->id_user; // Only the post owner can delete
     }
+
+    
 }

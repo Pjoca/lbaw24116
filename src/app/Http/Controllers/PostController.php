@@ -17,7 +17,7 @@ class PostController extends Controller
 {
     $posts = Post::where('visibility', 'public')
         ->latest()
-        ->paginate(10); // 10 posts por página
+        ->paginate(30); // nesta opçao podem dizer quantos posts querem por pagina -> igual ao exemplo de baixo dos myposts
 
     return view('pages.timeline', compact('posts'));
 }
@@ -107,40 +107,28 @@ public function personalizedTimeline()
     /**
      * Edit an existing post by the authenticated user. Access: OWN
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $id)
 {
-    $this->authorize('update', $post);
+    $post = Post::findOrFail($id); // Encontra o post pelo ID
 
     $validated = $request->validate([
         'content' => 'required|string',
         'visibility' => 'required|in:public,private,group',
-        'id_group' => 'nullable|integer|exists:groups,id',
-        'image_url' => 'nullable|url',
     ]);
 
+    // Atualiza o post com os dados validados
     $post->update($validated);
 
-    return response()->json([
-        'message' => 'Post updated successfully',
-        'data' => $post,
-    ], 200);
+    return redirect()->route('timeline.public')->with('success', 'Post atualizado com sucesso!');
 }
 
+public function userPosts()
+{
+    $user = Auth::user();
+    $posts = $user->posts()->latest()->get(); 
 
-
-    /**
-     * Delete an existing post by the authenticated user. Access: OWN
-     */
-    public function delete(Post $post)
-    {
-        $this->authorize('delete', $post);
-
-        $post->delete();
-
-        return response()->json([
-            'message' => 'Post deleted successfully',
-        ], 200);
-    }
+    return view('pages.user-posts', compact('posts')); 
+}
 
     public function showCreateForm()
 {
@@ -148,5 +136,39 @@ public function personalizedTimeline()
 
     return view('pages.create-post');
 }
+
+public function show(Post $post)
+{
+    return view('pages.edit-post', compact('post'));
 }
+
+public function showEditForm($id)
+{
+    $post = Post::findOrFail($id); 
+    return view('pages.edit-post', compact('post'));
+}
+
+public function edit($id)
+{
+    $post = Post::findOrFail($id);
+    return view('pages.edit-post', compact('post'));
+}
+
+public function delete(Post $post)
+{
+    
+    $this->authorize('delete', $post);
+
+
+    $post->delete();
+
+   
+    return redirect()->route('posts.userPosts')
+                     ->with('success', 'Post excluído com sucesso!');
+}
+
+
+
+}
+
 
