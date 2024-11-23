@@ -67,8 +67,9 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Profile
 Route::controller(UserController::class)->middleware('auth')->group(function () {
-    Route::get('/profile/{id}', 'show')->name('profile.show'); // View Profile
+    Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
     Route::put('/profile/{id}', 'update')->name('profile.update'); // Edit Profile
+    
 });
 
 // Posts

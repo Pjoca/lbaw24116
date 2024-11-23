@@ -1,30 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-</head>
-<body>
-    <header>
-        <h1>User Profile</h1>
-    </header>
+@extends('layouts.app')
 
-    <main>
-        <h2>{{ $user['name'] }}'s Profile</h2>
-        <p><strong>Username:</strong> {{ $user['username'] }}</p>
-        <p><strong>Last Login:</strong> {{ $user['last_login'] }}</p>
+@section('content')
+    <div class="container mx-auto py-8">
+        <!-- User Profile Section -->
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">{{ $user['name'] }}</h2>
+            <p><strong>Username:</strong> {{ $user['username'] }}</p>
+            <p><strong>Last Login:</strong> {{ $user['last_login'] }}</p>
+            @if (isset($user['email']))
+                <p><strong>Email:</strong> {{ $user['email'] }}</p>
+            @endif
+        </div>
 
-        @if (isset($user['email']))
-            <p><strong>Email:</strong> {{ $user['email'] }}</p>
-        @endif
-
-        <a href="{{ route('home') }}">Back to Home</a>
-    </main>
-
-    <footer>
-        <p>&copy; {{ date('Y') }} My Application. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+        <!-- User Posts Section -->
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Posts by {{ $user['name'] }}</h3>
+            @if ($posts->isEmpty())
+                <p>No posts available.</p>
+            @else
+                <div class="space-y-4">
+                    @foreach ($posts as $post)
+                        @include('partials.post', ['post' => $post])
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+@endsection

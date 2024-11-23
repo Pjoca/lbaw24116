@@ -13,7 +13,8 @@ class PostController extends Controller
     /**
      * Retrieve the public timeline of posts. Access: PUB
      */
-    public function publicTimeline()
+    
+public function publicTimeline()
 {
     $posts = Post::where('visibility', 'public')
         ->latest()
@@ -21,6 +22,7 @@ class PostController extends Controller
 
     return view('pages.timeline', compact('posts'));
 }
+
 
 public function personalizedTimeline()
 {
@@ -92,16 +94,14 @@ public function personalizedTimeline()
                 return redirect()->back()->withErrors(['image' => 'Failed to upload image. Please try again.']);
             }
         }
-        
         Log::info('Data being passed to Post::create:', [
-            'content' => $validated['content'],
-            'visibility' => $validated['visibility'],
-            'id_user' => Auth::id(),
-            'id_group' => $validated['id_group'] ?? null,
-            'image_url' => $imagePath,
+        'content' => $validated['content'],
+        'visibility' => $validated['visibility'],
+        'id_user' => Auth::id(),
+        'id_group' => $validated['id_group'] ?? null,
+        'image_url' => $imagePath,
         ]);
 
-        
         // Create the post in the database
         $post = Post::create([
             'content' => $validated['content'],
@@ -180,6 +180,7 @@ public function delete(Post $post)
     return redirect()->route('posts.userPosts')
                      ->with('success', 'Post excluído com sucesso!');
 }
+
 
 
 
