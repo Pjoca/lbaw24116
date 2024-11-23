@@ -35,7 +35,7 @@ public function personalizedTimeline()
                   ->whereIn('id_user', $user->friends()->pluck('user.id'));
         })
         ->latest()
-        ->simplePaginate(15); // Retrieve 15 posts per request
+        ->simplePaginate(50); // Retrieve 15 posts per request
 
     return view('pages.timeline', compact('posts'));
 }

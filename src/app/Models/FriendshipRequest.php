@@ -41,5 +41,4 @@ class FriendshipRequest extends Model
         return $this->belongsTo(User::class, 'id_receiver');
     }
 
-    // Add additional methods if needed for querying or business logic
 }
