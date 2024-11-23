@@ -56,28 +56,59 @@ class UserController extends Controller
      * Update the profile information of the authenticated user.
      */
     public function update(Request $request, $id)
+{
+    // Encontre o usuário pelo ID
+    $user = User::findOrFail($id);
+
+    // Assegure que o usuário autenticado está atualizando o próprio perfil
+    $this->authorize('update', $user);
+
+    // Validação dos dados de entrada, incluindo a unicidade do username
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'visibility' => 'required|in:public,private',
+        'password' => 'nullable|string|min:8', // Torne a senha opcional
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validação para imagem
+        'username' => 'required|string|max:50|unique:user,username,' . $user->id, // Validação de unicidade do username, exceto para o próprio usuário
+    ]);
+
+    // Se uma nova imagem for carregada, armazene-a
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('images', 'public');
+        $validated['image_url'] = $path;
+    }
+
+    // Se uma nova senha for fornecida, criptografe-a antes de atualizar
+    if ($request->filled('password')) {
+        $validated['password'] = bcrypt($request->password); // Atualiza a senha
+    } else {
+        // Se a senha não foi fornecida, mantemos a senha atual
+        unset($validated['password']); // Não altera a senha
+    }
+
+    // Atualize o perfil do usuário
+    $user->update($validated);
+
+    // Redirecione de volta para a página de perfil com uma mensagem de sucesso
+    return redirect()->route('profile.show', ['id' => $user->id])
+                     ->with('success', 'Profile updated successfully');
+}
+
+
+
+
+    public function edit($id)
     {
-        // Find the user by ID
         $user = User::findOrFail($id);
 
-        // Ensure the authenticated user is updating their own profile
-        $this->authorize('update', $user);
+        // Verifica se o usuário autenticado é o dono do perfil
+        if (Auth::id() !== $user->id) {
+            abort(403, 'You are not authorized to edit this profile.');
+        }
 
-        // Validate the input data
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'visibility' => 'required|in:public,private',
-        ]);
-
-        // Update the user's profile
-        $user->update($validated);
-
-        // Return success response
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'data' => $user,
-        ], 200);
+        return view('pages.edit', compact('user'));
     }
+
 
 }

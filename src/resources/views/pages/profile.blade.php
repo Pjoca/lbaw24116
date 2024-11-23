@@ -7,8 +7,8 @@
             <!-- User Profile Image -->
             <div class="mb-4">
                 <img src="{{ asset('storage/' . $user['image_url']) }}" 
-                     alt="{{ $user['name'] }}" 
-                     class="w-24 h-24 mx-auto rounded-full shadow-md">
+                    alt="{{ $user['name'] }}" 
+                    class="w-24 h-24 mx-auto rounded-full shadow-md">
             </div>
 
             <!-- User Info -->
@@ -18,7 +18,17 @@
             @if (isset($user['email']))
                 <p><strong>Email:</strong> {{ $user['email'] }}</p>
             @endif
-        </div>
+
+            <!-- Edit Profile Button (Visible only to the profile owner) -->
+            @if (Auth::id() === $user['id'])
+                <div class="mt-4">
+                    <a href="{{ route('profile.edit', ['id' => $user['id']]) }}" 
+                    class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                        Edit Profile
+                    </a>
+                </div>
+            @endif
+
 
         <!-- User Posts Section -->
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">

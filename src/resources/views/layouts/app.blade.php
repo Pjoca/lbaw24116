@@ -53,7 +53,9 @@
                 </nav>
                 @if (Auth::check())
                     <div class="flex items-center gap-4 mt-4 md:mt-0">
-                        <span class="text-sm font-bold">{{ Auth::user()->name }}</span>
+                        <a href="{{ route('profile.show', ['id' => Auth::id()]) }}" class="text-sm font-bold hover:text-yellow-500 transition">
+                            {{ Auth::user()->name }}
+                        </a>
                         <a href="{{ url('/logout') }}" class="bg-red-500 text-sm text-white py-2 px-3 rounded hover:bg-red-600 transition">
                             Logout
                         </a>
