@@ -104,15 +104,15 @@ CREATE TABLE comment (
     deleted_at DATE CHECK (deleted_at >= CURRENT_DATE),
     visibility visibility_type NOT NULL DEFAULT 'public',
     id_user INT REFERENCES "user"(id),
-    id_post INT REFERENCES post(id) NOT NULL
+    id_post INT NOT NULL REFERENCES post(id) ON DELETE CASCADE
 );
 
 CREATE TABLE "like" (
     id SERIAL PRIMARY KEY,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id),
-    id_post INT REFERENCES post(id),
-	id_comment INT REFERENCES comment(id),
+    id_post INT REFERENCES post(id) ON DELETE CASCADE,
+	id_comment INT REFERENCES comment(id) ON DELETE CASCADE,
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
@@ -121,8 +121,8 @@ CREATE TABLE report (
     description TEXT NOT NULL,
     status report_status_type NOT NULL DEFAULT 'pending',
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_reported_post INT REFERENCES post(id),
-    id_reported_comment INT REFERENCES comment(id)
+    id_reported_post INT REFERENCES post(id) ON DELETE CASCADE,
+    id_reported_comment INT REFERENCES comment(id) ON DELETE CASCADE
 );
 
 CREATE TABLE notification (
@@ -130,8 +130,8 @@ CREATE TABLE notification (
     seen BOOLEAN DEFAULT FALSE,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_related_post INT REFERENCES post(id),
-    id_related_comment INT REFERENCES comment(id),
+    id_related_post INT REFERENCES post(id) ON DELETE CASCADE,
+    id_related_comment INT REFERENCES comment(id) ON DELETE CASCADE,
     id_related_group INT REFERENCES "group"(id)
 );
 
@@ -146,37 +146,38 @@ CREATE TABLE message (
 
 
 CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type user_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
+
 CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type comment_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type group_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type post_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type like_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type message_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );

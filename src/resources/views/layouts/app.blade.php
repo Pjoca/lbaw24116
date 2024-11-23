@@ -11,6 +11,7 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
     </head>
     <body class="bg-gray-100 text-gray-800 font-sans">
+        @vite('resources/js/app.js')
         <main class="p-4">
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-blue-600 text-white p-4 rounded-lg mb-6">

@@ -111,12 +111,7 @@ Route::get('/pages/{post}/edit', [PostController::class, 'edit'])->name('posts.e
 
 Route::put('/pages/{post}', [PostController::class, 'update'])->name('posts.update'); // Atualização do post
 
-
 Route::get('/user/posts', [PostController::class, 'userPosts'])->name('posts.userPosts')->middleware('auth');
-
-Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit')->middleware('auth');
-
-Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete')->middleware('auth');;
 
 
 
