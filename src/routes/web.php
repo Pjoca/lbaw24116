@@ -79,7 +79,7 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::get('/timeline/public', 'publicTimeline')->name('timeline.public'); // View Public Timeline
     Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
     Route::post('/post', 'create')->name('post.create'); // Create Post
-    Route::put('/post/{id}', 'update')->name('post.update'); // Edit Post
+    Route::put('/posts/{post}', 'update')->name('posts.update');
     Route::delete('/post/{id}', 'delete')->name('post.delete');
 
 });
@@ -114,10 +114,6 @@ Route::get('/test-adminUpdate', function () {
 Route::get('/pages/create-post', [PostController::class, 'showCreateForm'])->name('posts.create'); // Rota para mostrar o formulário de criação
 
 Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); // Rota para enviar o post
-
-Route::get('/pages/{post}/edit', [PostController::class, 'edit'])->name('posts.edit'); // Formulário de 
-
-Route::put('/pages/{post}', [PostController::class, 'update'])->name('posts.update'); // Atualização do post
 
 
 

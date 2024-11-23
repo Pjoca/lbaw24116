@@ -16,4 +16,6 @@
             <span class="text-3xl leading-none">+</span>
         </a>
     </div>
+
+    @include('modals.edit-post-modal')
 @endsection

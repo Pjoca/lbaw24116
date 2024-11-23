@@ -24,8 +24,12 @@
                     </svg>
                 </button>
                 <div id="dropdownMenu-{{ $post->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                    <!-- Use the named route for Edit -->
-                    <a href="{{ route('posts.edit', ['post' => $post->id]) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
+                    <!-- Trigger Modal Instead of Redirect -->
+                    <button 
+                        onclick="showEditPostModal({{ $post->id }}, '{{ $post->content }}', '{{ $post->visibility }}')"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
+                        Edit
+                    </button>
                     <!-- Form for delete action -->
                     <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este post?');" class="block px-4 py-2">
                         @csrf

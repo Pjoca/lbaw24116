@@ -40,6 +40,44 @@ function filterUserList() {
     });
 }
 
+function showEditPostModal(id, content, visibility) {
+    const editPostForm = document.getElementById('edit-post-form');
+    const editPostContent = document.getElementById('edit-post-content');
+    const editPostVisibility = document.getElementById('edit-post-visibility');
+    const editPostModal = document.getElementById('edit-post-modal');
+
+    // Set form action
+    if (editPostForm) {
+        editPostForm.action = `/posts/${id}`;
+    }
+
+    // Set form values
+    if (editPostContent) {
+        editPostContent.value = content;
+    }
+
+    if (editPostVisibility) {
+        editPostVisibility.value = visibility;
+    }
+
+    // Show modal
+    if (editPostModal) {
+        editPostModal.classList.remove('hidden');
+    }
+}
+
+function hideEditPostModal() {
+    const editPostModal = document.getElementById('edit-post-modal');
+    if (editPostModal) {
+        editPostModal.classList.add('hidden');
+    }
+}
+
+// Attach functions to the global window object for accessibility
+window.showEditPostModal = showEditPostModal;
+window.hideEditPostModal = hideEditPostModal;
+
+
 // Dropdown Handling
 function handleDropdowns(event) {
     const allDropdowns = document.querySelectorAll('[id^="dropdownMenu-"]');

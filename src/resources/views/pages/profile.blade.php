@@ -52,4 +52,5 @@
             @endif
         </div>
     </div>
+    @include('modals.edit-post-modal')
 @endsection
