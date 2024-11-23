@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Illuminate\Support\Facades\Auth;
+
 class Post extends Model
 {
     use HasFactory;
@@ -34,6 +36,7 @@ class Post extends Model
         'content',
         'visibility',
         'id_user',
+        'image_url',
     ];
 
     /**
@@ -53,4 +56,24 @@ class Post extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public static function getAuthorizedPosts($profileOwnerId)
+    {
+        $authUserId = Auth::id(); // Get the authenticated user's ID
+
+        // Check if the authenticated user is viewing their own profile
+        if ($authUserId === $profileOwnerId) {
+            // Show all posts by the authenticated user
+            return self::where('id_user', $authUserId)
+                ->latest()
+                ->get();
+        }
+
+        // Show only public posts of the profile owner
+        return self::where('id_user', $profileOwnerId)
+            ->where('visibility', 'public')
+            ->latest()
+            ->get();
+    }
+
 }

@@ -68,8 +68,9 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Profile
 Route::controller(UserController::class)->middleware('auth')->group(function () {
-    Route::get('/profile/{id}', 'show')->name('profile.show'); // View Profile
+    Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
     Route::put('/profile/{id}', 'update')->name('profile.update'); // Edit Profile
+    
 });
 
 // Posts
@@ -78,7 +79,8 @@ Route::controller(PostController::class)->middleware('auth')->group(function () 
     Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
     Route::post('/post', 'create')->name('post.create'); // Create Post
     Route::put('/post/{id}', 'update')->name('post.update'); // Edit Post
-    Route::delete('/post/{id}', 'delete')->name('post.delete'); // Delete Post
+    Route::delete('/post/{id}', 'delete')->name('post.delete');
+
 });
 
 // Search
@@ -114,13 +116,6 @@ Route::post('/pages', [PostController::class, 'create'])->name('posts.store'); /
 Route::get('/pages/{post}/edit', [PostController::class, 'edit'])->name('posts.edit'); // Formulário de 
 
 Route::put('/pages/{post}', [PostController::class, 'update'])->name('posts.update'); // Atualização do post
-
-
-Route::get('/user/posts', [PostController::class, 'userPosts'])->name('posts.userPosts')->middleware('auth');
-
-Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit')->middleware('auth');
-
-Route::delete('/posts/{post}', [PostController::class, 'delete'])->name('posts.delete')->middleware('auth');;
 
 
 

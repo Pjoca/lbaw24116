@@ -13,7 +13,8 @@ class PostController extends Controller
     /**
      * Retrieve the public timeline of posts. Access: PUB
      */
-    public function publicTimeline()
+    
+public function publicTimeline()
 {
     $posts = Post::where('visibility', 'public')
         ->latest()
@@ -21,6 +22,7 @@ class PostController extends Controller
 
     return view('pages.timeline', compact('posts'));
 }
+
 
 public function personalizedTimeline()
 {
@@ -70,38 +72,50 @@ public function personalizedTimeline()
      * Create a new post by an authenticated user. Access: USR
      */
     public function create(Request $request)
-{
-    $this->authorize('create', Post::class);
+    {
+        $this->authorize('create', Post::class);
 
-    $validated = $request->validate([
-        'content' => 'required|string',
-        'visibility' => 'required|in:public,private,group',
-        'id_group' => 'nullable|integer|exists:groups,id',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Aceitar imagens com limite de 2MB
-    ]);
+        // Validate the incoming request
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'visibility' => 'required|in:public,private,group',
+            'id_group' => 'nullable|integer|exists:groups,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image
+        ]);
 
-    // Lidar com o upload da imagem
-    $imagePath = null;
-    if ($request->hasFile('image')) {
-        // Salvar a imagem no diretório 'posts/images' e obter o caminho
-        $imagePath = $request->file('image')->store('posts/images', 'public');
-    }
-
-    // Cria o post com o conteúdo e a imagem
-    $post = Post::create([
+        // Handle image upload
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            try {
+                $imagePath = $request->file('image')->store('posts/images', 'public');
+                Log::info('Image uploaded successfully:', ['path' => $imagePath]);
+            } catch (\Exception $e) {
+                Log::error('Failed to upload image:', ['error' => $e->getMessage()]);
+                return redirect()->back()->withErrors(['image' => 'Failed to upload image. Please try again.']);
+            }
+        }
+        Log::info('Data being passed to Post::create:', [
         'content' => $validated['content'],
         'visibility' => $validated['visibility'],
         'id_user' => Auth::id(),
         'id_group' => $validated['id_group'] ?? null,
-        'image_url' => $imagePath,  // Armazenar o caminho da imagem (se houver)
-    ]);
+        'image_url' => $imagePath,
+        ]);
 
-    Log::info('New post created:', ['data' => $post]);
+        // Create the post in the database
+        $post = Post::create([
+            'content' => $validated['content'],
+            'visibility' => $validated['visibility'],
+            'id_user' => Auth::id(),
+            'id_group' => $validated['id_group'] ?? null,
+            'image_url' => $imagePath, // Store the image path
+        ]);
 
-    // Redirecionar para a timeline
-    return redirect()->route('timeline.public')
-        ->with('success', 'Você criou um novo post com sucesso');
-}
+        Log::info('New post created:', ['post' => $post]);
+
+        return redirect()->route('timeline.public')->with('success', 'Você criou um novo post com sucesso');
+    }
+
 
 
     /**
@@ -154,18 +168,29 @@ public function edit($id)
     return view('pages.edit-post', compact('post'));
 }
 
-public function delete(Post $post)
+public function delete($id)
 {
-    
+    // Find the post by ID
+    $post = Post::findOrFail($id);
+
+    // Log the retrieved post for debugging purposes
+    Log::info('Attempting to delete post:', [
+        'post_id' => $post->id,
+        'post_user_id' => $post->id_user,
+    ]);
+
+    // Authorize the action
     $this->authorize('delete', $post);
 
-
+    // Delete the post
     $post->delete();
 
-   
-    return redirect()->route('posts.userPosts')
-                     ->with('success', 'Post excluído com sucesso!');
+    // Redirect to the user's profile with a success message
+    return redirect()->route('profile.show', ['id' => $post->id_user])
+        ->with('success', 'Post deleted successfully!');
 }
+
+
 
 
 

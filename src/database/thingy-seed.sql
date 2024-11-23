@@ -52,6 +52,7 @@ CREATE TYPE message_notification_type AS ENUM ('received_message');
 -- Create tables
 CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
+    image_url TEXT,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -104,15 +105,15 @@ CREATE TABLE comment (
     deleted_at DATE CHECK (deleted_at >= CURRENT_DATE),
     visibility visibility_type NOT NULL DEFAULT 'public',
     id_user INT REFERENCES "user"(id),
-    id_post INT REFERENCES post(id) NOT NULL
+    id_post INT NOT NULL REFERENCES post(id) ON DELETE CASCADE
 );
 
 CREATE TABLE "like" (
     id SERIAL PRIMARY KEY,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id),
-    id_post INT REFERENCES post(id),
-	id_comment INT REFERENCES comment(id),
+    id_post INT REFERENCES post(id) ON DELETE CASCADE,
+	id_comment INT REFERENCES comment(id) ON DELETE CASCADE,
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
@@ -121,8 +122,8 @@ CREATE TABLE report (
     description TEXT NOT NULL,
     status report_status_type NOT NULL DEFAULT 'pending',
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_reported_post INT REFERENCES post(id),
-    id_reported_comment INT REFERENCES comment(id)
+    id_reported_post INT REFERENCES post(id) ON DELETE CASCADE,
+    id_reported_comment INT REFERENCES comment(id) ON DELETE CASCADE
 );
 
 CREATE TABLE notification (
@@ -130,8 +131,8 @@ CREATE TABLE notification (
     seen BOOLEAN DEFAULT FALSE,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_related_post INT REFERENCES post(id),
-    id_related_comment INT REFERENCES comment(id),
+    id_related_post INT REFERENCES post(id) ON DELETE CASCADE,
+    id_related_comment INT REFERENCES comment(id) ON DELETE CASCADE,
     id_related_group INT REFERENCES "group"(id)
 );
 
@@ -146,37 +147,38 @@ CREATE TABLE message (
 
 
 CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type user_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
+
 CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type comment_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type group_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type post_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type like_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) ON UPDATE CASCADE NOT NULL,
+    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type message_notification_type NOT NULL,
     PRIMARY KEY (id_notification)
 );
@@ -481,26 +483,25 @@ ALTER SEQUENCE report_id_seq RESTART WITH 1;
 ALTER SEQUENCE notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE message_id_seq RESTART WITH 1;
 
--- Insert users
-INSERT INTO "user" (username, email, name, password, visibility, account_status)
+-- Insert users with the default image
+INSERT INTO "user" (username, email, name, password, visibility, account_status, image_url)
 VALUES 
-('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active'),
-('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active'),
-('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline'),
-('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active'),
-('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active'),
-('dave_black', 'dave.black@up.pt', 'Dave Black', 'hashed_password6', 'public', 'active'),
-('eve_green', 'eve.green@up.pt', 'Eve Green', 'hashed_password7', 'private', 'offline'),
-('frank_blue', 'frank.blue@up.pt', 'Frank Blue', 'hashed_password8', 'public', 'deleted'),
-('grace_yellow', 'grace.yellow@up.pt', 'Grace Yellow', 'hashed_password9', 'public', 'active'),
-('hank_red', 'hank.red@up.pt', 'Hank Red', 'hashed_password10', 'private', 'blocked'),
-('maria_purple', 'maria.p@up.pt', 'Maria Purple', 'hashed_password11', 'public', 'active'),
-('joao_orange', 'joao.o@up.pt', 'Joao Orange', 'hashed_password12', 'public', 'active'),
-('ana_brown', 'ana.brown@up.pt', 'Ana Brown', 'hashed_password13', 'public', 'active'),
-('francisco_madureira', 'macaco.super_dragoes@up.pt', 'Francisco Madureira', 'hashed_password14', 'public', 'active'),
-('marcelo_rebelo_sousa', 'mrs@up.pt', 'Marcelo Rebelo Sousa', 'hashed_password15', 'public', 'active'),
-('antonio_costa', 'ac@up.pt', 'Antonio Costa', 'hashed_password16', 'public', 'active');
-
+('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
+('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active', 'users/images/default.png'),
+('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline', 'users/images/default.png'),
+('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active', 'users/images/default.png'),
+('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active', 'users/images/default.png'),
+('dave_black', 'dave.black@up.pt', 'Dave Black', 'hashed_password6', 'public', 'active', 'users/images/default.png'),
+('eve_green', 'eve.green@up.pt', 'Eve Green', 'hashed_password7', 'private', 'offline', 'users/images/default.png'),
+('frank_blue', 'frank.blue@up.pt', 'Frank Blue', 'hashed_password8', 'public', 'deleted', 'users/images/default.png'),
+('grace_yellow', 'grace.yellow@up.pt', 'Grace Yellow', 'hashed_password9', 'public', 'active', 'users/images/default.png'),
+('hank_red', 'hank.red@up.pt', 'Hank Red', 'hashed_password10', 'private', 'blocked', 'users/images/default.png'),
+('maria_purple', 'maria.p@up.pt', 'Maria Purple', 'hashed_password11', 'public', 'active', 'users/images/default.png'),
+('joao_orange', 'joao.o@up.pt', 'Joao Orange', 'hashed_password12', 'public', 'active', 'users/images/default.png'),
+('ana_brown', 'ana.brown@up.pt', 'Ana Brown', 'hashed_password13', 'public', 'active', 'users/images/default.png'),
+('francisco_madureira', 'macaco.super_dragoes@up.pt', 'Francisco Madureira', 'hashed_password14', 'public', 'active', 'users/images/default.png'),
+('marcelo_rebelo_sousa', 'mrs@up.pt', 'Marcelo Rebelo Sousa', 'hashed_password15', 'public', 'active', 'users/images/default.png'),
+('antonio_costa', 'ac@up.pt', 'Antonio Costa', 'hashed_password16', 'public', 'active', 'users/images/default.png');
 
 -- Insert groups
 INSERT INTO "group" (name, description, visibility, id_owner)
@@ -540,17 +541,18 @@ VALUES
 -- Insert posts
 INSERT INTO post (content, visibility, id_user, id_group, image_url)
 VALUES 
-('Looking forward to our next hike!', 'public', 1, 1, 'https://picsum.photos/600/400?random=1'),
-('Has anyone read the latest mystery novel?', 'private', 2, 2, 'https://picsum.photos/600/400?random=2'),
-('What is your favorite band?', 'public', 3, 3, 'https://picsum.photos/600/400?random=3'),
-('Best movie of the year?', 'public', 4, 4, 'https://picsum.photos/600/400?random=4'),
-('Tips for beginner photographers?', 'private', 5, 5, 'https://picsum.photos/600/400?random=5'),
-('Best recipes for quick meals?', 'public', 6, 6, 'https://picsum.photos/600/400?random=6'),
-('Planning a trip to the mountains.', 'private', 7, 7, 'https://picsum.photos/600/400?random=7'),
-('Latest tech trends for 2024.', 'public', 8, 8, 'https://picsum.photos/600/400?random=8'),
-('Best multiplayer games this year.', 'private', 9, 9, 'https://picsum.photos/600/400?random=9'),
-('Art exhibitions worth visiting.', 'public', 10, 10, 'https://picsum.photos/600/400?random=10'),
-('Vamos ganhar!', 'public', 14, 11, 'https://picsum.photos/600/400?random=11');
+('Looking forward to our next hike!', 'public', 1, 1, 'posts/images/3fdH5IrFdTqI2FBiJaSS0w7QK36yr1hE5OFCyJuq.png'),
+('Has anyone read the latest mystery novel?', 'private', 2, 2, 'posts/images/5QuUoSbIPnAu5TkCm12ap0ruM51qkg2AjfFOUOLu.png'),
+('What is your favorite band?', 'public', 3, 3, 'posts/images/6GdnztpsMKDuEH8p0HWIWTBj4WpWHMnU6KrrIxr7.png'),
+('Best movie of the year?', 'public', 4, 4, 'posts/images/OuyVuADuyoExsAYSZ4dAqgjfJcMyRs2ZbC7X2npA.png'),
+('Tips for beginner photographers?', 'private', 5, 5, 'posts/images/ZQNwZHsGnVlyh0U05vzEMNxK4Vhg9vpOUFV6zuzU.png'),
+('Best recipes for quick meals?', 'public', 6, 6, 'posts/images/wHZwjj14zP8ElKgW3DACQug9DvfB2CIw6OW8tWgT.png'),
+('Planning a trip to the mountains.', 'private', 7, 7, 'posts/images/3fdH5IrFdTqI2FBiJaSS0w7QK36yr1hE5OFCyJuq.png'),
+('Latest tech trends for 2024.', 'public', 8, 8, 'posts/images/5QuUoSbIPnAu5TkCm12ap0ruM51qkg2AjfFOUOLu.png'),
+('Best multiplayer games this year.', 'private', 9, 9, 'posts/images/6GdnztpsMKDuEH8p0HWIWTBj4WpWHMnU6KrrIxr7.png'),
+('Art exhibitions worth visiting.', 'public', 10, 10, 'posts/images/OuyVuADuyoExsAYSZ4dAqgjfJcMyRs2ZbC7X2npA.png'),
+('Vamos ganhar!', 'public', 14, 11, 'posts/images/ZQNwZHsGnVlyh0U05vzEMNxK4Vhg9vpOUFV6zuzU.png');
+
 
 
 -- Insert comments

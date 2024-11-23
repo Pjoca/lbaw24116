@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'visibility',
         'account_status',
+        'image_url',
     ];
 
     /**

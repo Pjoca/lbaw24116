@@ -6,8 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Post;
+
+
+
 class UserController extends Controller
 {
+
     /**
      * Retrieve the profile information of a user.
      */
@@ -15,32 +20,37 @@ class UserController extends Controller
     {
         // Find the user by ID or return a 404 response
         $user = User::findOrFail($id);
-    
+
         // Authorize viewing the profile
         $this->authorize('view', $user);
-    
+
         // Check if the authenticated user is viewing their own profile
         $isOwnProfile = Auth::id() === $user->id;
-    
+
         // Prepare the user data for the response
         $userData = [
             'id' => $user->id,
-            'username'=> $user->username,
+            'username' => $user->username,
             'name' => $user->name,
             'last_login' => $user->last_login,
-
+            'image_url' => $user->image_url ?? 'users/images/default.png', // Ensure image_url is always set
         ];
-    
+
         // Include email if it's the authenticated user's own profile
         if ($isOwnProfile) {
             $userData['email'] = $user->email;
         }
-    
-        // Return the user profile
+
+        // Retrieve posts based on profile ownership
+        $posts = Post::getAuthorizedPosts($user->id);
+
+        // Return the user profile and posts
         return view('pages.profile', [
             'user' => $userData,
+            'posts' => $posts,
         ]);
     }
+
 
     /**
      * Search users.
@@ -82,4 +92,5 @@ class UserController extends Controller
             'data' => $user,
         ], 200);
     }
+
 }
