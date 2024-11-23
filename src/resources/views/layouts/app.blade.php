@@ -14,7 +14,7 @@
         @vite('resources/js/app.js')
         <main class="p-4">
             <!-- Header -->
-            <header class="flex flex-col md:flex-row justify-between items-center bg-blue-600 text-white p-4 rounded-lg mb-6">
+            <header class="flex flex-col md:flex-row justify-between items-center bg-teal-400 text-white p-4 rounded-lg mb-6">
                 <h1>
                     <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-yellow-500 transition">
                         ConnectFeup
@@ -23,17 +23,17 @@
                 <nav>
                     <ul class="flex gap-4 mt-4 md:mt-0">
                         <li>
-                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                            <a href="{{ url('/matchmaking') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
                                 Matchmaking
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url('/search') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                            <a href="{{ url('/search') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
                                 Search
                             </a>
                         </li>
                         <li>
-                            <a href="{{ url('/messages') }}" class="text-sm hover:bg-yellow-500 hover:text-white py-2 px-3 rounded transition">
+                            <a href="{{ url('/messages') }}" class="text-sm hover:bg-teal-600 hover:text-white py-2 px-3 rounded transition">
                                 Messages
                             </a>
                         </li>
@@ -64,7 +64,7 @@
                 @if (Request::is('login'))
                     <div class="flex gap-2 mt-4 w-full md:w-auto">
                         <input type="text" placeholder="Search in feed..." class="flex-1 border border-gray-300 rounded p-2 text-sm">
-                        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition">
+                        <button type="submit" class="bg-teal-600 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
                             Search
                         </button>
                     </div>

@@ -40,9 +40,15 @@
                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
+                <!-- Preview -->
+                <div id="preview-container" class="mb-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700">Preview:</label>
+                    <img id="preview-image" src="#" alt="Image Preview" class="w-full h-auto rounded-md shadow-md mt-2">
+                </div>
+
                 <!-- Botão para Submeter -->
                 <button type="submit" 
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
                     Criar Post
                 </button>
             </form>

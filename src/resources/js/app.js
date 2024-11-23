@@ -1,5 +1,6 @@
 import './bootstrap';
-function addEventListeners() {  
+
+function addEventListeners() {
     // Dropdown handling for multiple dropdowns
     document.addEventListener('click', function (e) {
         const allDropdowns = document.querySelectorAll('[id^="dropdownMenu-"]');
@@ -23,25 +24,57 @@ function addEventListeners() {
         // Hide all dropdowns if clicking outside
         allDropdowns.forEach(menu => menu.classList.add('hidden'));
     });
-  }
-  
-  function encodeForAjax(data) {
+
+    // Image preview functionality
+    const imageInput = document.getElementById('image');
+    if (imageInput) {
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    if (previewImage) {
+                        previewImage.src = e.target.result;
+                    }
+                    if (previewContainer) {
+                        previewContainer.classList.remove('hidden'); // Show the preview container
+                    }
+                };
+
+                reader.readAsDataURL(file); // Read the image as a data URL
+            } else {
+                if (previewContainer) {
+                    previewContainer.classList.add('hidden'); // Hide the preview if no file selected
+                }
+                if (previewImage) {
+                    previewImage.src = '#';
+                }
+            }
+        });
+    }
+}
+
+function encodeForAjax(data) {
     if (data == null) return null;
-    return Object.keys(data).map(function(k){
-        return encodeURIComponent(k) + '=' + encodeURIComponent(data[k])
+    return Object.keys(data).map(function (k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
     }).join('&');
-  }
-  
-  function sendAjaxRequest(method, url, data, handler) {
+}
+
+function sendAjaxRequest(method, url, data, handler) {
     let request = new XMLHttpRequest();
-  
+
     request.open(method, url, true);
     request.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.addEventListener('load', handler);
     request.send(encodeForAjax(data));
-  }
-  
-  // Initialize event listeners
-  addEventListeners();
-  
+}
+
+// Initialize event listeners
+addEventListeners();
