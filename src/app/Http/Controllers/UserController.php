@@ -33,6 +33,7 @@ class UserController extends Controller
             'username' => $user->username,
             'name' => $user->name,
             'last_login' => $user->last_login,
+            'image_url' => $user->image_url ?? 'users/images/default.png', // Ensure image_url is always set
         ];
 
         // Include email if it's the authenticated user's own profile

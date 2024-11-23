@@ -2,11 +2,15 @@
     <header class="flex items-center justify-between mb-4">
         <!-- Avatar and User Info -->
         <div class="flex items-center">
-            <div class="mr-4">
-                <img src="https://www.gravatar.com/avatar/{{ md5(strtolower(trim($post->user->email))) }}" alt="User Avatar" class="w-12 h-12 rounded-full">
-            </div>
+            <a href="{{ route('profile.show', ['id' => $post->id_user]) }}" class="mr-4">
+                <img src="{{ asset('storage/' . ($post->user->image_url ?? 'users/images/default.png')) }}" 
+                     alt="{{ $post->user->name }}" 
+                     class="w-12 h-12 rounded-full shadow-md hover:opacity-80">
+            </a>
             <div class="flex flex-col">
-                <p class="text-lg font-semibold text-gray-800">{{ $post->user->name }}</p>
+                <a href="{{ route('profile.show', ['id' => $post->id_user]) }}" class="text-lg font-semibold text-gray-800 hover:text-blue-500">
+                    {{ $post->user->name }}
+                </a>
                 <p class="text-sm text-gray-500">{{ $post->created_at->toFormattedDateString() }}</p>
             </div>
         </div>
@@ -30,7 +34,6 @@
                             <i class="fa fa-trash"></i> Delete
                         </button>
                     </form>
-
                 </div>
             </div>
         @endif
@@ -38,9 +41,8 @@
 
     <!-- Image -->
     @if ($post->image_url)
-    <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover">
+        <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover">
     @endif
-
 
     <!-- Content -->
     <p class="text-lg text-gray-800 mb-1">{{ $post->content }}</p>

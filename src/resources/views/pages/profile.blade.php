@@ -3,7 +3,15 @@
 @section('content')
     <div class="container mx-auto py-8">
         <!-- User Profile Section -->
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center">
+            <!-- User Profile Image -->
+            <div class="mb-4">
+                <img src="{{ asset('storage/' . $user['image_url']) }}" 
+                     alt="{{ $user['name'] }}" 
+                     class="w-24 h-24 mx-auto rounded-full shadow-md">
+            </div>
+
+            <!-- User Info -->
             <h2 class="text-2xl font-bold mb-4">{{ $user['name'] }}</h2>
             <p><strong>Username:</strong> {{ $user['username'] }}</p>
             <p><strong>Last Login:</strong> {{ $user['last_login'] }}</p>

@@ -52,6 +52,7 @@ CREATE TYPE message_notification_type AS ENUM ('received_message');
 -- Create tables
 CREATE TABLE "user" (
     id SERIAL PRIMARY KEY,
+    image_url TEXT,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
@@ -482,26 +483,25 @@ ALTER SEQUENCE report_id_seq RESTART WITH 1;
 ALTER SEQUENCE notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE message_id_seq RESTART WITH 1;
 
--- Insert users
-INSERT INTO "user" (username, email, name, password, visibility, account_status)
+-- Insert users with the default image
+INSERT INTO "user" (username, email, name, password, visibility, account_status, image_url)
 VALUES 
-('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active'),
-('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active'),
-('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline'),
-('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active'),
-('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active'),
-('dave_black', 'dave.black@up.pt', 'Dave Black', 'hashed_password6', 'public', 'active'),
-('eve_green', 'eve.green@up.pt', 'Eve Green', 'hashed_password7', 'private', 'offline'),
-('frank_blue', 'frank.blue@up.pt', 'Frank Blue', 'hashed_password8', 'public', 'deleted'),
-('grace_yellow', 'grace.yellow@up.pt', 'Grace Yellow', 'hashed_password9', 'public', 'active'),
-('hank_red', 'hank.red@up.pt', 'Hank Red', 'hashed_password10', 'private', 'blocked'),
-('maria_purple', 'maria.p@up.pt', 'Maria Purple', 'hashed_password11', 'public', 'active'),
-('joao_orange', 'joao.o@up.pt', 'Joao Orange', 'hashed_password12', 'public', 'active'),
-('ana_brown', 'ana.brown@up.pt', 'Ana Brown', 'hashed_password13', 'public', 'active'),
-('francisco_madureira', 'macaco.super_dragoes@up.pt', 'Francisco Madureira', 'hashed_password14', 'public', 'active'),
-('marcelo_rebelo_sousa', 'mrs@up.pt', 'Marcelo Rebelo Sousa', 'hashed_password15', 'public', 'active'),
-('antonio_costa', 'ac@up.pt', 'Antonio Costa', 'hashed_password16', 'public', 'active');
-
+('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
+('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active', 'users/images/default.png'),
+('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline', 'users/images/default.png'),
+('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active', 'users/images/default.png'),
+('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active', 'users/images/default.png'),
+('dave_black', 'dave.black@up.pt', 'Dave Black', 'hashed_password6', 'public', 'active', 'users/images/default.png'),
+('eve_green', 'eve.green@up.pt', 'Eve Green', 'hashed_password7', 'private', 'offline', 'users/images/default.png'),
+('frank_blue', 'frank.blue@up.pt', 'Frank Blue', 'hashed_password8', 'public', 'deleted', 'users/images/default.png'),
+('grace_yellow', 'grace.yellow@up.pt', 'Grace Yellow', 'hashed_password9', 'public', 'active', 'users/images/default.png'),
+('hank_red', 'hank.red@up.pt', 'Hank Red', 'hashed_password10', 'private', 'blocked', 'users/images/default.png'),
+('maria_purple', 'maria.p@up.pt', 'Maria Purple', 'hashed_password11', 'public', 'active', 'users/images/default.png'),
+('joao_orange', 'joao.o@up.pt', 'Joao Orange', 'hashed_password12', 'public', 'active', 'users/images/default.png'),
+('ana_brown', 'ana.brown@up.pt', 'Ana Brown', 'hashed_password13', 'public', 'active', 'users/images/default.png'),
+('francisco_madureira', 'macaco.super_dragoes@up.pt', 'Francisco Madureira', 'hashed_password14', 'public', 'active', 'users/images/default.png'),
+('marcelo_rebelo_sousa', 'mrs@up.pt', 'Marcelo Rebelo Sousa', 'hashed_password15', 'public', 'active', 'users/images/default.png'),
+('antonio_costa', 'ac@up.pt', 'Antonio Costa', 'hashed_password16', 'public', 'active', 'users/images/default.png');
 
 -- Insert groups
 INSERT INTO "group" (name, description, visibility, id_owner)
