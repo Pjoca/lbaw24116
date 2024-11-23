@@ -28,45 +28,19 @@ public function personalizedTimeline()
 {
     $user = Auth::user();
 
+    // Retrieve public posts and private posts of friends
     $posts = Post::where('visibility', 'public')
         ->orWhere(function ($query) use ($user) {
             $query->where('visibility', 'private')
-                  ->whereIn('id_user', $user->friends()->pluck('id'));
-        })
-        ->orWhere(function ($query) use ($user) {
-            $query->where('visibility', 'group')
-                  ->whereIn('id_group', $user->groups()->pluck('id')); // Se o usuário pertence ao grupo
+                  ->whereIn('id_user', $user->friends()->pluck('user.id'));
         })
         ->latest()
-        ->paginate(10);
+        ->simplePaginate(15); // Retrieve 15 posts per request
 
     return view('pages.timeline', compact('posts'));
 }
 
 
-    /**
-     * Retrieve the personalized timeline for the authenticated user. Access: USR
-     */
-    /*
-    public function personalizedTimeline()
-    {
-        $user = Auth::user();
-
-        // Get public posts or private posts from friends
-        $posts = Post::where('visibility', 'public')
-            ->orWhere(function ($query) use ($user) {
-                $query->where('visibility', 'private')
-                      ->whereIn('user_id', $user->friends()->pluck('id')); // Assuming `friends()` returns friends
-            })
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'message' => 'Personalized timeline retrieved successfully',
-            'data' => $posts,
-        ], 200);
-    }
-    */
 
     /**
      * Create a new post by an authenticated user. Access: USR
