@@ -67,26 +67,27 @@ Route::controller(RegisterController::class)->group(function () {
 });
 
 // Profile
-Route::controller(UserController::class)->middleware('auth')->group(function () {
+Route::controller(UserController::class)->group(function () {
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
-    Route::get('/profile/{id}/edit', [UserController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile/{id}', 'update')->name('profile.update'); // Edit Profile
+    Route::get('/profile/{id}/edit', [UserController::class, 'edit'])->middleware('auth')->name('profile.edit');
+    Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update'); // Edit Profile
     
 });
 
 // Posts
-Route::controller(PostController::class)->middleware('auth')->group(function () {
+Route::controller(PostController::class)->group(function () {
     Route::get('/timeline/public', 'publicTimeline')->name('timeline.public'); // View Public Timeline
-    Route::get('/timeline/personalized', 'personalizedTimeline')->name('timeline.personalized'); // View Personalized Timeline
-    Route::post('/post', 'create')->name('post.create'); // Create Post
-    Route::put('/posts/{post}', 'update')->name('posts.update');
-    Route::delete('/post/{id}', 'delete')->name('post.delete');
+    Route::get('/timeline/personalized', 'personalizedTimeline')->middleware('auth')->name('timeline.personalized'); // View Personalized Timeline
+    Route::post('/post', 'create')->middleware('auth')->name('post.create'); // Create Post
+    Route::put('/posts/{post}', 'update')->middleware('auth')->name('posts.update');
+    Route::delete('/post/{id}', 'delete')->middleware('auth')->name('post.delete');
 
 });
 
 // Search
 Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
 
+//Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
     Route::get('/admin', 'listUsers')->name('admin.panel');
     Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
