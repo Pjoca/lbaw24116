@@ -59,9 +59,8 @@ class Post extends Model
 
     public static function getAuthorizedPosts($profileOwnerId)
     {
-        $authUserId = Auth::id(); // Get the authenticated user's ID
+        $authUserId = Auth::id();
 
-        // Check if the authenticated user is viewing their own profile
         if ($authUserId === $profileOwnerId) {
             // Show all posts by the authenticated user
             return self::where('id_user', $authUserId)
@@ -69,7 +68,14 @@ class Post extends Model
                 ->get();
         }
 
-        // Show only public posts of the profile owner
+        $areFriends = Auth::user()->isFriend(User::find($profileOwnerId));
+
+        if ($areFriends) {
+            return self::where('id_user', $profileOwnerId)
+                ->whereIn('visibility', ['public', 'private'])
+                ->latest()
+                ->get();
+        }
         return self::where('id_user', $profileOwnerId)
             ->where('visibility', 'public')
             ->latest()
