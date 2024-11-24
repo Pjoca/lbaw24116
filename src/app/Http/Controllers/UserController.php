@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
 
 use App\Models\Post;
 
@@ -121,43 +125,64 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
 {
-    // Encontre o usuário pelo ID
     $user = User::findOrFail($id);
 
-    // Assegure que o usuário autenticado está atualizando o próprio perfil
-    $this->authorize('update', $user);
-
-    // Validação dos dados de entrada, incluindo a unicidade do username
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255',
+    // Validar entrada do usuário
+    $request->validate([
+        'name' => 'required|string|max:250',
+        'email' => [
+            'required',
+            'email',
+            'max:250',
+            Rule::unique('user', 'email')->ignore($user->id), // Email único (exceto para o usuário atual)
+            function ($attribute, $value, $fail) {
+                if (!str_ends_with($value, '@up.pt')) {
+                    $fail('The email must be a valid @up.pt email address.');
+                }
+            },
+        ],
+        'username' => [
+            'required',
+            'string',
+            'max:50',
+            Rule::unique('user', 'username')->ignore($user->id), // Username único (exceto para o usuário atual)
+        ],
+        'password' => 'nullable|min:8|confirmed', // Senha opcional, mas deve coincidir
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Apenas formatos de imagem suportados
         'visibility' => 'required|in:public,private',
-        'password' => 'nullable|string|min:8', // Torne a senha opcional
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validação para imagem
-        'username' => 'required|string|max:50|unique:user,username,' . $user->id, // Validação de unicidade do username, exceto para o próprio usuário
     ]);
 
-    // Se uma nova imagem for carregada, armazene-a
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('images', 'public');
-        $validated['image_url'] = $path;
-    }
+    // Atualizar os dados do usuário
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->username = $request->username;
+    $user->visibility = $request->visibility;
 
-    // Se uma nova senha for fornecida, criptografe-a antes de atualizar
+    // Atualizar senha se fornecida
     if ($request->filled('password')) {
-        $validated['password'] = bcrypt($request->password); // Atualiza a senha
-    } else {
-        // Se a senha não foi fornecida, mantemos a senha atual
-        unset($validated['password']); // Não altera a senha
+        $user->password = Hash::make($request->password);
     }
 
-    // Atualize o perfil do usuário
-    $user->update($validated);
+    // Atualizar imagem de perfil, se fornecida
+    if ($request->hasFile('image')) {
+        // Apagar imagem antiga, se houver
+        if ($user->image_url) {
+            Storage::delete('public/' . $user->image_url);
+        }
 
-    // Redirecione de volta para a página de perfil com uma mensagem de sucesso
-    return redirect()->route('profile.show', ['id' => $user->id])
-                     ->with('success', 'Profile updated successfully');
+        // Armazenar nova imagem
+        $path = $request->file('image')->store('profile_images', 'public');
+        $user->image_url = $path;
+    }
+
+    // Salvar alterações
+    $user->save();
+
+    // Redirecionar com mensagem de sucesso
+    return redirect()->route('profile.show', $id)
+        ->with('success', 'Profile updated successfully!');
 }
+
 
 
 
