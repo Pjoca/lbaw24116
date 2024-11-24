@@ -55,8 +55,6 @@ class UserController extends Controller
     ]);
 }
 
-
-
     /**
      * Search users.
      */
