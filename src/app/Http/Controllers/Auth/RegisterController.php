@@ -28,7 +28,17 @@ class RegisterController extends Controller
         $request->validate([
             'username' => 'required|string|max:50|unique:user,username', // Validate unique username
             'name' => 'required|string|max:250',
-            'email' => 'required|email|max:250|unique:user,email', // Validate unique email
+            'email' => [
+                'required',
+                'email',
+                'max:250',
+                'unique:user,email',
+                function ($attribute, $value, $fail) {
+                    if (!str_ends_with($value, '@up.pt')) {
+                        $fail('The email must be a valid @up.pt email address.');
+                    }
+                },
+            ],
             'password' => 'required|min:8|confirmed',
         ]);
 
