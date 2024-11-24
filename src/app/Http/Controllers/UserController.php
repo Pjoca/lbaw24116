@@ -59,14 +59,15 @@ class UserController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-    
+        $limit = $request->input('limit', null); 
+        
         $users = User::select('*')
             ->selectRaw('
                 CASE
-                    WHEN LOWER(name) = ? THEN 1                         -- Exact match
-                    WHEN LOWER(name) LIKE ? THEN 2                      -- Starts with query
-                    WHEN LOWER(name) LIKE ? THEN 3                      -- Contains query
-                    ELSE 4                                              -- No match
+                    WHEN LOWER(name) = ? THEN 1
+                    WHEN LOWER(name) LIKE ? THEN 2
+                    WHEN LOWER(name) LIKE ? THEN 3
+                    ELSE 4
                 END AS priority
             ', [
                 strtolower($query),
@@ -79,42 +80,21 @@ class UserController extends Controller
                   ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
             })
             ->orderBy('priority')
-            ->orderBy('name') // Secondary ordering by name alphabetically
-            ->get();
+            ->orderBy('name');
+    
+        // Apply the limit only if it's provided
+        if ($limit) {
+            $users = $users->take($limit);
+        }
+    
+        $users = $users->get();
+    
+        if ($request->ajax()) {
+            return view('partials.search-results', compact('users'))->render();
+        }
     
         return view('search.results', compact('users', 'query'));
     }
-    
-    
-
-    /*public function search(Request $request)
-    {
-        $query = $request->input('query');
-    
-        // Fetch exact matches
-        $exactMatches = User::where('name', $query)->get();
-    
-        // Fetch partial matches excluding exact matches
-        $partialMatches = User::where('name', 'ILIKE', "%$query%")
-                              ->whereNotIn('id', $exactMatches) // Exclude exact matches
-                              ->get();
-    
-        // Combine exact and partial matches with ordering
-        $users = User::select('*')
-                     ->selectRaw('
-                         CASE
-                             WHEN LOWER(name) = ? THEN 1
-                             ELSE 2
-                         END AS priority
-                     ', [strtolower($query)])
-                     ->orderBy('priority')
-                     ->orderBy('name')
-                     ->get();
-    
-        return view('search.results', compact('users', 'query'));
-    }*/
-    
-
 
     /**
      * Update the profile information of the authenticated user.
