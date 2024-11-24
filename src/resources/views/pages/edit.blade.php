@@ -12,16 +12,18 @@
             </div>
         @endif
 
+        
         <!-- Display Errors -->
         @if ($errors->any())
-            <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div>
+                @foreach ($errors->all() as $error)
+                    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+                        {{ $error }}
+                    </div>
+                @endforeach
             </div>
         @endif
+
 
         <!-- Form -->
         <form action="{{ route('profile.update', ['id' => $user->id]) }}" method="POST" enctype="multipart/form-data">
@@ -55,6 +57,14 @@
                     <input type="password" id="password" name="password" 
                            class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
             </div>
+
+            <!-- Confirm New Password -->
+            <div class="mb-4">
+                <label for="password_confirmation" class="block font-bold mb-2">Confirm New Password:</label>
+                <input type="password" id="password_confirmation" name="password_confirmation"
+                    class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
+            </div>
+
 
             <!-- Profile Image -->
             <div class="mb-4">
