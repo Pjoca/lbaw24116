@@ -1,6 +1,6 @@
 import './bootstrap';
 
-// Modal Handling
+// Modal Handling for User
 const modalHandler = {
     show(id, name, email, username) {
         const editUserForm = document.getElementById('edit-user-form');
@@ -23,9 +23,34 @@ const modalHandler = {
     }
 };
 
-// Attach modal functions to window for global access
+// Modal Handling for Posts
+function showEditPostModal(id, content, visibility) {
+    const editPostForm = document.getElementById('edit-post-form');
+    const editPostContent = document.getElementById('edit-post-content');
+    const editPostVisibility = document.getElementById('edit-post-visibility');
+    const editPostModal = document.getElementById('edit-post-modal');
+
+    // Set form action
+    if (editPostForm) editPostForm.action = `/posts/${id}`;
+
+    // Set content and visibility fields
+    if (editPostContent) editPostContent.value = content;
+    if (editPostVisibility) editPostVisibility.value = visibility;
+
+    // Show the modal
+    if (editPostModal) editPostModal.classList.remove('hidden');
+}
+
+function hideEditPostModal() {
+    const editPostModal = document.getElementById('edit-post-modal');
+    if (editPostModal) editPostModal.classList.add('hidden');
+}
+
+// Attach modal functions to the global window object for global access
 window.showEditUserModal = modalHandler.show;
 window.hideEditUserModal = modalHandler.hide;
+window.showEditPostModal = showEditPostModal;
+window.hideEditPostModal = hideEditPostModal;
 
 // Search Functionality
 function handleSearchInput() {
@@ -93,33 +118,6 @@ function handleUserSearchInput() {
     }
 }
 
-// AJAX Helper Functions
-const ajaxUtils = {
-    encodeForAjax(data) {
-        if (!data) return null;
-        return Object.keys(data)
-            .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`)
-            .join('&');
-    },
-
-    sendRequest(method, url, data, handler) {
-        const request = new XMLHttpRequest();
-        request.open(method, url, true);
-        request.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.addEventListener('load', handler);
-        request.send(this.encodeForAjax(data));
-    }
-};
-
-// Initialize Event Listeners
-function addEventListeners() {
-    document.addEventListener('click', handleDropdowns);
-    handleImagePreview();
-    handleSearchInput();
-    handleUserSearchInput();
-}
-
 // Image Preview Functionality
 function handleImagePreview() {
     const imageInput = document.getElementById('image');
@@ -160,6 +158,14 @@ function handleDropdowns(event) {
     } else {
         allDropdowns.forEach(menu => menu.classList.add('hidden'));
     }
+}
+
+// Initialize Event Listeners
+function addEventListeners() {
+    document.addEventListener('click', handleDropdowns);
+    handleImagePreview();
+    handleSearchInput();
+    handleUserSearchInput();
 }
 
 // Call the initialization function
