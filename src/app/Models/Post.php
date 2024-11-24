@@ -68,7 +68,11 @@ class Post extends Model
                 ->get();
         }
 
-        $areFriends = Auth::user()->isFriend(User::find($profileOwnerId));
+        if (Auth::check()){
+            $areFriends = Auth::user()->isFriend(User::find($profileOwnerId));
+        }else{
+            $areFriends = false;
+        }
 
         if ($areFriends) {
             return self::where('id_user', $profileOwnerId)

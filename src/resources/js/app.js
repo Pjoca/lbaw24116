@@ -28,6 +28,51 @@ window.showEditUserModal = modalHandler.show;
 window.hideEditUserModal = modalHandler.hide;
 
 // Search Functionality
+function handleSearchInput() {
+    const searchQueryInput = document.getElementById('search-query');
+    const searchResultsDiv = document.getElementById('search-results');
+
+    if (!searchQueryInput || !searchResultsDiv) return;
+
+    searchQueryInput.addEventListener('input', function () {
+        const query = this.value;
+
+        if (query.length > 0) {
+            fetch(`/search/users?query=${encodeURIComponent(query)}&limit=3`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // Ensure Laravel handles this as an AJAX request
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network error');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    searchResultsDiv.innerHTML = data;
+                    searchResultsDiv.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                });
+        } else {
+            searchResultsDiv.classList.add('hidden');
+            searchResultsDiv.innerHTML = '';
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        if (
+            !searchQueryInput.contains(event.target) &&
+            !searchResultsDiv.contains(event.target)
+        ) {
+            searchResultsDiv.classList.add('hidden');
+        }
+    });
+}
+
+// Filter User List Functionality
 function filterUserList() {
     const searchValue = document.getElementById('user-search-input')?.value.toLowerCase();
     const rows = document.querySelectorAll('#user-list-tbody tr');
@@ -40,60 +85,39 @@ function filterUserList() {
     });
 }
 
-function showEditPostModal(id, content, visibility) {
-    const editPostForm = document.getElementById('edit-post-form');
-    const editPostContent = document.getElementById('edit-post-content');
-    const editPostVisibility = document.getElementById('edit-post-visibility');
-    const editPostModal = document.getElementById('edit-post-modal');
-
-    // Set form action
-    if (editPostForm) {
-        editPostForm.action = `/posts/${id}`;
-    }
-
-    // Set form values
-    if (editPostContent) {
-        editPostContent.value = content;
-    }
-
-    if (editPostVisibility) {
-        editPostVisibility.value = visibility;
-    }
-
-    // Show modal
-    if (editPostModal) {
-        editPostModal.classList.remove('hidden');
+// Attach event listener for user search input
+function handleUserSearchInput() {
+    const userSearchInput = document.getElementById('user-search-input');
+    if (userSearchInput) {
+        userSearchInput.addEventListener('keyup', filterUserList);
     }
 }
 
-function hideEditPostModal() {
-    const editPostModal = document.getElementById('edit-post-modal');
-    if (editPostModal) {
-        editPostModal.classList.add('hidden');
+// AJAX Helper Functions
+const ajaxUtils = {
+    encodeForAjax(data) {
+        if (!data) return null;
+        return Object.keys(data)
+            .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`)
+            .join('&');
+    },
+
+    sendRequest(method, url, data, handler) {
+        const request = new XMLHttpRequest();
+        request.open(method, url, true);
+        request.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.addEventListener('load', handler);
+        request.send(this.encodeForAjax(data));
     }
-}
+};
 
-// Attach functions to the global window object for accessibility
-window.showEditPostModal = showEditPostModal;
-window.hideEditPostModal = hideEditPostModal;
-
-
-// Dropdown Handling
-function handleDropdowns(event) {
-    const allDropdowns = document.querySelectorAll('[id^="dropdownMenu-"]');
-    const dropdownButton = event.target.closest('[id^="dropdownMenuButton-"]');
-
-    if (dropdownButton) {
-        const dropdownId = dropdownButton.id.replace('dropdownMenuButton-', '');
-        const menu = document.getElementById(`dropdownMenu-${dropdownId}`);
-        const isHidden = menu?.classList.contains('hidden');
-
-        allDropdowns.forEach(dropdown => dropdown.classList.add('hidden')); // Hide all dropdowns
-        if (isHidden) menu?.classList.remove('hidden'); // Toggle clicked dropdown
-        event.stopPropagation();
-    } else {
-        allDropdowns.forEach(menu => menu.classList.add('hidden')); // Hide all dropdowns if clicking outside
-    }
+// Initialize Event Listeners
+function addEventListeners() {
+    document.addEventListener('click', handleDropdowns);
+    handleImagePreview();
+    handleSearchInput();
+    handleUserSearchInput();
 }
 
 // Image Preview Functionality
@@ -120,43 +144,23 @@ function handleImagePreview() {
     });
 }
 
-// AJAX Helper Functions
-const ajaxUtils = {
-    encodeForAjax(data) {
-        if (!data) return null;
-        return Object.keys(data)
-            .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(data[k])}`)
-            .join('&');
-    },
+// Dropdown Handling
+function handleDropdowns(event) {
+    const allDropdowns = document.querySelectorAll('[id^="dropdownMenu-"]');
+    const dropdownButton = event.target.closest('[id^="dropdownMenuButton-"]');
 
-    sendRequest(method, url, data, handler) {
-        const request = new XMLHttpRequest();
-        request.open(method, url, true);
-        request.setRequestHeader('X-CSRF-TOKEN', document.querySelector('meta[name="csrf-token"]').content);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.addEventListener('load', handler);
-        request.send(this.encodeForAjax(data));
+    if (dropdownButton) {
+        const dropdownId = dropdownButton.id.replace('dropdownMenuButton-', '');
+        const menu = document.getElementById(`dropdownMenu-${dropdownId}`);
+        const isHidden = menu?.classList.contains('hidden');
+
+        allDropdowns.forEach(dropdown => dropdown.classList.add('hidden'));
+        if (isHidden) menu?.classList.remove('hidden');
+        event.stopPropagation();
+    } else {
+        allDropdowns.forEach(menu => menu.classList.add('hidden'));
     }
-};
-
-// Initialize Event Listeners
-function addEventListeners() {
-
-    document.addEventListener('click', handleDropdowns);
-
-    handleImagePreview();
-
-    const userSearchInput = document.getElementById('user-search-input');
-    if (userSearchInput) {
-        userSearchInput.addEventListener('keyup', filterUserList);
-    }
-
-    document.addEventListener('click', event => {
-        if (event.target.matches('#edit-user-modal, #edit-user-modal button[data-dismiss="modal"]')) {
-            modalHandler.hide();
-        }
-    });
 }
 
-
+// Call the initialization function
 addEventListeners();

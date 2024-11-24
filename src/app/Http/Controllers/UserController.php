@@ -59,44 +59,45 @@ class UserController extends Controller
      * Search users.
      */
     public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $limit = $request->input('limit', null); 
-        
-        $users = User::select('*')
-            ->selectRaw('
-                CASE
-                    WHEN LOWER(name) = ? THEN 1
-                    WHEN LOWER(name) LIKE ? THEN 2
-                    WHEN LOWER(name) LIKE ? THEN 3
-                    ELSE 4
-                END AS priority
-            ', [
-                strtolower($query),
-                strtolower($query) . '%', // Starts with query
-                '%' . strtolower($query) . '%', // Contains query
-            ])
-            ->where(function ($q) use ($query) {
-                $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
-                  ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
-                  ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
-            })
-            ->orderBy('priority')
-            ->orderBy('name');
-    
-        // Apply the limit only if it's provided
-        if ($limit) {
-            $users = $users->take($limit);
-        }
-    
-        $users = $users->get();
-    
-        if ($request->ajax()) {
-            return view('partials.search-results', compact('users'))->render();
-        }
-    
-        return view('search.results', compact('users', 'query'));
+{
+    $query = $request->input('query');
+    $limit = $request->input('limit', null); 
+
+    $users = User::select('*')
+        ->selectRaw('
+            CASE
+                WHEN LOWER(name) = ? THEN 1
+                WHEN LOWER(name) LIKE ? THEN 2
+                WHEN LOWER(name) LIKE ? THEN 3
+                ELSE 4
+            END AS priority
+        ', [
+            strtolower($query),
+            strtolower($query) . '%',
+            '%' . strtolower($query) . '%',
+        ])
+        ->where(function ($q) use ($query) {
+            $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
+              ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
+              ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
+        })
+        ->orderBy('priority')
+        ->orderBy('name');
+
+    if ($limit) {
+        $users = $users->take($limit);
     }
+
+    $users = $users->get();
+
+    if ($request->ajax()) {
+        // Return the partial only
+        return response(view('partials.search-results', compact('users'))->render());
+    }
+
+    // Fallback for non-AJAX requests
+    return view('search.results', compact('users', 'query'));
+}
 
     /**
      * Update the profile information of the authenticated user.
