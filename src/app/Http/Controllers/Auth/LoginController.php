@@ -28,35 +28,41 @@ class LoginController extends Controller
      * Handle an authentication attempt.
      */
     public function authenticate(Request $request)
-    {
-        // Validate user input
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+{
+    // Validar os campos de entrada
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        // Attempt to log in the user with "remember me" option
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            // Regenerate session to prevent session fixation attacks
-            $request->session()->regenerate();
+    // Verificar se o email existe no banco de dados
+    $user = \App\Models\User::where('email', $credentials['email'])->first();
 
-            // Log successful login
-            Log::info('User logged in:',['email' => $credentials['email']]);
-
-            // Redirect to the intended page or default to cards
-            return redirect()->intended('/timeline/public');
-        }
-
-        // Log failed login attempt
-        Log::warning('Failed login attempt:', ['email' => $credentials['email']]);
-
-        // Redirect back with error messages
-        return back()
-            ->withErrors([
-                'email' => 'The provided credentials are incorrect. Please try again.',
-            ])
-            ->onlyInput('email');
+    if (!$user) {
+        // Se o email não existe
+        return back()->withErrors([
+            'email' => 'No account registered with that email.',
+        ])->onlyInput('email');
     }
+
+    // Verificar se a senha está correta
+    if (!Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->filled('remember'))) {
+        // Se a senha estiver incorreta
+        return back()->withErrors([
+            'password' => 'Password is incorrect.',
+        ])->onlyInput('email');
+    }
+
+    // Regenerar a sessão para evitar ataques de fixação de sessão
+    $request->session()->regenerate();
+
+    // Registrar login bem-sucedido
+    \Log::info('User logged in:', ['email' => $credentials['email']]);
+
+    // Redirecionar para a página pretendida ou padrão
+    return redirect()->intended('/timeline/public');
+}
+
 
     /**
      * Log out the user from the application.

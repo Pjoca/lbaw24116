@@ -82,4 +82,9 @@ class User extends Authenticatable
                      ->orWherePivot('id_user2', Auth::id())
                      ->distinct('user.id'); // Explicitly make the user ID distinct
      }
+
+     public function isFriend(User $user)
+     {
+         return $this->friends->contains($user);
+     }
 }

@@ -34,24 +34,24 @@
             {{ csrf_field() }}
 
             <!-- Email Field -->
-            <div class="mb-4 text-left">
-                <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-mail</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
-                @if ($errors->has('email'))
-                    <span class="text-sm text-red-500">{{ $errors->first('email') }}</span>
-                @endif
-            </div>
+        <div class="mb-4 text-left">
+            <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-mail</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+            @if ($errors->has('email'))
+                <span class="text-sm text-red-500">{{ $errors->first('email') }}</span>
+            @endif
+        </div>
 
-            <!-- Password Field -->
-            <div class="mb-4 text-left">
-                <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
-                <input id="password" type="password" name="password" required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
-                @if ($errors->has('password'))
-                    <span class="text-sm text-red-500">{{ $errors->first('password') }}</span>
-                @endif
-            </div>
+        <!-- Password Field -->
+        <div class="mb-4 text-left">
+            <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
+            <input id="password" type="password" name="password" required
+                class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+            @if ($errors->has('password'))
+                <span class="text-sm text-red-500">{{ $errors->first('password') }}</span>
+            @endif
+        </div>
 
             <!-- Remember Me -->
             <div class="mb-6 flex items-center">
@@ -68,6 +68,10 @@
             <!-- Register Link -->
             <a href="{{ route('register') }}" class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition duration-300">
                 Register
+            </a>
+
+            <a href="{{ route('timeline.public') }}" class="block w-full mt-4 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition duration-300">
+                Continue as a Guest
             </a>
 
             <!-- Success Message -->

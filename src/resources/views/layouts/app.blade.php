@@ -61,9 +61,12 @@
                         </a>
                     </div>
                 @else
-                    <div class="mt-4 md:mt-0">
+                    <div class="flex gap-4 mt-4 md:mt-0"> <!-- Use flex and gap for spacing -->
                         <a href="{{ route('login') }}" class="bg-teal-500 text-sm text-white py-2 px-4 rounded hover:bg-teal-600 transition">
                             Login
+                        </a>
+                        <a href="{{ route('register') }}" class="bg-teal-500 text-sm text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                            Register
                         </a>
                     </div>
                 @endif
