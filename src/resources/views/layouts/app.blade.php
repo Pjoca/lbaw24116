@@ -117,11 +117,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Make sure no extra elements like the logo appear in the search results */
-#search-results img {
-    display: none; /* Hide images inside the search results */
-}
-
 #search-results ul {
     margin: 0;
     padding: 0;
