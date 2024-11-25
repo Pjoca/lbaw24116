@@ -2,6 +2,9 @@
 
 @section('content')
     <div class="container mx-auto py-8">
+        <!-- Message Field -->
+        <div id="message-area" class="fixed bottom-4 right-4 w-96"></div>
+
         <!-- User Profile Section -->
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center">
             <!-- User Profile Image -->
@@ -22,13 +25,13 @@
             <!-- Edit Profile Button (Visible only to the profile owner) -->
             @if (Auth::id() === $user['id'])
                 <div class="mt-4">
-                    <a href="{{ route('profile.edit', ['id' => $user['id']]) }}" 
-                    class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
-                        Edit Profile
-                    </a>
+                <button onclick="showEditProfileModal({{ json_encode($user) }})" 
+                        class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                    Edit Profile
+                </button>
                 </div>
             @endif
-
+        </div>
 
         <!-- User Posts Section -->
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 text-center">
@@ -53,4 +56,5 @@
         </div>
     </div>
     @include('modals.edit-post-modal')
+    @include('modals.edit-profile-modal')
 @endsection

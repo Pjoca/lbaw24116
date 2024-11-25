@@ -70,6 +70,37 @@ window.hideEditUserModal = modalHandler.hide;
 window.showEditPostModal = postModalHandler.show;
 window.hideEditPostModal = postModalHandler.hide;
 
+
+const profileModalHandler = {
+    show(user) {
+        const modal = document.getElementById('edit-profile-modal');
+        const editNameField = document.getElementById('edit-name');
+        const editEmailField = document.getElementById('edit-email');
+        const editUsernameField = document.getElementById('edit-username');
+        const editVisibilityField = document.getElementById('edit-visibility');
+
+        if (!modal) return;
+
+        // Populate the modal fields with the provided user data
+        if (editNameField) editNameField.value = user.name || '';
+        if (editEmailField) editEmailField.value = user.email || '';
+        if (editUsernameField) editUsernameField.value = user.username || '';
+        if (editVisibilityField) editVisibilityField.value = user.visibility || 'public';
+
+        // Show the modal
+        modal.classList.remove('hidden');
+    },
+
+    hide() {
+        const modal = document.getElementById('edit-profile-modal');
+        if (modal) modal.classList.add('hidden');
+    },
+};
+
+// Attach modal functions to the global window object for global access
+window.showEditProfileModal = profileModalHandler.show;
+window.hideEditProfileModal = profileModalHandler.hide;
+
 // Search Functionality
 function handleSearchInput() {
     const searchQueryInput = document.getElementById('search-query');
