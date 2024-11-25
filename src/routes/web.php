@@ -28,8 +28,8 @@ Route::redirect('/', '/login');
 
 // Independent Home Route
 Route::get('/home', function () {
-    return view('home'); // Ensure a corresponding 'home.blade.php' exists
-})->name('home');
+    return redirect(route('timeline.public'));
+});
 
 
 // Authentication
