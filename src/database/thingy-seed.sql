@@ -222,10 +222,19 @@ SET user_search_tsv = to_tsvector('english', username || ' ' || name);
 CREATE INDEX idx_user_search 
 ON "user" USING GIN (user_search_tsv);
 
-CREATE TRIGGER trg_user_search_update 
-BEFORE INSERT OR UPDATE ON "user" 
-FOR EACH ROW EXECUTE FUNCTION 
-tsvector_update_trigger(user_search_tsv, 'pg_catalog.english', username, name);
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_trigger
+        WHERE tgname = 'trg_user_search_update'
+    ) THEN
+        CREATE TRIGGER trg_user_search_update 
+        BEFORE INSERT OR UPDATE ON "user" 
+        FOR EACH ROW EXECUTE FUNCTION 
+        tsvector_update_trigger(user_search_tsv, 'pg_catalog.english', username, name);
+    END IF;
+END $$;
 
 ----------------------------------
 
