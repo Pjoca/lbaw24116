@@ -25,23 +25,43 @@ const modalHandler = {
 
 // Modal Handling for Posts
 const postModalHandler = {
-    show(id, content, visibility) {
+    async show(id) {
         const editPostForm = document.getElementById('edit-post-form');
         const editPostContent = document.getElementById('edit-post-content');
         const editPostVisibility = document.getElementById('edit-post-visibility');
         const editPostModal = document.getElementById('edit-post-modal');
 
-        if (editPostForm) editPostForm.action = `/posts/${id}`;
-        if (editPostContent) editPostContent.value = content;
-        if (editPostVisibility) editPostVisibility.value = visibility;
+        try {
+            // Fetch the latest data for the post
+            const response = await fetch(`/posts/${id}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
 
-        if (editPostModal) editPostModal.classList.remove('hidden');
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error fetching post data:', errorText);
+                displayMessage('Failed to load post data.', 'error');
+                return;
+            }
+
+            const postData = await response.json();
+
+            // Populate the modal fields with the latest data
+            if (editPostForm) editPostForm.action = `/posts/${id}`;
+            if (editPostContent) editPostContent.value = postData.content || '';
+            if (editPostVisibility) editPostVisibility.value = postData.visibility || 'public';
+
+            // Show the modal
+            if (editPostModal) editPostModal.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error loading post data:', error);
+        }
     },
 
     hide() {
         const editPostModal = document.getElementById('edit-post-modal');
         if (editPostModal) editPostModal.classList.add('hidden');
-    }
+    },
 };
 
 // Attach modal functions to the global window object for global access
@@ -159,12 +179,11 @@ function handleEditPostSubmission() {
         event.preventDefault();
 
         const actionUrl = editPostForm.action;
-        const postId = actionUrl.split('/').pop();
+        const postId = actionUrl.match(/\/posts\/(\d+)/)[1];
         const content = document.getElementById('edit-post-content').value.trim();
         const visibility = document.getElementById('edit-post-visibility').value;
 
         if (!content) {
-            alert('Content cannot be empty.');
             return;
         }
 
@@ -173,16 +192,13 @@ function handleEditPostSubmission() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ content, visibility })
             });
 
-            if (!response.ok) {
-                const errorResponse = await response.json();
-                console.error('Error response from server:', errorResponse);
-                throw new Error('Failed to update post');
-            }
+            if (!response.ok) throw new Error('Failed to update post');
 
             const data = await response.json();
 
@@ -192,6 +208,7 @@ function handleEditPostSubmission() {
             // Close the modal
             postModalHandler.hide();
 
+            // Display success message
         } catch (error) {
             console.error('Error updating post:', error);
         }
@@ -201,13 +218,24 @@ function handleEditPostSubmission() {
 // Update Post Content Dynamically
 function updatePostContent(postId, data) {
     const postDiv = document.querySelector(`[data-id="${postId}"]`);
-    if (!postDiv) return;
+    if (!postDiv) {
+        console.warn(`Post with ID ${postId} not found on the page.`);
+        return;
+    }
 
+    // Update content
     const contentParagraph = postDiv.querySelector('p.text-lg');
-    if (contentParagraph) contentParagraph.textContent = data.content;
+    if (contentParagraph) {
+        contentParagraph.textContent = data.content;
+    } else {
+        console.warn('Content paragraph not found for post.');
+    }
 
+    // Update visibility if applicable
     const visibilityField = postDiv.querySelector('.post-visibility');
-    if (visibilityField) visibilityField.textContent = data.visibility;
+    if (visibilityField) {
+        visibilityField.textContent = data.visibility;
+    }
 }
 
 // Initialize Event Listeners

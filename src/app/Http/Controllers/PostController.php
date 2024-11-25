@@ -13,6 +13,7 @@ class PostController extends Controller
     /**
      * Retrieve the public timeline of posts. Access: PUB
      */
+
     
 public function publicTimeline()
 {
@@ -100,23 +101,23 @@ public function personalizedTimeline()
     /**
      * Edit an existing post by the authenticated user. Access: OWN
      */
-    public function update(Request $request, $id)
-    {
-        $post = Post::findOrFail($id);
+public function update(Request $request, $id)
+{
+    $post = Post::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'content' => 'required|string|max:500',
-            'visibility' => 'required|in:public,private,group',
-        ]);
+    $validatedData = $request->validate([
+        'content' => 'required|string|max:500',
+        'visibility' => 'required|in:public,private,group',
+    ]);
 
-        $post->update($validatedData);
+    $post->update($validatedData);
 
-        return response()->json([
-            'message' => 'Post updated successfully!',
-            'content' => $post->content,
-            'visibility' => $post->visibility,
-        ]);
-    }
+    return response()->json([
+        'message' => 'Post updated successfully!',
+        'content' => $post->content,
+        'visibility' => $post->visibility,
+    ], 200, ['Content-Type' => 'application/json']);
+}
 
 public function userPosts()
 {
@@ -133,9 +134,20 @@ public function userPosts()
     return view('pages.create-post');
 }
 
-public function show(Post $post)
+public function show($id)
 {
-    return view('pages.edit-post', compact('post'));
+    $post = Post::findOrFail($id);
+
+    // Authorization check if necessary
+    if (Auth::id() !== $post->id_user) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    return response()->json([
+        'id' => $post->id,
+        'content' => $post->content,
+        'visibility' => $post->visibility,
+    ]);
 }
 
 public function showEditForm($id)
