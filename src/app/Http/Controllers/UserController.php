@@ -9,10 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-
 use App\Models\Post;
-
-
 
 class UserController extends Controller
 {
@@ -58,10 +55,13 @@ class UserController extends Controller
     /**
      * Search users.
      */
-    public function search(Request $request)
+/**
+ * Search users.
+ */
+public function search(Request $request)
 {
     $query = $request->input('query');
-    $limit = $request->input('limit', null); 
+    $limit = $request->input('limit', null);
 
     $users = User::select('*')
         ->selectRaw('
@@ -80,9 +80,15 @@ class UserController extends Controller
             $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
               ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
               ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
-        })
-        ->orderBy('priority')
-        ->orderBy('name');
+        });
+
+    // Add visibility condition for guest users
+    if (!Auth::check()) {
+        $users->where('visibility', 'public');
+    }
+
+    $users->orderBy('priority')
+          ->orderBy('name');
 
     if ($limit) {
         $users = $users->take($limit);
