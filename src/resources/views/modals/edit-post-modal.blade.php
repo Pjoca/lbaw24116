@@ -24,7 +24,7 @@
             </div>
 
             <!-- Update Button -->
-            <button type="submit" class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+            <button type="submit" id="update-post-button" class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
                 Atualizar Post
             </button>
         </form>

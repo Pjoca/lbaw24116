@@ -101,19 +101,22 @@ public function personalizedTimeline()
      * Edit an existing post by the authenticated user. Access: OWN
      */
     public function update(Request $request, $id)
-{
-    $post = Post::findOrFail($id); // Encontra o post pelo ID
+    {
+        $post = Post::findOrFail($id);
 
-    $validated = $request->validate([
-        'content' => 'required|string',
-        'visibility' => 'required|in:public,private,group',
-    ]);
+        $validatedData = $request->validate([
+            'content' => 'required|string|max:500',
+            'visibility' => 'required|in:public,private,group',
+        ]);
 
-    // Atualiza o post com os dados validados
-    $post->update($validated);
+        $post->update($validatedData);
 
-    return redirect()->route('timeline.public')->with('success', 'Post atualizado com sucesso!');
-}
+        return response()->json([
+            'message' => 'Post updated successfully!',
+            'content' => $post->content,
+            'visibility' => $post->visibility,
+        ]);
+    }
 
 public function userPosts()
 {

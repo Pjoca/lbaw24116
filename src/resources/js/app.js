@@ -24,33 +24,31 @@ const modalHandler = {
 };
 
 // Modal Handling for Posts
-function showEditPostModal(id, content, visibility) {
-    const editPostForm = document.getElementById('edit-post-form');
-    const editPostContent = document.getElementById('edit-post-content');
-    const editPostVisibility = document.getElementById('edit-post-visibility');
-    const editPostModal = document.getElementById('edit-post-modal');
+const postModalHandler = {
+    show(id, content, visibility) {
+        const editPostForm = document.getElementById('edit-post-form');
+        const editPostContent = document.getElementById('edit-post-content');
+        const editPostVisibility = document.getElementById('edit-post-visibility');
+        const editPostModal = document.getElementById('edit-post-modal');
 
-    // Set form action
-    if (editPostForm) editPostForm.action = `/posts/${id}`;
+        if (editPostForm) editPostForm.action = `/posts/${id}`;
+        if (editPostContent) editPostContent.value = content;
+        if (editPostVisibility) editPostVisibility.value = visibility;
 
-    // Set content and visibility fields
-    if (editPostContent) editPostContent.value = content;
-    if (editPostVisibility) editPostVisibility.value = visibility;
+        if (editPostModal) editPostModal.classList.remove('hidden');
+    },
 
-    // Show the modal
-    if (editPostModal) editPostModal.classList.remove('hidden');
-}
-
-function hideEditPostModal() {
-    const editPostModal = document.getElementById('edit-post-modal');
-    if (editPostModal) editPostModal.classList.add('hidden');
-}
+    hide() {
+        const editPostModal = document.getElementById('edit-post-modal');
+        if (editPostModal) editPostModal.classList.add('hidden');
+    }
+};
 
 // Attach modal functions to the global window object for global access
 window.showEditUserModal = modalHandler.show;
 window.hideEditUserModal = modalHandler.hide;
-window.showEditPostModal = showEditPostModal;
-window.hideEditPostModal = hideEditPostModal;
+window.showEditPostModal = postModalHandler.show;
+window.hideEditPostModal = postModalHandler.hide;
 
 // Search Functionality
 function handleSearchInput() {
@@ -64,23 +62,17 @@ function handleSearchInput() {
 
         if (query.length > 0) {
             fetch(`/search/users?query=${encodeURIComponent(query)}&limit=3`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // Ensure Laravel handles this as an AJAX request
-                }
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network error');
-                    }
+                    if (!response.ok) throw new Error('Network error');
                     return response.text();
                 })
                 .then(data => {
                     searchResultsDiv.innerHTML = data;
                     searchResultsDiv.classList.remove('hidden');
                 })
-                .catch(err => {
-                    console.error('Error:', err);
-                });
+                .catch(err => console.error('Error:', err));
         } else {
             searchResultsDiv.classList.add('hidden');
             searchResultsDiv.innerHTML = '';
@@ -88,10 +80,7 @@ function handleSearchInput() {
     });
 
     document.addEventListener('click', function (event) {
-        if (
-            !searchQueryInput.contains(event.target) &&
-            !searchResultsDiv.contains(event.target)
-        ) {
+        if (!searchQueryInput.contains(event.target) && !searchResultsDiv.contains(event.target)) {
             searchResultsDiv.classList.add('hidden');
         }
     });
@@ -160,12 +149,74 @@ function handleDropdowns(event) {
     }
 }
 
+// Handle Post Update Submission
+function handleEditPostSubmission() {
+    const editPostForm = document.getElementById('edit-post-form');
+
+    if (!editPostForm) return;
+
+    editPostForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const actionUrl = editPostForm.action;
+        const postId = actionUrl.split('/').pop();
+        const content = document.getElementById('edit-post-content').value.trim();
+        const visibility = document.getElementById('edit-post-visibility').value;
+
+        if (!content) {
+            alert('Content cannot be empty.');
+            return;
+        }
+
+        try {
+            const response = await fetch(actionUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ content, visibility })
+            });
+
+            if (!response.ok) {
+                const errorResponse = await response.json();
+                console.error('Error response from server:', errorResponse);
+                throw new Error('Failed to update post');
+            }
+
+            const data = await response.json();
+
+            // Update the post content dynamically on the page
+            updatePostContent(postId, data);
+
+            // Close the modal
+            postModalHandler.hide();
+
+        } catch (error) {
+            console.error('Error updating post:', error);
+        }
+    });
+}
+
+// Update Post Content Dynamically
+function updatePostContent(postId, data) {
+    const postDiv = document.querySelector(`[data-id="${postId}"]`);
+    if (!postDiv) return;
+
+    const contentParagraph = postDiv.querySelector('p.text-lg');
+    if (contentParagraph) contentParagraph.textContent = data.content;
+
+    const visibilityField = postDiv.querySelector('.post-visibility');
+    if (visibilityField) visibilityField.textContent = data.visibility;
+}
+
 // Initialize Event Listeners
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
     handleImagePreview();
     handleSearchInput();
     handleUserSearchInput();
+    handleEditPostSubmission();
 }
 
 // Call the initialization function
