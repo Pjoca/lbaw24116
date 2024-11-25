@@ -28,17 +28,22 @@ public function personalizedTimeline()
 {
     $user = Auth::user();
 
-    // Retrieve public posts and private posts of friends
+    // Retrieve public posts, private posts of friends, and the user's own posts
     $posts = Post::where('visibility', 'public')
         ->orWhere(function ($query) use ($user) {
             $query->where('visibility', 'private')
-                  ->whereIn('id_user', $user->friends()->pluck('user.id'));
+                  ->where(function ($subQuery) use ($user) {
+                      $subQuery->whereIn('id_user', $user->friends()->pluck('user.id')) // Private posts of friends
+                               ->orWhere('id_user', $user->id); // Include the user's own private posts
+                  });
         })
+        ->orWhere('id_user', $user->id) // Include all the user's posts regardless of visibility
         ->latest()
-        ->simplePaginate(50); // Retrieve 15 posts per request
+        ->simplePaginate(50); // Retrieve 50 posts per request
 
     return view('pages.timeline', compact('posts'));
 }
+
 
 
 

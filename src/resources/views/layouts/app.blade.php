@@ -16,7 +16,7 @@
             <!-- Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-teal-400 text-white p-4 rounded-lg mb-6">
                 <h1>
-                    <a href="{{ url('/timeline/public') }}" class="text-xl font-bold uppercase hover:text-teal-300 transition">
+                    <a href="{{ url('/timeline') }}" class="text-xl font-bold uppercase hover:text-teal-300 transition">
                         ConnectFeup
                     </a>
                 </h1>
