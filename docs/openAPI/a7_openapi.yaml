@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: '1.0'
-  title: 'Platform API'
+  title: 'ConnectFEUP API'
   description: 'API for core platform functionalities including authentication, profile management, search, timelines, and posts.'
 servers:
   - url: https://lbaw.fe.up.pt
@@ -308,7 +308,7 @@ paths:
   /search/users:
     get:
       summary: "Search Users"
-      description: "Search users based on criteria. Access: USR"
+      description: "Search users based on criteria. Access: PUB"
       tags:
         - "Search"
       parameters:
