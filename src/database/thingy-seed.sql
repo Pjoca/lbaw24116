@@ -1,6 +1,6 @@
-DROP SCHEMA IF EXISTS thingy CASCADE;
-CREATE SCHEMA thingy;
-SET search_path TO thingy;
+DROP SCHEMA IF EXISTS lbaw24116 CASCADE;
+CREATE SCHEMA lbaw24116;
+SET search_path TO lbaw24116;
 
 
 -- Drop tables that depend on the types
