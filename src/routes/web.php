@@ -66,7 +66,7 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/timeline/public', 'publicTimeline')->name('timeline.public'); // View Public Timeline
     Route::get('/timeline/personalized', 'personalizedTimeline')->middleware('auth')->name('timeline.personalized'); // View Personalized Timeline
     Route::post('/pages', 'create')->name('posts.store'); // Rota para enviar o post
-    Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+    Route::get('/posts/{id}', 'show')->name('posts.show');
     Route::put('/posts/{post}', 'update')->middleware('auth')->name('posts.update');
     Route::delete('/post/{id}', 'delete')->middleware('auth')->name('post.delete');
     Route::get('/pages/create-post', 'showCreateForm')->name('posts.create'); // Rota para mostrar o formulário de criação
