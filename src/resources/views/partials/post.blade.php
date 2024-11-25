@@ -26,7 +26,7 @@
                 <div id="dropdownMenu-{{ $post->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
                     <!-- Trigger Modal Instead of Redirect -->
                     <button 
-                        onclick="showEditPostModal({{ $post->id }}, '{{ $post->content }}', '{{ $post->visibility }}')"
+                        onclick="showEditPostModal(1, 'Looking forward to our next hike!sssssa Oh yeah', 'public')"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                         Edit
                     </button>
