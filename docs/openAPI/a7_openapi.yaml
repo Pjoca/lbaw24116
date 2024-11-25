@@ -340,7 +340,7 @@ paths:
   /admin/users/{id}:
     get:
       summary: "View User Details"
-      description: "View detailed information of a specific user. Access: ADM"
+      description: "View detailed information of a specific user (Used for development only, the efective information of users is displayed on the admin Panel). Access: ADM"
       tags:
         - "Admin"
       parameters:
