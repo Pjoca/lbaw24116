@@ -529,7 +529,7 @@ ALTER SEQUENCE message_id_seq RESTART WITH 1;
 INSERT INTO "user" (username, email, name, password, visibility, account_status, image_url)
 VALUES 
 ('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
-('jane_smith', 'jane.smith@up.pt', 'Jane Smith', 'hashed_password2', 'private', 'active', 'users/images/default.png'),
+('jane_smith', 'jane.smith@up.pt', 'Jane Smith', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'private', 'active', 'users/images/default.png'),
 ('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline', 'users/images/default.png'),
 ('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active', 'users/images/default.png'),
 ('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active', 'users/images/default.png'),
@@ -646,7 +646,6 @@ VALUES
 INSERT INTO admin (id)
 VALUES 
 (1),
-(2),
 (3);
 
 -- Insert messages
@@ -713,7 +712,21 @@ VALUES
 (1, 13, CURRENT_DATE),
 (1, 14, CURRENT_DATE),
 (1, 15, CURRENT_DATE),
-(1, 16, CURRENT_DATE);
+(1, 16, CURRENT_DATE),
+(2, 3, CURRENT_DATE),
+(2, 4, CURRENT_DATE),
+(2, 5, CURRENT_DATE),
+(2, 6, CURRENT_DATE),
+(2, 7, CURRENT_DATE),
+(2, 8, CURRENT_DATE),
+(2, 9, CURRENT_DATE),
+(2, 10, CURRENT_DATE),
+(2, 11, CURRENT_DATE),
+(2, 12, CURRENT_DATE),
+(2, 13, CURRENT_DATE),
+(2, 14, CURRENT_DATE),
+(2, 15, CURRENT_DATE),
+(2, 16, CURRENT_DATE);
 
 INSERT INTO friendship_request (id_sender, id_receiver, status, created_at)
 VALUES 
