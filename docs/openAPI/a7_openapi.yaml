@@ -20,7 +20,26 @@ tags:
     description: "Endpoints for viewing, creating, editing, and deleting posts"
 
 paths:
+  /:
+    get:
+      summary: "Redirect to Login"
+      description: "Redirects unauthenticated users to login. Access: PUB"
+      tags:
+        - "Authentication"
+      responses:
+        '302':
+          description: "Redirects to login page"
+
   /auth/login:
+    get:
+      summary: "Login Page"
+      description: "Displays the login form. Access: PUB"
+      tags:
+        - "Authentication"
+      responses:
+        '200':
+          description: "Login page displayed successfully"
+
     post:
       summary: "Login"
       description: "Authenticate a user and create a session. Access: PUB"
@@ -45,14 +64,14 @@ paths:
                 - password
       responses:
         '200':
-          description: "Login successful, returns session token"
+          description: "Login successful"
         '401':
           description: "Invalid credentials"
 
   /auth/logout:
-    post:
+    get:
       summary: "Logout"
-      description: "End the user session. Access: USR"
+      description: "Ends the user session. Access: USR"
       tags:
         - "Authentication"
       responses:
@@ -60,6 +79,15 @@ paths:
           description: "Logout successful"
 
   /auth/register:
+    get:
+      summary: "Register Page"
+      description: "Displays the registration form. Access: PUB"
+      tags:
+        - "Authentication"
+      responses:
+        '200':
+          description: "Registration page displayed successfully"
+
     post:
       summary: "Register"
       description: "Register a new user. Access: PUB"
@@ -96,6 +124,38 @@ paths:
         '400':
           description: "Invalid input data"
 
+  /timeline:
+    get:
+      summary: "Timeline redirect"
+      description: "Redirects to personalized or public timeline based on authentication. Access: PUB"
+      tags:
+        - "Post"
+      responses:
+        '302':
+          description: "Redirected to the appropriate timeline"
+
+  /timeline/public:
+    get:
+      summary: "Public Timeline"
+      description: "Retrieve public timeline posts. Access: PUB"
+      tags:
+        - "Post"
+      responses:
+        '200':
+          description: "Timeline retrieved successfully"
+
+  /timeline/personalized:
+    get:
+      summary: "Personalized Timeline"
+      description: "Retrieve personalized timeline posts. Access: USR"
+      tags:
+        - "Post"
+      responses:
+        '200':
+          description: "Personalized timeline retrieved successfully"
+        '401':
+          description: "Unauthorized access"
+
   /profile/{id}:
     get:
       summary: "View Profile"
@@ -117,9 +177,16 @@ paths:
 
     put:
       summary: "Edit Profile"
-      description: "Update profile information of the authenticated user. Access: OWN"
+      description: "Update the profile information of the authenticated user. Access: OWN"
       tags:
         - "Profile"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
       requestBody:
         required: true
         content:
@@ -129,15 +196,14 @@ paths:
               properties:
                 name:
                   type: string
-                  description: "Updated full name"
+                  description: "Full name of the user"
                 email:
                   type: string
-                  format: email
-                  description: "Updated email address"
+                  description: "Email address of the user"
                 visibility:
                   type: string
                   enum: ["public", "private"]
-                  description: "Updated visibility of the user"
+                  description: "Visibility status of the user"
               required:
                 - name
                 - email
@@ -148,70 +214,10 @@ paths:
         '400':
           description: "Invalid input data"
 
-  /search/exact:
-    get:
-      summary: "Exact Match Search"
-      description: "Search for users with exact match criteria. Access: USR"
-      tags:
-        - "Search"
-      parameters:
-        - name: username
-          in: query
-          required: true
-          schema:
-            type: string
-          description: "Exact username to search for"
-      responses:
-        '200':
-          description: "Search results returned successfully"
-        '400':
-          description: "Invalid query"
-
-  /search/fulltext:
-    get:
-      summary: "Full-Text Search"
-      description: "Perform a full-text search across users and content. Access: USR"
-      tags:
-        - "Search"
-      parameters:
-        - name: query
-          in: query
-          required: true
-          schema:
-            type: string
-          description: "Full-text search query"
-      responses:
-        '200':
-          description: "Search results returned successfully"
-        '400':
-          description: "Invalid query"
-
-  /timeline/public:
-    get:
-      summary: "View Public Timeline"
-      description: "Retrieve the public timeline of posts. Access: PUB"
-      tags:
-        - "Post"
-      responses:
-        '200':
-          description: "Timeline retrieved successfully"
-
-  /timeline/personalized:
-    get:
-      summary: "View Personalized Timeline"
-      description: "Retrieve the personalized timeline for the authenticated user. Access: USR"
-      tags:
-        - "Post"
-      responses:
-        '200':
-          description: "Timeline retrieved successfully"
-        '401':
-          description: "Unauthorized access"
-
   /post:
     post:
       summary: "Create Post"
-      description: "Create a new post by an authenticated user. Access: USR"
+      description: "Create a new post. Access: USR"
       tags:
         - "Post"
       requestBody:
@@ -230,9 +236,13 @@ paths:
                   description: "Visibility of the post"
                 id_group:
                   type: integer
-                  description: "ID of the group where the post is created (optional)"
+                  description: "Group ID for the post (optional)"
+                image:
+                  type: object
+                  description: "Image of the Post (optional)"
               required:
                 - content
+                - visibility
       responses:
         '201':
           description: "Post created successfully"
@@ -242,7 +252,7 @@ paths:
   /post/{id}:
     put:
       summary: "Edit Post"
-      description: "Edit an existing post by the authenticated user. Access: OWN"
+      description: "Edit an existing post. Access: OWN"
       tags:
         - "Post"
       parameters:
@@ -261,26 +271,25 @@ paths:
               properties:
                 content:
                   type: string
-                  description: "Updated content of the post"
+                  description: "Content of the post"
                 visibility:
                   type: string
                   enum: ["public", "private", "group"]
-                  description: "Updated visibility of the post"
+                  description: "Visibility of the post"
               required:
                 - content
+                - visibility
       responses:
         '200':
           description: "Post updated successfully"
         '400':
           description: "Invalid input data"
-        '403':
-          description: "Unauthorized action"
         '404':
           description: "Post not found"
 
     delete:
       summary: "Delete Post"
-      description: "Delete an existing post by the authenticated user. Access: OWN"
+      description: "Delete an existing post. Access: OWN"
       tags:
         - "Post"
       parameters:
@@ -293,74 +302,40 @@ paths:
       responses:
         '200':
           description: "Post deleted successfully"
-        '403':
-          description: "Unauthorized action"
         '404':
           description: "Post not found"
 
-  /admin/users:
+  /search/users:
     get:
       summary: "Search Users"
-      description: "View and search user accounts. Access: ADM"
+      description: "Search users based on criteria. Access: USR"
       tags:
-        - "Admin"
+        - "Search"
       parameters:
-        - name: search
+        - name: query
           in: query
+          required: true
           schema:
             type: string
-          description: "Search term for user accounts (e.g., username or email)"
+          description: "Search term for users"
       responses:
         '200':
-          description: "User accounts retrieved successfully"
+          description: "Search results returned successfully"
         '400':
           description: "Invalid search query"
 
-    post:
-      summary: "Create User"
-      description: "Create a new user account. Access: ADM"
+  /admin:
+    get:
+      summary: "Admin Panel"
+      description: "Access the main admin panel. Access: ADM"
       tags:
         - "Admin"
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  description: "New user's username"
-                email:
-                  type: string
-                  format: email
-                  description: "New user's email"
-                name:
-                  type: string
-                  description: "New user's full name"
-                password:
-                  type: string
-                  description: "New user's password"
-                visibility:
-                  type: string
-                  enum: ["public", "private"]
-                  description: "User visibility status"
-                account_status:
-                  type: string
-                  enum: ["active", "blocked", "deleted", "offline"]
-                  description: "Account status"
-              required:
-                - username
-                - email
-                - name
-                - password
-                - visibility
-                - account_status
       responses:
-        '201':
-          description: "User account created successfully"
-        '400':
-          description: "Invalid input data"
+        '200':
+          description: "Admin panel retrieved successfully"
+        '401':
+          description: "Unauthorized access"
+
 
   /admin/users/{id}:
     get:
@@ -386,6 +361,13 @@ paths:
       description: "Edit a specific user's account details. Access: ADM"
       tags:
         - "Admin"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID of the user"
       requestBody:
         required: true
         content:
@@ -442,3 +424,4 @@ paths:
           description: "User account deleted successfully"
         '404':
           description: "User not found"
+

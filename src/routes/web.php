@@ -2,9 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\CardController;
-use App\Http\Controllers\ItemController;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
@@ -81,11 +78,7 @@ Route::get('/search/users', [UserController::class, 'search'])->name('users.sear
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
     Route::get('/admin', 'listUsers')->name('admin.panel');
-    Route::get('/admin/users', 'listUsers')->name('admin.users'); // List Users
-    Route::get('/admin/users/{id}', 'showUser')->name('admin.users.show'); // View User
-    Route::get('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('admin.editUser');
     Route::put('/admin/update-user/{id}', [AdminController::class, 'updateUser'])->name('admin.updateUser');
-    Route::get('/admin/create-user', 'createUser')->name('admin.createUser'); // Page to create a user
     Route::post('/admin/store-user', 'storeUser')->name('admin.storeUser');   // Submit user creation form
     
 });
