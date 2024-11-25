@@ -58,6 +58,11 @@
                         <a href="{{ route('profile.show', ['id' => Auth::id()]) }}" class="text-sm font-bold hover:text-yellow-300 transition">
                             {{ Auth::user()->name }}
                         </a>
+                        @if (Auth::user()->isAdmin())
+                            <a href="{{ route('admin.panel') }}" class="bg-yellow-400 text-sm text-white py-2 px-4 rounded-lg hover:bg-yellow-500 transition">
+                                Admin Panel
+                            </a>
+                        @endif
                         <a href="{{ url('/logout') }}" class="bg-red-500 text-sm text-white py-2 px-3 rounded-lg hover:bg-red-600 transition">
                             Logout
                         </a>
