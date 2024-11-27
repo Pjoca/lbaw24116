@@ -54,7 +54,7 @@ class AdminController extends Controller
         $user = User::findOrFail($id);
         $user->update($validated);
 
-        return redirect()->route('admin.users')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.panel')->with('success', 'User updated successfully.');
     }
 
 
@@ -88,10 +88,11 @@ class AdminController extends Controller
             // Create the user
             $user = User::create($validated);
 
-            return redirect()->route('admin.users')->with('success', 'User created successfully.');
+            return redirect()->route('admin.panel')->with('success', 'User created successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
+            \Log::error($e);
             return back()->with('error', 'An unexpected error occurred.');
         }
     }

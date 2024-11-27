@@ -29,7 +29,7 @@ Route::redirect('/', '/login');
 // Independent Home Route
 Route::get('/home', function () {
     return redirect(route('timeline.public'));
-});
+})->name('home');
 
 
 // Authentication
