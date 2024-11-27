@@ -47,7 +47,7 @@ class FriendshipController extends Controller
             $authUserId = Auth::id();
             $friend = User::findOrFail($id);
 
-            // Ensure the users are friends
+            // Check for the friendship where the authenticated user is either id_user1 or id_user2
             $friendship = Friendship::where(function ($query) use ($authUserId, $friend) {
                 $query->where('id_user1', $authUserId)
                     ->where('id_user2', $friend->id);
@@ -56,6 +56,7 @@ class FriendshipController extends Controller
                     ->where('id_user2', $authUserId);
             })->first();
 
+            // If no friendship exists, return an error
             if (!$friendship) {
                 return response()->json(['error' => 'Friendship not found'], 404);
             }
@@ -63,7 +64,7 @@ class FriendshipController extends Controller
             // Delete the friendship record
             $friendship->delete();
 
-            return response()->json(['success' => 'Friendship removed'], 200);
+            return response()->json(['success' => 'Friendship removed successfully'], 200);
         } catch (\Exception $e) {
             Log::error('Error removing friendship: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while removing the friendship.'], 500);
