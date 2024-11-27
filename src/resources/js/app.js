@@ -286,7 +286,7 @@ const messageHandler = {
 
         alert.innerHTML = `
             <span class="mr-1">${message}</span>
-            <button type="button" class="ml-1 px-4 py-2 text-${type}-700 hover:text-${type}-800" onclick="this.parentElement.remove()">
+            <button type="button" class="px-4 py-2 text-${type}-700 hover:text-${type}-800" onclick="this.parentElement.remove()">
                 &times;
             </button>
         `;
