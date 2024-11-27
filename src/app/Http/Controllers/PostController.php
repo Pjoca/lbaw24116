@@ -15,38 +15,54 @@ class PostController extends Controller
      */
 
     
-public function publicTimeline()
-{
-    $posts = Post::where('visibility', 'public')
-        ->latest()
-        ->paginate(30); // nesta opçao podem dizer quantos posts querem por pagina -> igual ao exemplo de baixo dos myposts
+     public function publicTimeline(Request $request)
+     {
+         // Retrieve public posts
+         $query = Post::where('visibility', 'public')->latest();
+     
+         // Handle AJAX requests for dynamic loading
+         if ($request->ajax()) {
+             $posts = $query->simplePaginate(5); // Fetch 5 posts per page for infinite scroll
+             return view('partials.posts-renderer', compact('posts'))->render(); // Render the post partials
+         }
+     
+         // For the initial page load, retrieve the first 5 posts
+         $posts = $query->simplePaginate(5);
+     
+         return view('pages.timeline', compact('posts'));
+     }
 
-    return view('pages.timeline', compact('posts'));
-}
 
+    public function personalizedTimeline(Request $request)
+    {
+        $user = Auth::user();
 
-public function personalizedTimeline()
-{
-    $user = Auth::user();
+        // Get the IDs of the user's friends
+        $friendIds = $user->friendships()->pluck('id_user2')->toArray();
 
-    // Get the IDs of the user's friends
-    $friendIds = $user->friendships()->pluck('id_user2')->toArray(); // Fetch friend IDs into an array
+        // Retrieve public posts, private posts of friends, and the user's own posts
+        $query = Post::where('visibility', 'public')
+            ->orWhere(function ($query) use ($user, $friendIds) {
+                $query->where('visibility', 'private')
+                    ->where(function ($subQuery) use ($user, $friendIds) {
+                        $subQuery->whereIn('id_user', $friendIds)
+                                ->orWhere('id_user', $user->id);
+                    });
+            })
+            ->orWhere('id_user', $user->id)
+            ->latest();
 
-    // Retrieve public posts, private posts of friends, and the user's own posts
-    $posts = Post::where('visibility', 'public')
-        ->orWhere(function ($query) use ($user, $friendIds) {
-            $query->where('visibility', 'private')
-                  ->where(function ($subQuery) use ($user, $friendIds) {
-                      $subQuery->whereIn('id_user', $friendIds) // Private posts of friends
-                               ->orWhere('id_user', $user->id); // Include the user's own private posts
-                  });
-        })
-        ->orWhere('id_user', $user->id) // Include all the user's posts regardless of visibility
-        ->latest()
-        ->simplePaginate(50); // Retrieve 50 posts per request
+        // For AJAX requests, return only the posts
+        if ($request->ajax()) {
+            $posts = $query->simplePaginate(5); // Load 5 posts per page
+            return view('partials.posts-renderer', compact('posts'))->render(); // Render posts partial
+        }
 
-    return view('pages.timeline', compact('posts'));
-}
+        // For the initial page load, retrieve the first 5 posts
+        $posts = $query->simplePaginate(5);
+
+        return view('pages.timeline', compact('posts'));
+    }
 
 
 

@@ -467,5 +467,7 @@ async function rejectFriendRequest(requestId) {
     }
 }
 
+
+
 window.acceptFriendRequest = acceptFriendRequest;
 window.rejectFriendRequest = rejectFriendRequest;
