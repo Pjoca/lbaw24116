@@ -29,12 +29,15 @@ public function personalizedTimeline()
 {
     $user = Auth::user();
 
+    // Get the IDs of the user's friends
+    $friendIds = $user->friendships()->pluck('id_user2')->toArray(); // Fetch friend IDs into an array
+
     // Retrieve public posts, private posts of friends, and the user's own posts
     $posts = Post::where('visibility', 'public')
-        ->orWhere(function ($query) use ($user) {
+        ->orWhere(function ($query) use ($user, $friendIds) {
             $query->where('visibility', 'private')
-                  ->where(function ($subQuery) use ($user) {
-                      $subQuery->whereIn('id_user', $user->friends()->pluck('user.id')) // Private posts of friends
+                  ->where(function ($subQuery) use ($user, $friendIds) {
+                      $subQuery->whereIn('id_user', $friendIds) // Private posts of friends
                                ->orWhere('id_user', $user->id); // Include the user's own private posts
                   });
         })

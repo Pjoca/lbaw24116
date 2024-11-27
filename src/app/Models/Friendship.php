@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Friendship extends Model
 {
@@ -44,14 +45,25 @@ class Friendship extends Model
 
     public static function createFriendship($userId1, $userId2)
     {
-        // Ensure user IDs are always stored in ascending order
-        $friendship = new self();
-        $friendship->id_user1 = min($userId1, $userId2);
-        $friendship->id_user2 = max($userId1, $userId2);
-        $friendship->created_at = now();
-        $friendship->save();
+        if ($userId1 === $userId2) {
+            throw new \InvalidArgumentException('Users cannot be friends with themselves.');
+        }
 
-        return $friendship;
+        DB::transaction(function () use ($userId1, $userId2) {
+            // Insert both directions of the friendship
+            self::updateOrCreate(['id_user1' => $userId1, 'id_user2' => $userId2]);
+            self::updateOrCreate(['id_user1' => $userId2, 'id_user2' => $userId1]);
+        });
     }
+
+    public static function removeFriendship($userId1, $userId2)
+    {
+        DB::transaction(function () use ($userId1, $userId2) {
+            // Remove both directions of the friendship
+            self::where(['id_user1' => $userId1, 'id_user2' => $userId2])->delete();
+            self::where(['id_user1' => $userId2, 'id_user2' => $userId1])->delete();
+        });
+    }
+
     // Add additional methods if needed for querying or business logic
 }

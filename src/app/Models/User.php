@@ -75,15 +75,10 @@ class User extends Authenticatable
         return $this->admin !== null;
      }   
 
-     public function friends()
-    {
-        return User::whereIn('id', function ($query) {
-            $query->select('id_user2')->from('friendship')->where('id_user1', $this->id)
-                ->union(
-                    $query->select('id_user1')->from('friendship')->where('id_user2', $this->id)
-                );
-        });
-    }
+     public function friendships()
+     {
+         return Friendship::where('id_user1', $this->id);
+     }
 
      public function requestedFriends()
      {
@@ -93,16 +88,13 @@ class User extends Authenticatable
                      ->distinct('user.id');
      }
 
-     public function isFriend(User $user)
-    {
-        return Friendship::where(function ($query) use ($user) {
-            $query->where('id_user1', $this->id)
-                ->where('id_user2', $user->id);
-        })->orWhere(function ($query) use ($user) {
-            $query->where('id_user1', $user->id)
-                ->where('id_user2', $this->id);
-        })->exists();
-    }
+     public function isFriend(User $user): bool
+     {
+         // Check if a friendship exists where the current user is id_user1 and the given user is id_user2
+         return Friendship::where('id_user1', $this->id)
+             ->where('id_user2', $user->id)
+             ->exists();
+     }
 
 
      public function hasRequestedFriendship(User $user)
