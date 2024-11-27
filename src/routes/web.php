@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\FriendshipController;
 
 
 /*
@@ -86,11 +87,14 @@ Route::controller(AdminController::class)->middleware('auth')->group(function ()
 
 
 
-
-
-
-
-
+Route::controller(FriendshipController::class)->middleware('auth')->group(function () {
+        Route::post('/friends/add/{id}', 'add');
+        Route::delete('/friends/remove/{id}', 'remove');
+        Route::delete('/friends/cancel/{id}', 'cancel');
+        Route::post('/friends/accept/{id}', 'accept');
+        Route::delete('/friends/reject/{id}', 'reject');
+    });
+    
 
 
 

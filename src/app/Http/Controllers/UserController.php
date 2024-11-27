@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\Post;
+use App\Models\FriendshipRequest;
 
 class UserController extends Controller
 {
@@ -19,38 +20,66 @@ class UserController extends Controller
      */
     public function show($id)
 {
-    // Find the user by ID or return a 404 response
     $user = User::findOrFail($id);
 
-    // Check if the profile is public or if the user is authenticated and authorized to view it
     if ($user->visibility !== 'public' && !Auth::check()) {
         abort(403, 'You are not authorized to view this profile.');
     }
 
-    // Prepare the user data for the response
     $userData = [
         'id' => $user->id,
         'username' => $user->username,
         'name' => $user->name,
         'last_login' => $user->last_login,
-        'image_url' => $user->image_url ?? 'users/images/default.png', // Ensure image_url is always set
+        'image_url' => $user->image_url ?? 'users/images/default.png',
     ];
 
-    // Include email if it's the authenticated user's own profile
     $isOwnProfile = Auth::check() && Auth::id() === $user->id;
     if ($isOwnProfile) {
         $userData['email'] = $user->email;
     }
 
-    // Retrieve posts based on profile ownership or public visibility
     $posts = Post::getAuthorizedPosts($user->id);
 
-    // Return the user profile and posts
+    $isFriend = false;
+    $hasRequestedFriendship = false;
+    $hasIncomingFriendRequest = false;
+    $incomingFriendRequestId = null;
+
+    if (Auth::check() && !$isOwnProfile) {
+        $authUser = Auth::user();
+        $isFriend = $authUser->isFriend($user);
+        $hasRequestedFriendship = $authUser->hasRequestedFriendship($user);
+
+        $incomingRequest = FriendshipRequest::where('id_sender', $user->id)
+            ->where('id_receiver', $authUser->id)
+            ->first();
+
+        if ($incomingRequest) {
+            $hasIncomingFriendRequest = true;
+            $incomingFriendRequestId = $incomingRequest->id;
+        }
+    }
+
+    // Fetch friend requests only for the profile owner
+    $friendRequests = [];
+    if ($isOwnProfile) {
+        $friendRequests = FriendshipRequest::where('id_receiver', Auth::id())
+            ->with('sender') // Load sender details
+            ->get();
+    }
+
     return view('pages.profile', [
         'user' => $userData,
         'posts' => $posts,
+        'isFriend' => $isFriend,
+        'hasRequestedFriendship' => $hasRequestedFriendship,
+        'hasIncomingFriendRequest' => $hasIncomingFriendRequest,
+        'incomingFriendRequestId' => $incomingFriendRequestId,
+        'friendRequests' => $friendRequests, // Pass friend requests
     ]);
 }
+
 
     /**
      * Search users.

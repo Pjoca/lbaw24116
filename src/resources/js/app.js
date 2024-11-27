@@ -330,3 +330,142 @@ function addEventListeners() {
 
 // Call the initialization function
 addEventListeners();
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('friend-requests-sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+}
+
+window.toggleRequestsSidebar = toggleSidebar;
+
+async function addFriend(userId) {
+    try {
+        const response = await fetch(`/friends/add/${userId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to add friend');
+        const data = await response.json();
+
+        // Update the button dynamically
+        const button = document.querySelector(`[data-user-id="${userId}"]`);
+        if (button) {
+            button.textContent = 'Cancel Friend Request';
+            button.className = 'bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition';
+            button.setAttribute('onclick', `cancelFriendRequest(${userId})`);
+        }
+
+        window.showFeedbackMessage('green', 'Friend request sent successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while sending the friend request.');
+    }
+}
+
+async function removeFriend(userId) {
+    try {
+        const response = await fetch(`/friends/remove/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to remove friend');
+        const data = await response.json();
+
+        // Update the button dynamically
+        const button = document.querySelector(`[data-user-id="${userId}"]`);
+        if (button) {
+            button.textContent = 'Add Friend';
+            button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
+            button.setAttribute('onclick', `addFriend(${userId})`);
+        }
+
+        window.showFeedbackMessage('green', 'Friend removed successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while removing the friend.');
+    }
+}
+
+async function cancelFriendRequest(userId) {
+    try {
+        const response = await fetch(`/friends/cancel/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to cancel friend request');
+        const data = await response.json();
+
+        // Update the button dynamically
+        const button = document.querySelector(`[data-user-id="${userId}"]`);
+        if (button) {
+            button.textContent = 'Add Friend';
+            button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
+            button.setAttribute('onclick', `addFriend(${userId})`);
+        }
+
+        window.showFeedbackMessage('green', 'Friend request canceled successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while canceling the friend request.');
+    }
+}
+
+
+window.cancelFriendRequest = cancelFriendRequest;
+window.addFriend = addFriend;
+window.removeFriend = removeFriend;
+
+
+async function acceptFriendRequest(requestId) {
+    try {
+        const response = await fetch(`/friends/accept/${requestId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to accept friend request');
+        window.showFeedbackMessage('green', 'Friend request accepted!');
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while accepting the friend request.');
+    }
+}
+
+async function rejectFriendRequest(requestId) {
+    try {
+        const response = await fetch(`/friends/reject/${requestId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to reject friend request');
+        window.showFeedbackMessage('green', 'Friend request rejected!');
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while rejecting the friend request.');
+    }
+}
+
+window.acceptFriendRequest = acceptFriendRequest;
+window.rejectFriendRequest = rejectFriendRequest;
