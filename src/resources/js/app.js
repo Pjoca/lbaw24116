@@ -269,6 +269,46 @@ function updatePostContent(postId, data) {
     }
 }
 
+
+const messageHandler = {
+    show(type, message) {
+        // Get the container for alerts
+        const container = document.querySelector('.fixed.bottom-5.right-5');
+        if (!container) return;
+
+        // Create the alert element
+        const alert = document.createElement('div');
+        alert.className = `alert bg-${type}-100 border border-${type}-400 text-${type}-700 px-4 py-3 rounded shadow-md opacity-100 transition-opacity duration-500`;
+        alert.setAttribute('role', 'alert');
+
+        // Add the message
+        alert.innerHTML = `<span class="mr-1">${message}</span>`;
+
+        // Append the alert to the container
+        container.appendChild(alert);
+
+        // Auto-remove after 5 seconds with Tailwind fade-out
+        this.autoRemove(alert);
+    },
+
+    autoRemove(alert) {
+        setTimeout(() => {
+            alert.classList.remove('opacity-100'); // Remove opacity-100
+            alert.classList.add('opacity-0'); // Add opacity-0
+            setTimeout(() => alert.remove(), 300); // Remove after fade-out transition
+        }, 5000);
+    }
+};
+
+function initializeMessageHandler() {
+    document.querySelectorAll('.alert').forEach(alert => {
+        messageHandler.autoRemove(alert);
+    });
+}
+
+window.showFeedbackMessage = (type, message) => messageHandler.show(type, message);
+
+
 // Initialize Event Listeners
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
@@ -276,7 +316,11 @@ function addEventListeners() {
     handleSearchInput();
     handleUserSearchInput();
     handleEditPostSubmission();
+    initializeMessageHandler();
 }
+
+
+
 
 // Call the initialization function
 addEventListeners();
