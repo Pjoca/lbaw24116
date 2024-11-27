@@ -210,11 +210,12 @@ function handleEditPostSubmission() {
         event.preventDefault();
 
         const actionUrl = editPostForm.action;
-        const postId = actionUrl.match(/\/posts\/(\d+)/)[1];
-        const content = document.getElementById('edit-post-content').value.trim();
-        const visibility = document.getElementById('edit-post-visibility').value;
+        const postId = actionUrl.match(/\/posts\/(\d+)/)?.[1];
+        const content = document.getElementById('edit-post-content')?.value.trim();
+        const visibility = document.getElementById('edit-post-visibility')?.value;
 
         if (!content) {
+            window.showFeedbackMessage('red', 'Post content cannot be empty.');
             return;
         }
 
@@ -224,12 +225,14 @@ function handleEditPostSubmission() {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ content, visibility })
+                body: JSON.stringify({ content, visibility }),
             });
 
-            if (!response.ok) throw new Error('Failed to update post');
+            if (!response.ok) {
+                throw new Error('Failed to update post');
+            }
 
             const data = await response.json();
 
@@ -240,8 +243,10 @@ function handleEditPostSubmission() {
             postModalHandler.hide();
 
             // Display success message
+            window.showFeedbackMessage('green', 'Post updated successfully!');
         } catch (error) {
             console.error('Error updating post:', error);
+            window.showFeedbackMessage('red', 'An error occurred while updating the post.');
         }
     });
 }
@@ -272,33 +277,34 @@ function updatePostContent(postId, data) {
 
 const messageHandler = {
     show(type, message) {
-        // Get the container for alerts
         const container = document.querySelector('.fixed.bottom-5.right-5');
         if (!container) return;
 
-        // Create the alert element
         const alert = document.createElement('div');
-        alert.className = `alert bg-${type}-100 border border-${type}-400 text-${type}-700 px-4 py-3 rounded shadow-md opacity-100 transition-opacity duration-500`;
+        alert.className = `alert bg-${type}-100 border border-${type}-400 text-${type}-700 px-4 py-3 rounded shadow-md opacity-100 transition-opacity duration-500 flex items-center justify-between`;
         alert.setAttribute('role', 'alert');
 
-        // Add the message
-        alert.innerHTML = `<span class="mr-1">${message}</span>`;
+        alert.innerHTML = `
+            <span class="mr-1">${message}</span>
+            <button type="button" class="ml-1 px-4 py-2 text-${type}-700 hover:text-${type}-800" onclick="this.parentElement.remove()">
+                &times;
+            </button>
+        `;
 
-        // Append the alert to the container
         container.appendChild(alert);
-
-        // Auto-remove after 5 seconds with Tailwind fade-out
         this.autoRemove(alert);
     },
 
     autoRemove(alert) {
         setTimeout(() => {
-            alert.classList.remove('opacity-100'); // Remove opacity-100
-            alert.classList.add('opacity-0'); // Add opacity-0
-            setTimeout(() => alert.remove(), 300); // Remove after fade-out transition
+            alert.classList.remove('opacity-100');
+            alert.classList.add('opacity-0');
+            setTimeout(() => alert.remove(), 500);
         }, 5000);
     }
 };
+
+window.showFeedbackMessage = (type, message) => messageHandler.show(type, message);
 
 function initializeMessageHandler() {
     document.querySelectorAll('.alert').forEach(alert => {
