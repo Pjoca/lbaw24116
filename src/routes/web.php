@@ -91,6 +91,8 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::post('/friends/add/{id}', 'add');
         Route::delete('/friends/remove/{id}', 'remove');
         Route::delete('/friends/cancel/{id}', 'cancel');
+        Route::post('/friends/accept/{id}', 'accept');
+        Route::delete('/friends/reject/{id}', 'reject');
     });
     
 

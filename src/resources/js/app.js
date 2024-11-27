@@ -332,6 +332,12 @@ function addEventListeners() {
 addEventListeners();
 
 
+function toggleSidebar() {
+    const sidebar = document.getElementById('friend-requests-sidebar');
+    sidebar.classList.toggle('-translate-x-full');
+}
+
+window.toggleRequestsSidebar = toggleSidebar;
 
 async function addFriend(userId) {
     try {
@@ -421,3 +427,45 @@ async function cancelFriendRequest(userId) {
 window.cancelFriendRequest = cancelFriendRequest;
 window.addFriend = addFriend;
 window.removeFriend = removeFriend;
+
+
+async function acceptFriendRequest(requestId) {
+    try {
+        const response = await fetch(`/friends/accept/${requestId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to accept friend request');
+        window.showFeedbackMessage('green', 'Friend request accepted!');
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while accepting the friend request.');
+    }
+}
+
+async function rejectFriendRequest(requestId) {
+    try {
+        const response = await fetch(`/friends/reject/${requestId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to reject friend request');
+        window.showFeedbackMessage('green', 'Friend request rejected!');
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while rejecting the friend request.');
+    }
+}
+
+window.acceptFriendRequest = acceptFriendRequest;
+window.rejectFriendRequest = rejectFriendRequest;

@@ -76,12 +76,14 @@ class User extends Authenticatable
      }   
 
      public function friends()
-     {
-         return $this->belongsToMany(User::class, 'friendship', 'id_user1', 'id_user2')
-                     ->wherePivot('id_user1', Auth::id())
-                     ->orWherePivot('id_user2', Auth::id())
-                     ->distinct('user.id');
-     }
+    {
+        return User::whereIn('id', function ($query) {
+            $query->select('id_user2')->from('friendship')->where('id_user1', $this->id)
+                ->union(
+                    $query->select('id_user1')->from('friendship')->where('id_user2', $this->id)
+                );
+        });
+    }
 
      public function requestedFriends()
      {
@@ -92,9 +94,16 @@ class User extends Authenticatable
      }
 
      public function isFriend(User $user)
-     {
-         return $this->friends->contains($user);
-     }
+    {
+        return Friendship::where(function ($query) use ($user) {
+            $query->where('id_user1', $this->id)
+                ->where('id_user2', $user->id);
+        })->orWhere(function ($query) use ($user) {
+            $query->where('id_user1', $user->id)
+                ->where('id_user2', $this->id);
+        })->exists();
+    }
+
 
      public function hasRequestedFriendship(User $user)
      {

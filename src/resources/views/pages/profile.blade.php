@@ -2,11 +2,21 @@
 
 @section('content')
     <div class="container mx-auto py-8">
-        <!-- Message Area -->
-        <div id="message-area" class="fixed bottom-4 right-4 w-96"></div>
 
         <!-- User Profile Section -->
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center relative">
+            <!-- Friend Requests Button (top-right corner) -->
+            @if (Auth::id() === $user['id']) <!-- Only show for the profile owner -->
+                <!-- Friend Requests Button (top-right corner of the profile info section) -->
+                <button id="friend-requests-toggle" 
+                        onclick="toggleRequestsSidebar()" 
+                        class="absolute top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                    View Friend Requests
+                </button>
+
+                @include('partials.friend-requests-sidebar')
+            @endif
+
             <!-- User Profile Image -->
             <div class="mb-4">
                 <img src="{{ asset('storage/' . $user['image_url']) }}" 
@@ -24,14 +34,14 @@
 
             <!-- Action Buttons for Friends -->
             <div class="mt-4">
-                @if (Auth::id() !== $user['id'])
+                @if (Auth::id() !== $user['id'] && Auth::check())
                     @if ($isFriend)
                         <!-- Remove Friend Button -->
                         <button type="button" data-user-id="{{ $user['id'] }}" onclick="removeFriend({{ $user['id'] }})" 
                                 class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition">
                             Remove Friend
                         </button>
-                    @elseif (!$isFriend && !$hasRequestedFriendship)
+                    @elseif (!$isFriend && !$hasRequestedFriendship && !$hasIncomingFriendRequest)
                         <!-- Add Friend Button -->
                         <button type="button" data-user-id="{{ $user['id'] }}" onclick="addFriend({{ $user['id'] }})" 
                                 class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
@@ -43,9 +53,27 @@
                                 class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition">
                             Cancel Friend Request
                         </button>
+                    @elseif ($hasIncomingFriendRequest)
+                        <!-- Accept/Reject Friend Request -->
+                        <div class="border-2 border-dashed border-gray-400 rounded-md px-5 py-3 bg-gray-50 text-center">
+                            <p class="text-gray-700 mb-3 text-base font-medium">
+                                This user has sent you a friend request.
+                            </p>
+                            <div class="flex items-center justify-center space-x-4">
+                                <button type="button" onclick="acceptFriendRequest({{ $user['id'] }})" 
+                                        class="bg-green-500 text-white text-base px-4 py-2 rounded-md hover:bg-green-600 transition">
+                                    Accept
+                                </button>
+                                <button type="button" onclick="rejectFriendRequest({{ $user['id'] }})" 
+                                        class="bg-red-500 text-white text-base px-4 py-2 rounded-md hover:bg-red-600 transition">
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
                     @endif
                 @endif
             </div>
+
 
             <!-- Edit Profile Button (Visible only to the profile owner) -->
             @if (Auth::id() === $user['id'])

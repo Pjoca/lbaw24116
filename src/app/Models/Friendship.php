@@ -42,5 +42,16 @@ class Friendship extends Model
         return $this->belongsTo(User::class, 'id_user2');
     }
 
+    public static function createFriendship($userId1, $userId2)
+    {
+        // Ensure user IDs are always stored in ascending order
+        $friendship = new self();
+        $friendship->id_user1 = min($userId1, $userId2);
+        $friendship->id_user2 = max($userId1, $userId2);
+        $friendship->created_at = now();
+        $friendship->save();
+
+        return $friendship;
+    }
     // Add additional methods if needed for querying or business logic
 }
