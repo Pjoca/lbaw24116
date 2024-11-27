@@ -43,29 +43,32 @@ class FriendshipController extends Controller
 
     public function remove($id)
     {
+        DB::beginTransaction();
+
         try {
             $authUserId = Auth::id();
-            $friend = User::findOrFail($id);
 
-            // Check for the friendship where the authenticated user is either id_user1 or id_user2
-            $friendship = Friendship::where(function ($query) use ($authUserId, $friend) {
-                $query->where('id_user1', $authUserId)
-                    ->where('id_user2', $friend->id);
-            })->orWhere(function ($query) use ($authUserId, $friend) {
-                $query->where('id_user1', $friend->id)
-                    ->where('id_user2', $authUserId);
-            })->first();
+            // Check if a bidirectional friendship exists
+            $friendshipAtoB = Friendship::where('id_user1', $authUserId)
+                ->where('id_user2', $id)
+                ->exists();
 
-            // If no friendship exists, return an error
-            if (!$friendship) {
+            $friendshipBtoA = Friendship::where('id_user1', $id)
+                ->where('id_user2', $authUserId)
+                ->exists();
+
+            if (!$friendshipAtoB && !$friendshipBtoA) {
                 return response()->json(['error' => 'Friendship not found'], 404);
             }
 
-            // Delete the friendship record
-            $friendship->delete();
+            // Remove bidirectional friendship
+            Friendship::removeFriendship($authUserId, $id);
+
+            DB::commit();
 
             return response()->json(['success' => 'Friendship removed successfully'], 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Error removing friendship: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while removing the friendship.'], 500);
         }
@@ -90,7 +93,7 @@ public function accept($senderId)
     DB::beginTransaction();
 
     try {
-        // Find the friendship request by sender and receiver
+        // Find the friendship request
         $request = FriendshipRequest::where('id_sender', $senderId)
             ->where('id_receiver', Auth::id())
             ->first();
@@ -99,7 +102,7 @@ public function accept($senderId)
             return response()->json(['error' => 'Friend request not found'], 404);
         }
 
-        // Create the friendship (single-record approach)
+        // Create bidirectional friendships
         Friendship::createFriendship(Auth::id(), $senderId);
 
         // Delete the friend request
@@ -111,7 +114,6 @@ public function accept($senderId)
     } catch (\Exception $e) {
         DB::rollBack();
         Log::error('Error accepting friend request: ' . $e->getMessage());
-
         return response()->json(['error' => 'An error occurred while accepting the friend request.'], 500);
     }
 }
