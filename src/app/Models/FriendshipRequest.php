@@ -12,6 +12,8 @@ class FriendshipRequest extends Model
     // Define the table name (optional if Laravel's naming convention is followed)
     protected $table = 'friendship_request';
 
+    public $timestamps = false;
+
     // Define the primary key (optional if it's 'id')
     protected $primaryKey = 'id';
 

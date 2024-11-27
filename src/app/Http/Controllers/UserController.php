@@ -18,39 +18,52 @@ class UserController extends Controller
      * Retrieve the profile information of a user.
      */
     public function show($id)
-{
-    // Find the user by ID or return a 404 response
-    $user = User::findOrFail($id);
+    {
+        // Find the user by ID or return a 404 response
+        $user = User::findOrFail($id);
 
-    // Check if the profile is public or if the user is authenticated and authorized to view it
-    if ($user->visibility !== 'public' && !Auth::check()) {
-        abort(403, 'You are not authorized to view this profile.');
+        // Check if the profile is public or if the user is authenticated and authorized to view it
+        if ($user->visibility !== 'public' && !Auth::check()) {
+            abort(403, 'You are not authorized to view this profile.');
+        }
+
+        // Prepare the user data for the response
+        $userData = [
+            'id' => $user->id,
+            'username' => $user->username,
+            'name' => $user->name,
+            'last_login' => $user->last_login,
+            'image_url' => $user->image_url ?? 'users/images/default.png', // Ensure image_url is always set
+        ];
+
+        // Include email if it's the authenticated user's own profile
+        $isOwnProfile = Auth::check() && Auth::id() === $user->id;
+        if ($isOwnProfile) {
+            $userData['email'] = $user->email;
+        }
+
+        // Retrieve posts based on profile ownership or public visibility
+        $posts = Post::getAuthorizedPosts($user->id);
+
+        // Retrieve relationship status if the user is authenticated
+        $isFriend = false;
+        $hasRequestedFriendship = false;
+
+        if (Auth::check() && !$isOwnProfile) {
+            $authUser = Auth::user();
+            $isFriend = $authUser->isFriend($user);
+            $hasRequestedFriendship = $authUser->hasRequestedFriendship($user);
+        }
+
+        // Return the user profile, posts, and relationship status
+        return view('pages.profile', [
+            'user' => $userData,
+            'posts' => $posts,
+            'isFriend' => $isFriend,
+            'hasRequestedFriendship' => $hasRequestedFriendship,
+        ]);
     }
 
-    // Prepare the user data for the response
-    $userData = [
-        'id' => $user->id,
-        'username' => $user->username,
-        'name' => $user->name,
-        'last_login' => $user->last_login,
-        'image_url' => $user->image_url ?? 'users/images/default.png', // Ensure image_url is always set
-    ];
-
-    // Include email if it's the authenticated user's own profile
-    $isOwnProfile = Auth::check() && Auth::id() === $user->id;
-    if ($isOwnProfile) {
-        $userData['email'] = $user->email;
-    }
-
-    // Retrieve posts based on profile ownership or public visibility
-    $posts = Post::getAuthorizedPosts($user->id);
-
-    // Return the user profile and posts
-    return view('pages.profile', [
-        'user' => $userData,
-        'posts' => $posts,
-    ]);
-}
 
     /**
      * Search users.

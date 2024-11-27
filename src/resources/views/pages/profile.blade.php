@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container mx-auto py-8">
-        <!-- Message Field -->
+        <!-- Message Area -->
         <div id="message-area" class="fixed bottom-4 right-4 w-96"></div>
 
         <!-- User Profile Section -->
@@ -21,6 +21,31 @@
             @if (isset($user['email']))
                 <p><strong>Email:</strong> {{ $user['email'] }}</p>
             @endif
+
+            <!-- Action Buttons for Friends -->
+            <div class="mt-4">
+                @if (Auth::id() !== $user['id'])
+                    @if ($isFriend)
+                        <!-- Remove Friend Button -->
+                        <button type="button" data-user-id="{{ $user['id'] }}" onclick="removeFriend({{ $user['id'] }})" 
+                                class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition">
+                            Remove Friend
+                        </button>
+                    @elseif (!$isFriend && !$hasRequestedFriendship)
+                        <!-- Add Friend Button -->
+                        <button type="button" data-user-id="{{ $user['id'] }}" onclick="addFriend({{ $user['id'] }})" 
+                                class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+                            Add Friend
+                        </button>
+                    @elseif ($hasRequestedFriendship)
+                        <!-- Cancel Friend Request Button -->
+                        <button type="button" data-user-id="{{ $user['id'] }}" onclick="cancelFriendRequest({{ $user['id'] }})" 
+                                class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition">
+                            Cancel Friend Request
+                        </button>
+                    @endif
+                @endif
+            </div>
 
             <!-- Edit Profile Button (Visible only to the profile owner) -->
             @if (Auth::id() === $user['id'])
@@ -55,6 +80,8 @@
             @endif
         </div>
     </div>
+
+    <!-- Modals -->
     @include('modals.edit-post-modal')
     @include('modals.edit-profile-modal')
 @endsection
