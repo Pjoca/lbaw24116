@@ -101,4 +101,16 @@ class User extends Authenticatable
      {
          return $this->requestedFriends->contains($user);
      }
+
+     
+     public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'id_sender');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'id_receiver');
+    }
+
 }
