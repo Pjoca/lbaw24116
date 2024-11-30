@@ -100,8 +100,10 @@ CREATE TABLE group_membership_request (
     id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
     request_status group_membership_type NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
-    requested_at DATE DEFAULT CURRENT_DATE
+    requested_at DATE DEFAULT CURRENT_DATE,
+    is_invite BOOLEAN DEFAULT FALSE -- Distinguishes invites from user requests
 );
+
 
 CREATE TABLE post (
     id SERIAL PRIMARY KEY,
