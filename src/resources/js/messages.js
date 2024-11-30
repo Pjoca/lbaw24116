@@ -22,11 +22,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 messageList.innerHTML = "";
 
                 // Atualizar o placeholder do painel
-                messagePanel.innerHTML = `
-                    <ul id="message-list" class="space-y-4"></ul>
-                `;
-                
+                const placeholder = document.getElementById("placeholder");
+                if (placeholder) placeholder.classList.add("hidden");
+
                 const newMessageList = document.getElementById("message-list");
+                newMessageList.classList.remove("hidden");
 
                 try {
                     // Faz a requisição para buscar as mensagens
@@ -70,6 +70,54 @@ document.addEventListener("DOMContentLoaded", () => {
                     console.error(error);
                     messagePanel.innerHTML = `<h4 class="text-red-500">Failed to load messages.</h4>`;
                 }
+            }
+        });
+    }
+
+    // Enviar mensagens
+    if (messageForm) {
+        messageForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (currentContactId && messageInput.value.trim()) {
+                try {
+                    const response = await fetch(`/messages/send`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            content: messageInput.value.trim(),
+                            receiver_id: currentContactId,
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error("Failed to send message");
+                    }
+    
+                    const result = await response.json();
+                    const userProfileImage = document.querySelector(".container").getAttribute("data-user-profile");
+
+                    if (result.success) {
+                        const listItem = document.createElement("li");
+                        listItem.className = "flex justify-end items-start gap-3";
+                        listItem.innerHTML = `
+                            <div class="bg-teal-500 text-white px-4 py-2 rounded-lg max-w-md">
+                                ${messageInput.value.trim()}
+                            </div>
+                            <img src="${userProfileImage}" alt="You" class="w-10 h-10 rounded-full">
+                        `;
+                        messageList.appendChild(listItem);
+                        messageInput.value = ""; // Limpar campo de texto
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Failed to send message");
+                }
+            } else {
+                alert("No conversation selected or message is empty.");
             }
         });
     }

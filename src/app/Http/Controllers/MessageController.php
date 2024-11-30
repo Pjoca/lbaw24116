@@ -38,31 +38,37 @@ class MessageController extends Controller
 
 public function getMessages($contactId)
 {
-    $userId = Auth::id(); // Usuário autenticado
+    $userId = Auth::id();
 
-    // Buscar mensagens entre o usuário autenticado e o contato fornecido
-    $messages = Message::where(function ($query) use ($userId, $contactId) {
-            $query->where('id_sender', $userId)
-                  ->where('id_receiver', $contactId);
-        })
-        ->orWhere(function ($query) use ($userId, $contactId) {
-            $query->where('id_sender', $contactId)
-                  ->where('id_receiver', $userId);
-        })
-        ->orderBy('created_at', 'asc') // Ordenar por data
-        ->get();
+    try {
+        // Buscar mensagens entre o usuário autenticado e o contato fornecido
+        $messages = Message::where(function ($query) use ($userId, $contactId) {
+                $query->where('id_sender', $userId)
+                      ->where('id_receiver', $contactId);
+            })
+            ->orWhere(function ($query) use ($userId, $contactId) {
+                $query->where('id_sender', $contactId)
+                      ->where('id_receiver', $userId);
+            })
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-    // Transformar mensagens para o formato JSON
-    $formattedMessages = $messages->map(function ($message) use ($userId) {
-        return [
-            'content' => $message->content,
-            'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
-            'created_at' => $message->created_at->format('Y-m-d H:i:s'),
-        ];
-    });
+        // Formatar as mensagens para JSON
+        $formattedMessages = $messages->map(function ($message) use ($userId) {
+            return [
+                'content' => $message->content,
+                'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
+                'created_at' => $message->created_at->format('Y-m-d H:i:s'),
+            ];
+        });
 
-    return response()->json($formattedMessages);
+        return response()->json($formattedMessages);
+    } catch (\Exception $e) {
+        \Log::error('Failed to load messages: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to load messages'], 500);
+    }
 }
+
 
 
 
@@ -73,19 +79,28 @@ public function sendMessage(Request $request)
         'receiver_id' => 'required|exists:user,id',
     ]);
 
-    $message = new Message();
-    $message->content = $request->input('content');
-    $message->id_sender = Auth::id();
-    $message->id_receiver = $request->input('receiver_id');
-    $message->created_at = now(); // Adiciona o valor manualmente
-    $message->save();
+    try {
+        $message = new Message([
+            'content' => $request->input('content'),
+            'id_sender' => Auth::id(),
+            'id_receiver' => $request->input('receiver_id'),
+            'created_at' => now(), // Definir manualmente para evitar o uso de updated_at
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Message sent successfully!',
-    ]);
+        $message->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message sent successfully!',
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Failed to send message: ' . $e->getMessage()); // Log para debugging
+        return response()->json([
+            'success' => false,
+            'error' => 'Failed to send message.',
+        ], 500);
+    }
 }
-
 
 
 
