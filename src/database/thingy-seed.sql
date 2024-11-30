@@ -92,8 +92,15 @@ CREATE TABLE group_membership (
     id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
     joined_at DATE DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id_user, id_group),
-    group_status group_membership_type NOT NULL DEFAULT 'pending'
+    PRIMARY KEY (id_user, id_group)
+);
+
+CREATE TABLE group_membership_request (
+    id SERIAL PRIMARY KEY,
+    id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
+    id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
+    request_status group_membership_type NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+    requested_at DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE post (
@@ -435,6 +442,28 @@ EXECUTE FUNCTION trg_check_unique_friendship_request();
 
 ------------
 
+CREATE OR REPLACE FUNCTION trg_check_unique_group_request()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM group_membership_request 
+        WHERE id_user = NEW.id_user AND id_group = NEW.id_group
+    ) THEN
+        RAISE EXCEPTION 'Group membership request already exists for this user and group';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_group_request
+BEFORE INSERT ON group_membership_request
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_group_request();
+
+------------
+
 -- Create the trigger function to enforce unique likes
 CREATE OR REPLACE FUNCTION trg_check_unique_like()
 RETURNS TRIGGER AS $$
@@ -570,24 +599,29 @@ VALUES
 ('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14);
 
 -- Insert group memberships
-INSERT INTO group_membership (id_user, id_group, group_status)
+INSERT INTO group_membership (id_user, id_group, joined_at)
 VALUES 
-(1, 1, 'accepted'),
-(2, 1, 'pending'),
-(3, 2, 'accepted'),
-(4, 3, 'accepted'),
-(5, 4, 'accepted'),
-(6, 5, 'pending'),
-(7, 6, 'accepted'),
-(8, 7, 'accepted'),
-(9, 8, 'accepted'),
-(10, 9, 'pending'),
-(11, 10, 'accepted'),
-(12, 11, 'accepted'),
-(13, 11, 'accepted'),
-(14, 11, 'accepted'),
-(15, 11, 'accepted'),
-(16, 11, 'accepted');
+    (1, 1, CURRENT_DATE),
+    (3, 2, CURRENT_DATE),
+    (4, 3, CURRENT_DATE),
+    (6, 5, CURRENT_DATE),
+    (7, 6, CURRENT_DATE),
+    (8, 7, CURRENT_DATE),
+    (10, 9, CURRENT_DATE),
+    (11, 10, CURRENT_DATE),
+    (12, 11, CURRENT_DATE),
+    (16, 11, CURRENT_DATE);
+
+
+INSERT INTO group_membership_request (id_user, id_group, request_status, requested_at)
+VALUES 
+    (2, 1, 'pending', CURRENT_DATE),
+    (5, 4, 'pending', CURRENT_DATE),
+    (9, 8, 'pending', CURRENT_DATE),
+    (13, 11, 'pending', CURRENT_DATE),
+    (14, 11, 'pending', CURRENT_DATE),
+    (15, 10, 'rejected', CURRENT_DATE),
+    (16, 2, 'pending', CURRENT_DATE);
 
 -- Insert posts
 INSERT INTO post (content, visibility, id_user, id_group, image_url)
