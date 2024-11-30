@@ -47,7 +47,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url('/messages') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
+                                <a href="{{ route('messages.index') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
                                     Messages
                                 </a>
                             </li>

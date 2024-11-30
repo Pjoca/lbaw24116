@@ -12,6 +12,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
 
+use App\Http\Controllers\MessageController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,23 +97,4 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::delete('/friends/reject/{id}', 'reject');
     });
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
