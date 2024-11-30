@@ -51,6 +51,8 @@
                         class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
                     Manage Group Requests
                 </button>
+
+                @include('partials.group-requests-sidebar')
             @endif
         </div>
 
@@ -65,7 +67,11 @@
             <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
                 <h2 class="text-2xl font-bold mb-4">Timeline</h2>
                 <div id="posts-container" class="space-y-6">
-                    @each('partials.post', $posts, 'post')
+                    @if ($posts->isEmpty())
+                        <p class="text-center text-gray-500">No posts have been shared in this group yet.</p>
+                    @else
+                        @each('partials.post', $posts, 'post')
+                    @endif
                 </div>
 
                 <!-- Loader -->
@@ -89,9 +95,6 @@
 
     <!-- Include Modals -->
     @include('modals.edit-post-modal')
-
-    <!-- Group Requests Sidebar -->
-    @include('partials.group-requests-sidebar')
 
     <!-- Include JavaScript -->
     @vite('resources/js/group.js')

@@ -102,8 +102,8 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
     Route::post('/groups/{id}/join', 'requestMembership')->name('groups.join');
     Route::delete('/groups/{id}/leave', 'leaveGroup')->name('groups.leave');
     Route::delete('/groups/{id}/cancel', 'cancelMembershipRequest')->name('groups.cancel');
-    Route::post('/groups/request/{id}/accept', 'accept')->name('groups.acceptRequest');
-    Route::post('/groups/request/{id}/reject', 'reject')->name('groups.rejectRequest');
+    Route::post('/groups/request/{id}/accept', 'acceptMembershipRequest')->name('groups.acceptRequest');
+    Route::post('/groups/request/{id}/reject', 'rejectMembershipRequest')->name('groups.rejectRequest');
 });
 
 Route::controller(GroupController::class)->middleware('auth')->group(function () {

@@ -29,10 +29,10 @@ public function show($id)
         ->exists();
 
     // If not a member, restrict access to posts
-    $posts = [];
+    $posts = collect();
     if ($isMember) {
         // Retrieve only posts with visibility = 'group' and id_group = $id
-        $posts = $group->posts()->where('visibility', 'group')->where('id_group', $id)->get();
+        $posts = $group->posts()->where('visibility', 'group')->where('id_group', $id)->latest()->get();
     }
 
     // Check if the authenticated user has a pending membership request
@@ -41,6 +41,16 @@ public function show($id)
         ->where('request_status', 'pending')
         ->exists();
 
-    return view('pages.group', compact('group', 'isMember', 'hasRequestedMembership', 'posts'));
+    // Fetch group membership requests if the user is the owner of the group
+    $groupRequests = collect();
+    if ($group->owner->id === $user->id) {
+        $groupRequests = GroupMembershipRequest::where('id_group', $group->id)
+            ->where('request_status', 'pending')
+            ->with('user') // Ensure 'user' relationship is loaded
+            ->get();
+    }
+
+    return view('pages.group', compact('group', 'isMember', 'hasRequestedMembership', 'posts', 'groupRequests'));
 }
+
 }

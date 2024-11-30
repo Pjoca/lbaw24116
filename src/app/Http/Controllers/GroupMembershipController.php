@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Group;
 use App\Models\GroupMembership;
@@ -70,9 +71,7 @@ class GroupMembershipController extends Controller
             $group = Group::findOrFail($request->id_group);
 
             // Ensure only the group owner can accept requests
-            if ($group->id_owner !== Auth::id()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
+            $this->authorize('requests', [GroupMembership::class, $group]);
 
             // Add the user to the group
             GroupMembership::create([
@@ -108,8 +107,8 @@ class GroupMembershipController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
 
-            // Mark the request as rejected
-            $request->update(['request_status' => 'rejected']);
+            // Delete the request
+            $request->delete();
 
             return response()->json(['success' => 'Membership request rejected'], 200);
         } catch (\Exception $e) {

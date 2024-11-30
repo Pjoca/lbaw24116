@@ -90,3 +90,79 @@ async function cancelMembershipRequest(groupId) {
 }
 
 window.cancelMembershipRequest = cancelMembershipRequest;
+
+// Function to accept a membership request
+async function acceptMembershipRequest(requestId) {
+    try {
+        const response = await fetch(`/groups/request/${requestId}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to accept membership request');
+        const data = await response.json();
+
+        // Remove the request from the list dynamically
+        const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+        if (requestElement) {
+            requestElement.remove();
+        }
+
+        // Check if there are remaining requests
+        const remainingRequests = document.querySelectorAll('[data-request-id]');
+        if (remainingRequests.length === 0) {
+            const requestListContainer = document.querySelector('#requests-list');
+            if (requestListContainer) {
+                requestListContainer.innerHTML = '<p class="text-gray-500">No membership requests received.</p>';
+            }
+        }
+
+        window.showFeedbackMessage('green', 'Membership request accepted successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while accepting the membership request.');
+    }
+}
+
+window.acceptMembershipRequest = acceptMembershipRequest;
+
+// Function to reject a membership request
+async function rejectMembershipRequest(requestId) {
+    try {
+        const response = await fetch(`/groups/request/${requestId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to reject membership request');
+        const data = await response.json();
+
+        // Remove the request from the list dynamically
+        const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+        if (requestElement) {
+            requestElement.remove();
+        }
+
+        // Check if there are remaining requests
+        const remainingRequests = document.querySelectorAll('[data-request-id]');
+        if (remainingRequests.length === 0) {
+            const requestListContainer = document.querySelector('#requests-list');
+            if (requestListContainer) {
+                requestListContainer.innerHTML = '<p class="text-gray-500">No membership requests received.</p>';
+            }
+        }
+
+        window.showFeedbackMessage('green', 'Membership request rejected successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while rejecting the membership request.');
+    }
+}
+
+window.rejectMembershipRequest = rejectMembershipRequest;

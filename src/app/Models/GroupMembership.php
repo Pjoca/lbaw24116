@@ -11,6 +11,8 @@ class GroupMembership extends Model
 
     // Define the table name
     protected $table = 'group_membership';
+    protected $primaryKey = null;
+    public $incrementing = false;
 
     // Disable timestamps if not using created_at and updated_at
     public $timestamps = false;

@@ -1,4 +1,4 @@
-<div id="friend-requests-sidebar" 
+<div id="sidebar" 
      class="fixed top-0 left-0 z-50 h-full w-80 bg-white shadow-lg transform -translate-x-full transition-transform duration-300">
     <!-- Close Button -->
     <div class="flex justify-between items-center p-4 border-b">
