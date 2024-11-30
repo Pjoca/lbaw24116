@@ -339,6 +339,24 @@ EXECUTE FUNCTION trg_update_last_login_func();
 
 -----------------------
 
+CREATE OR REPLACE FUNCTION add_owner_to_membership()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert the owner into the group_membership table
+    INSERT INTO group_membership (id_user, id_group, joined_at)
+    VALUES (NEW.id_owner, NEW.id, CURRENT_DATE);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER after_group_insert
+AFTER INSERT ON "group"
+FOR EACH ROW
+EXECUTE FUNCTION add_owner_to_membership();
+
+----------------------
+
 
 CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
 RETURNS TRIGGER AS $$
@@ -603,7 +621,6 @@ VALUES
 -- Insert group memberships
 INSERT INTO group_membership (id_user, id_group, joined_at)
 VALUES 
-    (1, 1, CURRENT_DATE),
     (3, 2, CURRENT_DATE),
     (4, 3, CURRENT_DATE),
     (6, 5, CURRENT_DATE),
