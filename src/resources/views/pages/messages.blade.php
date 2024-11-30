@@ -11,9 +11,9 @@
             <ul id="conversation-list" class="divide-y divide-gray-200">
                 @foreach ($contacts as $contact)
                 <li class="p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item" data-contact-id="{{ $contact->id }}">
-                    <!-- Foto de perfil -->
-                    <img src="{{ $contact->profile_picture }}" alt="Profile Picture" class="w-12 h-12 rounded-full object-cover">
-                    <!-- Nome do contato -->
+
+                    <img src="{{ asset('storage/' . $contact['image_url']) }}" alt="{{ $contact['name'] }}" class="w-12 h-12 rounded-full object-cover">
+
                     <div>
                         <p class="font-semibold text-gray-800">{{ $contact->name }}</p>
                         <p class="text-sm text-gray-500">Last message preview...</p>
