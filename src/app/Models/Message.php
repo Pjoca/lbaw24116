@@ -12,6 +12,8 @@ class Message extends Model
     protected $fillable = ['content', 'id_sender', 'id_receiver', 'visibility'];
     protected $table = 'message';
 
+    // public $timestamps = false; //tive que fazer isto porque não temos na tabela updated_at 
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'id_sender');

@@ -97,9 +97,11 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::delete('/friends/reject/{id}', 'reject');
     });
     
+    
 Route::middleware('auth')->group(function () {
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 });
 
 Route::get('/messages/conversation/{contactId}', [MessageController::class, 'getConversation'])->name('messages.conversation');
-Route::get('/messages/{contactId}', [MessageController::class, 'getMessages']);
+Route::get('/messages/{contactId}', [MessageController::class, 'getMessages'])->name('messages.get');
+Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('messages.send');
