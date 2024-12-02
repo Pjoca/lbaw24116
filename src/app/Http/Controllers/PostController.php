@@ -203,10 +203,52 @@ public function delete($id)
         ->with('success', 'Post deleted successfully!');
 }
 
+public function like($postId)
+{
+    if (Auth::check()) {
+        $post = Post::findOrFail($postId);
 
+        // Verifica se o usuário já curtiu o post
+        if (!$post->likes()->where('id_user', Auth::id())->exists()) {
+            // Lógica para curtir o post
+            $post->likes()->create([
+                'id_user' => Auth::id(),
+                'id_post' => $post->id,
+                'visibility' => 'public', // Ou como for necessário
+            ]);
+        }
 
+        // Recupera a URL da página anterior (pode ser a timeline ou outra)
+        $previousUrl = url()->previous();
 
+        // Redireciona de volta para a página anterior (onde o usuário estava)
+        return redirect($previousUrl)->with('success', 'Você curtiu o post!');
+    }
 
+    return redirect()->route('login')->with('error', 'Você precisa estar logado!');
 }
+
+    
+    public function unlike($postId)
+{
+    
+    if (Auth::check()) {
+        $post = Post::findOrFail($postId);
+
+       
+        $like = $post->likes()->where('id_user', Auth::id())->first();  // Alterar 'user_id' para 'id_user'
+
+        if ($like) {
+            
+            $like->delete();
+        }
+    }
+
+    return redirect()->back(); 
+}
+
+
+
+}   
 
 

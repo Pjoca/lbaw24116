@@ -105,3 +105,8 @@ Route::get('/messages', [MessageController::class, 'index'])->name('messages.ind
 Route::get('/messages/conversation/{contactId}', [MessageController::class, 'getConversation'])->name('messages.conversation');
 Route::get('/messages/{contactId}', [MessageController::class, 'getMessages'])->name('messages.get');
 Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('messages.send');
+
+Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
+Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
+
+

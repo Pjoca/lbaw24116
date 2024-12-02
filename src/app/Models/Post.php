@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 use Illuminate\Support\Facades\Auth;
 
@@ -85,5 +87,10 @@ class Post extends Model
             ->latest()
             ->get();
     }
+
+    public function likes()
+{
+    return $this->hasMany(Like::class, 'id_post');
+}
 
 }
