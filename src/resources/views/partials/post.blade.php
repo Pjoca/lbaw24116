@@ -1,6 +1,12 @@
 <head>
+   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
+   
+    <script src='resources/js/comments.js'></script>
+
 </head>
+
 
 <!-- Exibir post -->
 <article class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-300 transform hover:scale-105" data-id="{{ $post->id }}">
@@ -75,9 +81,12 @@
         </div>
 
         <!-- Carregar mais comentários -->
-        @if ($post->comments->count() > 3)
-            <button onclick="loadMoreComments({{ $post->id }}, 3)" class="text-blue-500 hover:underline mt-2">Carregar mais comentários</button>
-        @endif
+@if ($post->comments->count() > 3)
+    <button onclick="loadMoreComments({{ $post->id }})" class="text-blue-500 hover:underline mt-2">
+        Carregar mais comentários
+    </button>
+@endif
+
 
         <!-- Formulário para adicionar um comentário -->
         @auth
@@ -89,26 +98,4 @@
         @endauth
     </div>
 </article>
-
-<script>
-    function loadMoreComments(postId, offset) {
-        fetch(`/posts/${postId}/comments/load/${offset}`)
-            .then(response => response.json())
-            .then(data => {
-                const commentsSection = document.getElementById(`comments-section-${postId}`);
-                data.comments.forEach(comment => {
-                    const commentDiv = document.createElement('div');
-                    commentDiv.classList.add('bg-gray-100', 'p-4', 'rounded-lg', 'mb-2');
-                    commentDiv.innerHTML = `
-                        <div class="flex items-center">
-                            <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
-                            <span class="font-semibold text-gray-800">${comment.user_name}</span>
-                        </div>
-                        <p class="mt-2 text-gray-700">${comment.content}</p>
-                    `;
-                    commentsSection.appendChild(commentDiv);
-                });
-            });
-    }
-</script>
 

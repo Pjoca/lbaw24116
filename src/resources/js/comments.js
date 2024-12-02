@@ -1,32 +1,44 @@
-$(document).ready(function() {
-    $('.view-more-comments').on('click', function() {
-        var postId = $(this).data('post-id');
-        var offset = $(this).data('offset');  // Quantos comentários já foram carregados
-        var button = $(this);
+let currentOffset = 3; // Começa em 3, porque já há 3 comentários carregados inicialmente.
 
-        $.ajax({
-            url: '/posts/' + postId + '/comments/load/' + offset,
-            method: 'GET',
-            success: function(response) {
-                if (response.comments.length > 0) {
-                    response.comments.forEach(function(comment) {
-                        // Adiciona cada comentário à lista (ajuste o seletor conforme necessário)
-                        $('#comments-list-' + postId).append(
-                            '<div class="comment"><strong>' + comment.user.name + ':</strong> ' + comment.text + '</div>'
-                        );
+function loadMoreComments(postId) {
+    console.log(`Carregando mais comentários para o post ${postId}, offset atual: ${currentOffset}`);
+
+    fetch(`/posts/${postId}/comments/load/${currentOffset}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na resposta da requisição');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Dados recebidos:', data);
+
+            if (data.comments && data.comments.length > 0) {
+                const commentsSection = document.getElementById(`comments-section-${postId}`);
+                if (commentsSection) {
+                    data.comments.forEach(comment => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.classList.add('bg-gray-100', 'p-4', 'rounded-lg', 'mb-2');
+                        commentDiv.innerHTML = `
+                            <div class="flex items-center">
+                                <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
+                                <span class="font-semibold text-gray-800">${comment.user_name}</span>
+                            </div>
+                            <p class="mt-2 text-gray-700">${comment.content}</p>
+                        `;
+                        commentsSection.appendChild(commentDiv);
                     });
 
-                    // Atualiza o offset no botão
-                    button.data('offset', offset + response.comments.length);
-
-                    // Se não houver mais comentários, remove o botão
-                    if (response.comments.length < 3) {
-                        button.remove();  // Remove o botão "Ver mais"
-                    }
+                    // Incrementa o offset
+                    currentOffset += 3;
                 } else {
-                    button.remove();  // Remove se não houver mais comentários
+                    console.error('Elemento comments-section não encontrado');
                 }
+            } else {
+                console.log('Nenhum comentário adicional encontrado');
             }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar comentários:', error);
         });
-    });
-});
+}

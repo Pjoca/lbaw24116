@@ -265,13 +265,22 @@ public function loadMoreComments($postId, $offset)
 {
     $post = Post::findOrFail($postId);
 
-    // Pega mais comentários a partir do offset
+    // Carrega mais 3 comentários a partir do offset
     $comments = $post->comments()->latest()->skip($offset)->take(3)->get();
 
+    // Retorna os comentários em formato JSON
     return response()->json([
-        'comments' => $comments
+        'comments' => $comments->map(function ($comment) {
+            return [
+                'user_image_url' => $comment->user->image_url ?? 'users/images/default.png',
+                'user_name' => $comment->user->name,
+                'content' => $comment->content,
+            ];
+        }),
     ]);
 }
+
+
 
 public function storeComment(Request $request, $postId)
 {

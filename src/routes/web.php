@@ -112,4 +112,6 @@ Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('
 Route::post('/posts/{postId}/comments', [PostController::class, 'storeComment'])->name('comments.store');
 Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
+Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
+
 
