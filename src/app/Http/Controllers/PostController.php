@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -246,6 +247,47 @@ public function like($postId)
 
     return redirect()->back(); 
 }
+
+public function getComments($postId)
+{
+    $post = Post::findOrFail($postId);
+
+    // Pega os 3 primeiros comentários
+    $comments = $post->comments()->latest()->take(3)->get();
+
+    return response()->json([
+        'comments' => $comments,
+        'total_comments' => $post->comments()->count()
+    ]);
+}
+
+public function loadMoreComments($postId, $offset)
+{
+    $post = Post::findOrFail($postId);
+
+    // Pega mais comentários a partir do offset
+    $comments = $post->comments()->latest()->skip($offset)->take(3)->get();
+
+    return response()->json([
+        'comments' => $comments
+    ]);
+}
+
+public function storeComment(Request $request, $postId)
+{
+    $validated = $request->validate([
+        'content' => 'required|string|max:1000',
+    ]);
+
+    $comment = new Comment();
+    $comment->content = $validated['content'];
+    $comment->id_user = Auth::id();
+    $comment->id_post = $postId;
+    $comment->save();
+
+    return redirect()->back();
+}
+
 
 
 

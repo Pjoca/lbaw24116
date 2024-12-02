@@ -93,4 +93,8 @@ class Post extends Model
     return $this->hasMany(Like::class, 'id_post');
 }
 
+public function comments()
+    {
+        return $this->hasMany(Comment::class, 'id_post'); 
+    }
 }
