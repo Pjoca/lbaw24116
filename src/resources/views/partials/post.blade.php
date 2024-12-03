@@ -98,36 +98,48 @@
         <div id="comments-section-{{ $post->id }}" class="mt-4 overflow-y-auto max-h-[400px] p-2">
             <!-- Comentários já carregados -->
             @foreach($post->comments as $comment)
-                <div class="bg-gray-100 p-4 rounded-lg mb-2">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
-                            <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
-                        </div>
+    <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-{{ $comment->id }}">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
+                <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
+            </div>
 
-                        <!-- Edição e Exclusão de Comentário -->
-                        @if(Auth::check() && Auth::id() === $comment->user->id)
-                            <div class="flex space-x-2">
-                                <!-- Editar -->
-                                <button type="button" onclick="openEditModal({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
-                                <i class="fas fa-edit"></i> Editar
-                                    </button>
+            @if(Auth::check() && Auth::id() === $comment->user->id)
+                <div class="flex space-x-2">
+                    <!-- Editar -->
+                    <button type="button" onclick="openInlineEdit({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
 
-                                
-                                <!-- Excluir -->
-                                <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="flex items-center">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash-alt"></i> Excluir
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>
-                    <p class="mt-2 text-gray-700">{{ $comment->content }}</p>
+                    <!-- Excluir -->
+                    <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="flex items-center">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i> Excluir
+                        </button>
+                    </form>
                 </div>
-            @endforeach
+            @endif
+        </div>
+
+        <!-- Comentário original -->
+        <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
+
+        <!-- Formulário de edição oculto -->
+        <form action="{{ route('comments.update', $comment->id) }}" method="POST" id="editForm-{{ $comment->id }}" class="hidden mt-2">
+            @csrf
+            @method('PUT')
+            <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
+            <div class="flex justify-end mt-2">
+                <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+            </div>
+        </form>
+    </div>
+@endforeach
+
         </div>
 
         <!-- Formulário para adicionar um comentário -->
@@ -139,33 +151,21 @@
             </form>
         @endauth
     </div>
-    <!-- Modal de Edição de Comentário -->
-<div id="editCommentModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h3 class="text-lg font-semibold mb-4">Editar Comentário</h3>
-        <form id="editCommentForm" method="POST">
-            @csrf
-            @method('PUT')
-            <textarea id="editCommentContent" name="content" class="w-full p-3 border rounded-lg" required></textarea>
-            <div class="flex justify-end mt-4">
-                <button type="button" onclick="closeEditModal()" class="mr-2 text-gray-600">Cancelar</button>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar alterações</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 </article>
 
 <script>
-    function openEditModal(commentId, content) {
-    document.getElementById('editCommentContent').value = content; // Preenche o textarea com o conteúdo atual
-    const form = document.getElementById('editCommentForm');
-    form.action = `/comments/${commentId}`;  // Define a rota do formulário dinamicamente
-    document.getElementById('editCommentModal').classList.remove('hidden'); // Mostra o modal
+    function openInlineEdit(commentId, content) {
+    // Esconde o texto do comentário e mostra o formulário de edição
+    document.getElementById(`commentContent-${commentId}`).classList.add('hidden');
+    document.getElementById(`editForm-${commentId}`).classList.remove('hidden');
+    document.getElementById(`editTextArea-${commentId}`).value = content; // Preenche com o conteúdo atual
 }
 
-function closeEditModal() {
-    document.getElementById('editCommentModal').classList.add('hidden'); // Esconde o modal
+function cancelInlineEdit(commentId) {
+    // Esconde o formulário e mostra novamente o texto do comentário
+    document.getElementById(`editForm-${commentId}`).classList.add('hidden');
+    document.getElementById(`commentContent-${commentId}`).classList.remove('hidden');
 }
+
 </script>

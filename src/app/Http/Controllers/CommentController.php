@@ -38,7 +38,7 @@ class CommentController extends Controller
     $comment->content = $request->input('content');
     $comment->save();
 
-    // Garantir que retorna um redirecionamento
+    
     return redirect()->back();
 }
 
@@ -53,16 +53,7 @@ public function destroy($id)
     // Exclui o comentário
     $comment->delete();
 
-    // Verifica se o post_id está presente antes de redirecionar
-    if ($comment->post_id) {
-        // Redireciona para o post com sucesso
-        return redirect()->route('posts.show', ['id' => $comment->post_id])
-                         ->with('success', 'Comentário excluído com sucesso.');
-    } else {
-        // Se o post_id não existir, redireciona para a home com erro
-        return redirect()->route('home')
-                         ->with('error', 'Post associado ao comentário não encontrado.');
-    }
+    return redirect()->back();
 }
 
 }
