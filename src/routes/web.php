@@ -13,6 +13,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
 
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\CommentController;
 
 
 /*
@@ -113,5 +114,19 @@ Route::post('/posts/{postId}/comments', [PostController::class, 'storeComment'])
 Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
+
+
+Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
+
+Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
+
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
+
+
+
 
 
