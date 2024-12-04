@@ -40,23 +40,23 @@ public function startConversation(Request $request)
     $userId = Auth::id(); // Authenticated user
     $friendId = $request->input('friend_id');
 
-    // Validate friend ID and ensure it's not the same as the user
+    
     if ($userId == $friendId || !User::find($friendId)) {
         return response()->json(['error' => 'Invalid friend ID'], 400);
     }
 
-    // Check if there are already messages between the two users
-    $existingConversation = Message::where(function ($query) use ($userId, $friendId) {
-        $query->where('id_sender', $userId)
-              ->where('id_receiver', $friendId);
-    })->orWhere(function ($query) use ($userId, $friendId) {
-        $query->where('id_sender', $friendId)
-              ->where('id_receiver', $userId);
-    })->exists();
+    
+    // $existingConversation = Message::where(function ($query) use ($userId, $friendId) {
+    //     $query->where('id_sender', $userId)
+    //           ->where('id_receiver', $friendId);
+    // })->orWhere(function ($query) use ($userId, $friendId) {
+    //     $query->where('id_sender', $friendId)
+    //           ->where('id_receiver', $userId);
+    // })->exists();
 
-    if ($existingConversation) {
-        return response()->json(['success' => true, 'message' => 'Conversation already exists.']);
-    }
+    // if ($existingConversation) {
+    //     return response()->json(['success' => true, 'message' => 'Conversation already exists.']);
+    // }
 
     // Respond without creating a placeholder message
     return response()->json(['success' => true, 'message' => 'New conversation started.']);

@@ -13,7 +13,7 @@
                     New Conversation
                 </button>
             </div>
-            <ul id="conversation-list" class="divide-y divide-gray-200">
+            <ul id="conversation-list" class="divide-y divide-gray-200 max-h-[60vh] overflow-y-auto">
                 @foreach ($contacts as $contact)
                 <li class="p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item" data-contact-id="{{ $contact->id }}">
                     <img src="{{ asset('storage/' . $contact['image_url']) }}" alt="{{ $contact['name'] }}" class="w-12 h-12 rounded-full object-cover">
@@ -75,8 +75,6 @@
         </div>
     </div>
 </div>
-
-
 
 <!-- Importar o arquivo JavaScript -->
 @vite('resources/js/messages.js')
