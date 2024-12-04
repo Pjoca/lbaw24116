@@ -53,7 +53,7 @@ public function destroy($id)
     // Exclui o comentário
     $comment->delete();
 
-    return redirect()->back();
+   return redirect()->back();
 }
 
 }
