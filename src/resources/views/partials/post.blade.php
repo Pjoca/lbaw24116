@@ -1,7 +1,6 @@
 <head>
    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-
 </head>
 
 
@@ -64,32 +63,23 @@
     <p class="text-lg text-gray-800 mb-1">{{ $post->content }}</p>
 
     <!-- LIKE -->
-    <div class="flex items-center">
-        @if(Auth::check())
-            @if($post->likes()->where('id_user', Auth::id())->exists()) 
-                <!-- Botão para remover o like -->
-                <form action="{{ route('posts.unlike', $post->id) }}" method="POST" class="flex items-center">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="transition-transform transform hover:scale-125 hover:text-red-500 text-red-500 flex items-center">
-                        <i class="fas fa-heart text-2xl mr-2"></i> <!-- Ícone de coração -->
-                        Remove like
-                    </button>
-                </form>
-            @else
-                <!-- Botão de like -->
-                <form action="{{ route('posts.like', $post->id) }}" method="POST" class="flex items-center">
-                    @csrf
-                    <button type="submit" class="transition-transform transform hover:scale-125 hover:text-red-500 text-gray-500 flex items-center">
-                        <i class="far fa-heart text-2xl mr-2"></i> <!-- Ícone de coração -->
-                        Like
-                    </button>
-                </form>
-            @endif
+   <!-- Botão de Like/Unlike -->
+<div class="flex items-center">
+    <button onclick="toggleLike({{ $post->id }})" class="flex items-center like-button" id="like-button-{{ $post->id }}">
+        @if($post->likes()->where('id_user', Auth::id())->exists())
+            <i class="fas fa-heart text-2xl mr-2 text-red-500"></i>
+            <span>Remove like</span>
+        @else
+            <i class="far fa-heart text-2xl mr-2 text-gray-500"></i>
+            <span>Like</span>
         @endif
-        <!-- Contagem de Likes -->
-        <span class="ml-4 text-gray-600">{{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }}</span>
-    </div>
+    </button>
+    <!-- Contagem de Likes -->
+    <span class="ml-4 text-gray-600" id="like-count-{{ $post->id }}">
+        {{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }}
+    </span>
+</div>
+
 
     <!-- Seção de Comentários com rolagem infinita -->
     <div class="mt-6">
@@ -152,6 +142,8 @@
         @endauth
     </div>
 
+
+
 </article>
 
 <script>
@@ -167,5 +159,91 @@ function cancelInlineEdit(commentId) {
     document.getElementById(`editForm-${commentId}`).classList.add('hidden');
     document.getElementById(`commentContent-${commentId}`).classList.remove('hidden');
 }
+
+function toggleLike(postId) {
+    // Seleciona o botão e o contador de likes
+    const likeButton = document.getElementById(`like-button-${postId}`);
+    const likeCount = document.getElementById(`like-count-${postId}`);
+
+    fetch(`/posts/${postId}/like-toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Necessário para segurança CSRF
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Atualiza o botão e a contagem com base na resposta
+        if (data.liked) {
+            likeButton.innerHTML = '<i class="fas fa-heart text-2xl mr-2 text-red-500"></i> Remove like';
+        } else {
+            likeButton.innerHTML = '<i class="far fa-heart text-2xl mr-2 text-gray-500"></i> Like';
+        }
+
+        likeCount.textContent = `${data.likesCount} ${data.likesCount === 1 ? 'like' : 'likes'}`;
+    })
+    .catch(error => console.error('Erro ao processar like:', error));
+}
+function deleteComment(commentId) {
+    if (!confirm('Tem certeza que deseja excluir este comentário?')) {
+        return;
+    }
+
+    fetch(`/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro ao excluir o comentário.');
+        }
+        return response.json(); // Converte a resposta para JSON
+    })
+    .then(data => {
+        if (data.success) {
+            // Remove o comentário do DOM sem a necessidade de refresh
+            document.getElementById(`comment-${commentId}`).remove();
+        } else {
+            alert('Falha ao excluir o comentário.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao excluir o comentário:', error);
+        alert('Ocorreu um erro ao excluir o comentário. Tente novamente.');
+    });
+}
+
+function saveInlineEdit(commentId) {
+    const textarea = document.getElementById(`editTextArea-${commentId}`);
+    const newContent = textarea.value;
+    
+    fetch(`/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ content: newContent }) // Envia o novo conteúdo
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Atualiza o conteúdo do comentário sem a necessidade de refresh
+            document.getElementById(`commentContent-${commentId}`).textContent = newContent;
+            cancelInlineEdit(commentId);  // Fecha o formulário de edição
+        } else {
+            alert('Falha ao salvar a edição.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar a edição:', error);
+        alert('Ocorreu um erro ao editar o comentário. Tente novamente.');
+    });
+}
+
 
 </script>

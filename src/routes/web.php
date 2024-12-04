@@ -126,6 +126,11 @@ Route::put('/comments/{id}', [CommentController::class, 'update'])->name('commen
 
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
+Route::post('/posts/{post}/like-toggle', [PostController::class, 'toggleLike'])->middleware('auth');
+
+Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middleware('auth');
+
+
 
 
 
