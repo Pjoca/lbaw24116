@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInputPanel = document.getElementById("message-input-panel");
     const messageForm = document.getElementById("message-form");
     const messageInput = document.getElementById("message-input");
+    const friendList = document.getElementById("friend-list");
+    const newConversationModal = document.getElementById("new-conversation-modal");
+    const newConversationBtn = document.getElementById("new-conversation-btn");
+    const closeModalBtn = document.getElementById("close-modal-btn");
 
     let currentContactId = null; // Stores the selected contact
 
@@ -26,10 +30,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const contactId = listItem.getAttribute("data-contact-id");
                 currentContactId = contactId; // Update the selected contact
 
-                // Show the message input panel
+                
                 messageInputPanel.classList.remove("hidden");
 
-                // Clear old messages
+                
                 messageList.innerHTML = "";
 
                 // Update the placeholder in the panel
@@ -40,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 newMessageList.classList.remove("hidden");
 
                 try {
-                    // Fetch messages
+                    
                     const response = await fetch(`/messages/${contactId}`);
                     if (!response.ok) {
                         throw new Error("Failed to load messages");
@@ -48,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const messages = await response.json();
 
-                    // Display messages
+                    
                     if (messages.length === 0) {
                         newMessageList.innerHTML = `<li class="text-gray-500 italic">No messages to display.</li>`;
                     } else {
@@ -137,21 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-});
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const friendList = document.getElementById("friend-list");
-    const newConversationModal = document.getElementById("new-conversation-modal");
-    const newConversationBtn = document.getElementById("new-conversation-btn");
-    const closeModalBtn = document.getElementById("close-modal-btn");
-    const conversationList = document.getElementById("conversation-list");
-    const messageList = document.getElementById("message-list");
-    const messagePanel = document.getElementById("message-panel");
-    const messageInputPanel = document.getElementById("message-input-panel");
-
-    let currentContactId = null;
 
     // Open modal
     if (newConversationBtn) {
@@ -205,12 +194,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                         conversationList.appendChild(newContact);
 
-                        // Simulate selecting the conversation
+                        // Set the current contact and initialize the conversation box
                         currentContactId = friendId;
                         messageList.innerHTML = ""; // Clear messages
                         messagePanel.querySelector("#placeholder").classList.add("hidden");
                         messageList.classList.remove("hidden");
                         messageInputPanel.classList.remove("hidden");
+
+                        // Trigger click to refresh UI
+                        newContact.click();
                     }
                 } catch (error) {
                     console.error(error);
@@ -220,5 +212,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
-
 
