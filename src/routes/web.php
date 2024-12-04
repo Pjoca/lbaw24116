@@ -12,6 +12,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
 
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\CommentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -95,21 +98,33 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::delete('/friends/reject/{id}', 'reject');
     });
     
+    
+Route::middleware('auth')->group(function () {
+Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+});
+
+Route::get('/messages/conversation/{contactId}', [MessageController::class, 'getConversation'])->name('messages.conversation');
+Route::get('/messages/{contactId}', [MessageController::class, 'getMessages'])->name('messages.get');
+Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('messages.send');
+
+Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
+Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
+
+Route::post('/posts/{postId}/comments', [PostController::class, 'storeComment'])->name('comments.store');
+Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
+Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
+Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
 
 
+Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
 
+Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
 
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
 
-
-
-
-
-
-
-
-
-
+Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
 
 
