@@ -13,12 +13,11 @@ class MessageController extends Controller
 {
     $userId = Auth::id();
 
-    // Obter mensagens relevantes (como sender ou receiver)
+    // Fetch relevant contacts
     $messages = Message::where('id_sender', $userId)
         ->orWhere('id_receiver', $userId)
         ->get();
 
-    // Obter os IDs únicos de contatos (excluindo o próprio usuário)
     $contactIds = $messages->pluck('id_sender')
         ->merge($messages->pluck('id_receiver'))
         ->unique()
@@ -26,11 +25,43 @@ class MessageController extends Controller
             return $id != $userId;
         });
 
-    // Buscar os contatos pelo ID
     $contacts = User::whereIn('id', $contactIds)->get();
 
-    return view('pages.messages', compact('contacts'));
+    
+    $friends = User::where('id', '!=', $userId)
+                   ->whereNotIn('id', $contactIds) 
+                   ->get();
+
+    return view('pages.messages', compact('contacts', 'friends'));
 }
+
+public function startConversation(Request $request)
+{
+    $userId = Auth::id(); // Authenticated user
+    $friendId = $request->input('friend_id');
+
+    // Validate friend ID and ensure it's not the same as the user
+    if ($userId == $friendId || !User::find($friendId)) {
+        return response()->json(['error' => 'Invalid friend ID'], 400);
+    }
+
+    // Check if there are already messages between the two users
+    $existingConversation = Message::where(function ($query) use ($userId, $friendId) {
+        $query->where('id_sender', $userId)
+              ->where('id_receiver', $friendId);
+    })->orWhere(function ($query) use ($userId, $friendId) {
+        $query->where('id_sender', $friendId)
+              ->where('id_receiver', $userId);
+    })->exists();
+
+    if ($existingConversation) {
+        return response()->json(['success' => true, 'message' => 'Conversation already exists.']);
+    }
+
+    // Respond without creating a placeholder message
+    return response()->json(['success' => true, 'message' => 'New conversation started.']);
+}
+
 
 
 
