@@ -65,9 +65,7 @@ class PostController extends Controller
         return view('pages.timeline', compact('posts'));
     }
 
-
-
-
+    
     /**
      * Create a new post by an authenticated user. Access: USR
      */
@@ -297,8 +295,27 @@ public function storeComment(Request $request, $postId)
     return redirect()->back();
 }
 
+public function toggleLike(Request $request, Post $post)
+{
+    $user = Auth::user();
 
+    // Verifica se o usuário já deu like
+    if ($post->likes()->where('id_user', $user->id)->exists()) {
+        // Remove o like existente
+        $post->likes()->where('id_user', $user->id)->delete();
+        $liked = false;
+    } else {
+        // Adiciona um novo like
+        $post->likes()->create(['id_user' => $user->id]);
+        $liked = true;
+    }
 
+    // Retorna a contagem atualizada de likes em JSON
+    return response()->json([
+        'liked' => $liked,
+        'likesCount' => $post->likes()->count()
+    ]);
+}
 
 }   
 
