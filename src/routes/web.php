@@ -120,8 +120,6 @@ Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name
 
 Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
 
-Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-
 Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
 
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
@@ -129,6 +127,9 @@ Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 Route::post('/posts/{post}/like-toggle', [PostController::class, 'toggleLike'])->middleware('auth');
 
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middleware('auth');
+
+Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
 
 
 

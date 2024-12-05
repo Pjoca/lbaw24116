@@ -103,13 +103,10 @@
                     </button>
 
                     <!-- Excluir -->
-                    <form action="{{ route('comments.destroy', $comment->id) }}" method="POST" class="flex items-center">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash-alt"></i> Excluir
-                        </button>
-                    </form>
+                    <button onclick="deleteComment({{ $comment->id }})" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-trash-alt"></i> Excluir
+                    </button>
+
                 </div>
             @endif
         </div>
@@ -186,6 +183,7 @@ function toggleLike(postId) {
     .catch(error => console.error('Erro ao processar like:', error));
 }
 function deleteComment(commentId) {
+    // Confirm deletion with the user
     if (!confirm('Tem certeza que deseja excluir este comentário?')) {
         return;
     }
@@ -194,18 +192,13 @@ function deleteComment(commentId) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        }
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'  // CSRF protection
+        },
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro ao excluir o comentário.');
-        }
-        return response.json(); // Converte a resposta para JSON
-    })
+    .then(response => response.json())  // Convert response to JSON
     .then(data => {
         if (data.success) {
-            // Remove o comentário do DOM sem a necessidade de refresh
+            // Remove the comment element from the DOM
             document.getElementById(`comment-${commentId}`).remove();
         } else {
             alert('Falha ao excluir o comentário.');
@@ -216,6 +209,7 @@ function deleteComment(commentId) {
         alert('Ocorreu um erro ao excluir o comentário. Tente novamente.');
     });
 }
+
 
 function saveInlineEdit(commentId) {
     const textarea = document.getElementById(`editTextArea-${commentId}`);
@@ -244,6 +238,4 @@ function saveInlineEdit(commentId) {
         alert('Ocorreu um erro ao editar o comentário. Tente novamente.');
     });
 }
-
-
 </script>
