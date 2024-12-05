@@ -29,20 +29,15 @@ class CommentController extends Controller
 }
 
 
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
 {
     $comment = Comment::findOrFail($id);
-
-    // Validação e verificação do usuário
-    $request->validate(['content' => 'required|string|max:1000']);
     $comment->content = $request->input('content');
     $comment->save();
 
-    
-    return redirect()->back();
+    // Retornar um JSON como resposta
+    return response()->json(['success' => true, 'content' => $comment->content]);
 }
-
-
 
 public function destroy($id)
 {
@@ -51,12 +46,32 @@ public function destroy($id)
     if (!$comment) {
         return response()->json(['success' => false, 'message' => 'Comentário não encontrado'], 404);
     }
-
     if ($comment->delete()) {
         return response()->json(['success' => true, 'message' => 'Comentário excluído com sucesso']);
     } else {
         return response()->json(['success' => false, 'message' => 'Falha ao excluir o comentário']);
     }
+}
+public function store(Request $request, $postId)
+{
+    $request->validate(['content' => 'required|string']);
+
+    $comment = new Comment([
+        'content' => $request->input('content'),
+        'id_user' => auth()->id(),
+        'id_post' => $postId,
+    ]);
+    $comment->save();
+
+    return response()->json([
+        'success' => true,
+        'comment' => [
+            'id' => $comment->id,
+            'content' => $comment->content,
+            'user_name' => $comment->user->name,
+            'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
+        ],
+    ]);
 }
 
 }

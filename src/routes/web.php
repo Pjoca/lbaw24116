@@ -130,6 +130,8 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middlewa
 
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+
 
 
 

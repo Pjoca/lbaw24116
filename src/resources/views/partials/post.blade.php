@@ -115,15 +115,16 @@
         <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
 
         <!-- Formulário de edição oculto -->
-        <form action="{{ route('comments.update', $comment->id) }}" method="POST" id="editForm-{{ $comment->id }}" class="hidden mt-2">
-            @csrf
-            @method('PUT')
-            <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
-            <div class="flex justify-end mt-2">
-                <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
-            </div>
-        </form>
+        <form id="editForm-{{ $comment->id }}" class="hidden mt-2" onsubmit="saveInlineEdit(event, {{ $comment->id }})">
+    @csrf
+    @method('PUT')
+    <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
+    <div class="flex justify-end mt-2">
+        <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+    </div>
+</form>
+
     </div>
 @endforeach
 
@@ -141,9 +142,37 @@
 
 
 
+
 </article>
 
 <script>
+    function updateComment(commentId) {
+    const content = document.getElementById(`edit-content-${commentId}`).value;
+
+    fetch(`/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'  // CSRF protection
+        },
+        body: JSON.stringify({ content: content })
+    })
+    .then(response => response.json())  // Convert response to JSON
+    .then(data => {
+        if (data.success) {
+            // Atualiza o conteúdo do comentário no DOM
+            document.getElementById(`comment-content-${commentId}`).innerText = data.comment.content;
+            alert('Comentário atualizado com sucesso!');
+        } else {
+            alert('Falha ao atualizar o comentário.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao atualizar o comentário:', error);
+        alert('Ocorreu um erro ao atualizar o comentário. Tente novamente.');
+    });
+}
+
     function openInlineEdit(commentId, content) {
     // Esconde o texto do comentário e mostra o formulário de edição
     document.getElementById(`commentContent-${commentId}`).classList.add('hidden');
@@ -195,10 +224,12 @@ function deleteComment(commentId) {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'  // CSRF protection
         },
     })
+    
     .then(response => response.json())  // Convert response to JSON
     .then(data => {
         if (data.success) {
             // Remove the comment element from the DOM
+            
             document.getElementById(`comment-${commentId}`).remove();
         } else {
             alert('Falha ao excluir o comentário.');
@@ -211,10 +242,12 @@ function deleteComment(commentId) {
 }
 
 
-function saveInlineEdit(commentId) {
+function saveInlineEdit(event, commentId) {
+    event.preventDefault(); // Evita o envio padrão do formulário
+
     const textarea = document.getElementById(`editTextArea-${commentId}`);
     const newContent = textarea.value;
-    
+
     fetch(`/comments/${commentId}`, {
         method: 'PUT',
         headers: {
@@ -226,9 +259,11 @@ function saveInlineEdit(commentId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Atualiza o conteúdo do comentário sem a necessidade de refresh
-            document.getElementById(`commentContent-${commentId}`).textContent = newContent;
-            cancelInlineEdit(commentId);  // Fecha o formulário de edição
+            // Atualiza o conteúdo do comentário no DOM
+            document.getElementById(`commentContent-${commentId}`).textContent = data.content;
+            
+            // Fecha o formulário de edição e exibe o comentário atualizado
+            cancelInlineEdit(commentId);
         } else {
             alert('Falha ao salvar a edição.');
         }
@@ -238,4 +273,5 @@ function saveInlineEdit(commentId) {
         alert('Ocorreu um erro ao editar o comentário. Tente novamente.');
     });
 }
+
 </script>
