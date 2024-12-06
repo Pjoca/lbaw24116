@@ -5,23 +5,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInputPanel = document.getElementById("message-input-panel");
     const messageForm = document.getElementById("message-form");
     const messageInput = document.getElementById("message-input");
+    const friendList = document.getElementById("friend-list");
+    const newConversationModal = document.getElementById("new-conversation-modal");
+    const newConversationBtn = document.getElementById("new-conversation-btn");
+    const closeModalBtn = document.getElementById("close-modal-btn");
 
-    let currentContactId = null; // Armazena o contato selecionado
+    let currentContactId = null; // Stores the selected contact
+
+    function scrollToBottom() {
+        messageList.scrollTop = messageList.scrollHeight;
+    }
+
+    function removeNoMessagesPlaceholder() {
+        const noMessagesPlaceholder = messageList.querySelector(".text-gray-500");
+        if (noMessagesPlaceholder) {
+            noMessagesPlaceholder.remove();
+        }
+    }
 
     if (conversationList) {
         conversationList.addEventListener("click", async (event) => {
             const listItem = event.target.closest(".conversation-item");
             if (listItem) {
                 const contactId = listItem.getAttribute("data-contact-id");
-                currentContactId = contactId; // Atualizar o contato selecionado
+                currentContactId = contactId; // Update the selected contact
 
-                // Mostrar o campo de envio de mensagens
+                
                 messageInputPanel.classList.remove("hidden");
 
-                // Limpa mensagens antigas
+                
                 messageList.innerHTML = "";
 
-                // Atualizar o placeholder do painel
+                // Update the placeholder in the panel
                 const placeholder = document.getElementById("placeholder");
                 if (placeholder) placeholder.classList.add("hidden");
 
@@ -29,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 newMessageList.classList.remove("hidden");
 
                 try {
-                    // Faz a requisição para buscar as mensagens
+                    
                     const response = await fetch(`/messages/${contactId}`);
                     if (!response.ok) {
                         throw new Error("Failed to load messages");
@@ -37,14 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const messages = await response.json();
 
-                    // Exibe as mensagens no painel
+                    
                     if (messages.length === 0) {
                         newMessageList.innerHTML = `<li class="text-gray-500 italic">No messages to display.</li>`;
                     } else {
                         messages.forEach((message) => {
                             const listItem = document.createElement("li");
 
-                            // Estilizar as mensagens enviadas e recebidas
                             if (message.sender_name === "You") {
                                 listItem.className = "flex justify-end items-start gap-3";
                                 listItem.innerHTML = `
@@ -65,6 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             newMessageList.appendChild(listItem);
                         });
+
+                        scrollToBottom();
                     }
                 } catch (error) {
                     console.error(error);
@@ -74,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Enviar mensagens
+    // Send messages
     if (messageForm) {
         messageForm.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -91,15 +107,19 @@ document.addEventListener("DOMContentLoaded", () => {
                             receiver_id: currentContactId,
                         }),
                     });
-    
+
                     if (!response.ok) {
                         throw new Error("Failed to send message");
                     }
-    
+
                     const result = await response.json();
                     const userProfileImage = document.querySelector(".container").getAttribute("data-user-profile");
 
                     if (result.success) {
+                        // Remove "No messages to display" if present
+                        removeNoMessagesPlaceholder();
+
+                        // Append the new message
                         const listItem = document.createElement("li");
                         listItem.className = "flex justify-end items-start gap-3";
                         listItem.innerHTML = `
@@ -109,9 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             <img src="${userProfileImage}" alt="You" class="w-10 h-10 rounded-full">
                         `;
                         messageList.appendChild(listItem);
-                        messageInput.value = ""; // Limpar campo de texto
+                        messageInput.value = ""; // Clear input field
+                        scrollToBottom();
                     }
-
                 } catch (error) {
                     console.error(error);
                     alert("Failed to send message");
@@ -121,4 +141,75 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // Open modal
+    if (newConversationBtn) {
+        newConversationBtn.addEventListener("click", () => {
+            newConversationModal.classList.remove("hidden");
+        });
+    }
+
+    // Close modal
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", () => {
+            newConversationModal.classList.add("hidden");
+        });
+    }
+
+    // Start a new conversation
+    if (friendList) {
+        friendList.addEventListener("click", async (event) => {
+            const friendItem = event.target.closest(".friend-item");
+            if (friendItem) {
+                const friendId = friendItem.getAttribute("data-friend-id");
+
+                try {
+                    const response = await fetch(`/messages/start-conversation`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ friend_id: friendId }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed to start conversation.");
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        // Close the modal
+                        newConversationModal.classList.add("hidden");
+
+                        // Add the new contact to the conversation list dynamically
+                        const newContact = document.createElement("li");
+                        newContact.className = "p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item";
+                        newContact.setAttribute("data-contact-id", friendId);
+                        newContact.innerHTML = `
+                            <img src="/path/to/default-profile.jpg" alt="Friend" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold text-gray-800">${friendItem.querySelector('span').innerText}</p>
+                            </div>
+                        `;
+                        conversationList.appendChild(newContact);
+
+                        // Set the current contact and initialize the conversation box
+                        currentContactId = friendId;
+                        messageList.innerHTML = ""; // Clear messages
+                        messagePanel.querySelector("#placeholder").classList.add("hidden");
+                        messageList.classList.remove("hidden");
+                        messageInputPanel.classList.remove("hidden");
+
+                        // Trigger click to refresh UI
+                        newContact.click();
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert("Failed to start conversation.");
+                }
+            }
+        });
+    }
 });
+
