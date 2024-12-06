@@ -32,7 +32,11 @@ public function show($id)
     $posts = collect();
     if ($isMember) {
         // Retrieve only posts with visibility = 'group' and id_group = $id
-        $posts = $group->posts()->where('visibility', 'group')->where('id_group', $id)->latest()->get();
+        $posts = $group->posts()
+            ->where('visibility', 'group')
+            ->where('id_group', $id)
+            ->latest()
+            ->get();
     }
 
     // Check if the authenticated user has a pending membership request
@@ -42,15 +46,24 @@ public function show($id)
         ->exists();
 
     // Fetch group membership requests if the user is the owner of the group
-    $groupRequests = collect();
+    $joinRequests = collect();
+    $invites = collect();
     if ($group->owner->id === $user->id) {
-        $groupRequests = GroupMembershipRequest::where('id_group', $group->id)
+        // Separate join requests and invites
+        $joinRequests = GroupMembershipRequest::where('id_group', $group->id)
             ->where('request_status', 'pending')
+            ->where('is_invite', false) // Only join requests
+            ->with('user') // Ensure 'user' relationship is loaded
+            ->get();
+
+        $invites = GroupMembershipRequest::where('id_group', $group->id)
+            ->where('request_status', 'pending')
+            ->where('is_invite', true) // Only invites
             ->with('user') // Ensure 'user' relationship is loaded
             ->get();
     }
 
-    return view('pages.group', compact('group', 'isMember', 'hasRequestedMembership', 'posts', 'groupRequests'));
+    return view('pages.group', compact('group', 'isMember', 'hasRequestedMembership', 'posts', 'joinRequests', 'invites'));
 }
 
 }

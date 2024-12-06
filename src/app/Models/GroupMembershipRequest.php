@@ -21,6 +21,7 @@ class GroupMembershipRequest extends Model
         'id_group',
         'request_status',
         'requested_at',
+        'is_invite',
     ];
 
     // Relationships

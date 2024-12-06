@@ -166,3 +166,92 @@ async function rejectMembershipRequest(requestId) {
 }
 
 window.rejectMembershipRequest = rejectMembershipRequest;
+
+
+async function sendGroupInvite(groupId) {
+    const usernameOrEmail = document.getElementById('invite-username').value.trim();
+
+    if (!usernameOrEmail) {
+        window.showFeedbackMessage('red', 'Please enter a username or email.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/groups/${groupId}/invite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ usernameOrEmail }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to send invite');
+        }
+
+        const data = await response.json();
+
+        // Clear the input field
+        document.getElementById('invite-username').value = '';
+
+        // Add the new invite to the invites list dynamically
+        const invitesList = document.querySelector('#invites-list'); // Correct selector using ID
+        if (invitesList) {
+            const newInviteItem = document.createElement('li');
+            newInviteItem.className = 'flex items-center justify-between';
+            newInviteItem.innerHTML = `
+                <span>${data.username}</span>
+                <div class="space-x-2">
+                    <button onclick="cancelInvite(${data.invite_id})" 
+                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
+                        Cancel Invite
+                    </button>
+                </div>
+            `;
+            invitesList.appendChild(newInviteItem);
+        }
+
+        // Show success message
+        window.showFeedbackMessage('green', data.success || 'Invite sent successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', error.message || 'An error occurred while sending the invite.');
+    }
+}
+
+window.sendGroupInvite = sendGroupInvite;
+
+
+
+
+
+async function cancelInvite(inviteId) {
+    try {
+        const response = await fetch(`/groups/invite/${inviteId}/cancel`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to cancel invite');
+        const data = await response.json();
+
+        // Remove the invite dynamically from the list
+        const inviteElement = document.querySelector(`[data-invite-id="${inviteId}"]`);
+        if (inviteElement) {
+            inviteElement.remove();
+        }
+
+        window.showFeedbackMessage('green', 'Invite canceled successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while canceling the invite.');
+    }
+}
+
+window.cancelInvite = cancelInvite;
+
