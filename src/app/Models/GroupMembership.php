@@ -24,6 +24,13 @@ class GroupMembership extends Model
         'joined_at',
     ];
 
+    public function delete()
+    {
+        return static::where('id_user', $this->id_user)
+            ->where('id_group', $this->id_group)
+            ->delete();
+    }
+
     // Relationships
     public function user()
     {

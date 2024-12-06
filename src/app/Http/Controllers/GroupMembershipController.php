@@ -248,6 +248,30 @@ public function rejectInvite($inviteId)
     return response()->json(['success' => 'Invite rejected successfully'], 200);
 }
 
+public function removeMember($groupId, $memberId)
+{
+    // Ensure the group exists
+    $group = Group::findOrFail($groupId);
+
+    // Check if the authenticated user is the group owner
+    if ($group->id_owner !== Auth::id()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    // Find the membership using the composite key
+    $membership = GroupMembership::where('id_user', $memberId)
+        ->where('id_group', $groupId)
+        ->first();
+
+    if (!$membership) {
+        return response()->json(['error' => 'Membership not found'], 404);
+    }
+
+    // Delete the membership
+    $membership->delete();
+
+    return response()->json(['success' => 'Member removed successfully'], 200);
+}
 
 
 }

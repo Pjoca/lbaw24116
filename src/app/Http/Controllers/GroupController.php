@@ -18,6 +18,7 @@ class GroupController extends Controller
  */
 public function show($id)
 {
+    // Load the group along with relationships
     $group = Group::with(['owner', 'memberships.user', 'membershipRequests.user'])
         ->findOrFail($id);
 
@@ -31,7 +32,6 @@ public function show($id)
     // If not a member, restrict access to posts
     $posts = collect();
     if ($isMember) {
-        // Retrieve only posts with visibility = 'group' and id_group = $id
         $posts = $group->posts()
             ->where('visibility', 'group')
             ->where('id_group', $id)
@@ -45,11 +45,10 @@ public function show($id)
         ->where('request_status', 'pending')
         ->exists();
 
-    // Fetch group membership requests if the user is the owner of the group
+    // Fetch group membership requests and invites if the user is the owner of the group
     $joinRequests = collect();
     $invites = collect();
     if ($group->owner->id === $user->id) {
-        // Separate join requests and invites
         $joinRequests = GroupMembershipRequest::where('id_group', $group->id)
             ->where('request_status', 'pending')
             ->where('is_invite', false) // Only join requests
@@ -63,7 +62,22 @@ public function show($id)
             ->get();
     }
 
-    return view('pages.group', compact('group', 'isMember', 'hasRequestedMembership', 'posts', 'joinRequests', 'invites'));
+    // Fetch members of the group excluding the group owner
+    $members = $group->memberships()
+        ->where('id_user', '!=', $group->id_owner) // Exclude the group owner
+        ->with('user')
+        ->get();
+
+    return view('pages.group', compact(
+        'group',
+        'isMember',
+        'hasRequestedMembership',
+        'posts',
+        'joinRequests',
+        'invites',
+        'members'
+    ));
 }
+
 
 }

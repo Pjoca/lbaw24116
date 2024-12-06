@@ -48,4 +48,18 @@
             </button>
         </div>
     </div>
+
+    <!-- Manage Members Section -->
+    <div class="p-4 border-t">
+        <h4 class="text-md font-semibold mb-2">Manage Members</h4>
+        @if ($members->isEmpty())
+            <p class="text-gray-500">No members found.</p>
+        @else
+            <ul id="members-list" class="space-y-2">
+                @foreach ($members as $member)
+                    @include('partials.group-member', ['member' => $member])
+                @endforeach
+            </ul>
+        @endif
+    </div>
 </div>

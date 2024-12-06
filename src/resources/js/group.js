@@ -255,3 +255,41 @@ async function cancelInvite(inviteId) {
 
 window.cancelInvite = cancelInvite;
 
+
+function removeMember(memberId, groupId) {
+    if (!confirm("Are you sure you want to remove this member?")) {
+        return;
+    }
+
+    fetch(`/groups/${groupId}/members/${memberId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.error || "An error occurred");
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        window.showFeedbackMessage('green', 'Member removed successfully!');
+
+        // Remove the member dynamically from the DOM
+        const memberElement = document.getElementById(`member-${memberId}`);
+        if (memberElement) {
+            memberElement.remove();
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error.message);
+        window.showFeedbackMessage('red', error.message);
+    });
+}
+
+
+window.removeMember = removeMember;
