@@ -15,6 +15,7 @@ use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
 
+use App\Http\Controllers\MatchmakingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -133,6 +134,8 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middlewa
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+Route::get('/matchmaking', [MatchmakingController::class, 'index'])->name('matchmaking.index');
 
 
 
