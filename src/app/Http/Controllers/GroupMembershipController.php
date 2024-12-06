@@ -250,8 +250,12 @@ public function rejectInvite($inviteId)
 
 public function removeMember($groupId, $memberId)
 {
+    Log::info('Group ID: ' . $groupId);
     // Ensure the group exists
     $group = Group::findOrFail($groupId);
+
+    Log::info('Authenticated User ID: ' . Auth::id());
+    Log::info('Group Owner ID: ' . $group->id_owner);
 
     // Check if the authenticated user is the group owner
     if ($group->id_owner !== Auth::id()) {
@@ -272,6 +276,86 @@ public function removeMember($groupId, $memberId)
 
     return response()->json(['success' => 'Member removed successfully'], 200);
 }
+
+public function getMembers(Request $request, $groupId)
+{
+    $group = Group::findOrFail($groupId);
+
+    $user = Auth::user();
+    if ($group->id_owner !== $user->id && !GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    $query = GroupMembership::where('id_group', $groupId)
+        ->where('id_user', '!=', $group->id_owner)
+        ->with('user')
+        ->orderBy('joined_at', 'desc');
+
+    $members = $query->simplePaginate(5);
+
+    return response()->json([
+        'html' => view('partials.members-renderer', compact('members', 'group'))->render(),
+        'hasMorePages' => $members->hasMorePages(),
+        'nextPageUrl' => $members->nextPageUrl()
+    ]);
+}
+
+
+public function getJoinRequests(Request $request, $groupId)
+{
+    $group = Group::findOrFail($groupId);
+
+    $user = Auth::user();
+    // Ensure the user is the group owner
+    if ($group->id_owner !== $user->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    // Query join requests (pending status)
+    $query = GroupMembershipRequest::where('id_group', $groupId)
+        ->where('request_status', 'pending')
+        ->where('is_invite', false) // Only join requests, not invites
+        ->with('user')
+        ->orderBy('requested_at', 'desc'); // Assuming requested_at tracks the join request time
+
+    $joinRequests = $query->simplePaginate(5);
+
+    return response()->json([
+        'html' => view('partials.join-requests-renderer', compact('joinRequests', 'group'))->render(),
+        'hasMorePages' => $joinRequests->hasMorePages(),
+        'nextPageUrl' => $joinRequests->nextPageUrl()
+    ]);
+
+    
+}
+
+
+public function getInvites(Request $request, $groupId)
+{
+    $group = Group::findOrFail($groupId);
+
+    $user = Auth::user();
+    // Ensure the user is the group owner
+    if ($group->id_owner !== $user->id) {
+        return response()->json(['error' => 'Unauthorized'], 403);
+    }
+
+    // Query pending invites
+    $query = GroupMembershipRequest::where('id_group', $groupId)
+        ->where('request_status', 'pending')
+        ->where('is_invite', true) // Only invites, not join requests
+        ->with('user')
+        ->orderBy('requested_at', 'desc'); // Assuming requested_at tracks the invite time
+
+    $invites = $query->simplePaginate(5);
+
+    return response()->json([
+        'html' => view('partials.invites-renderer', compact('invites', 'group'))->render(),
+        'hasMorePages' => $invites->hasMorePages(),
+        'nextPageUrl' => $invites->nextPageUrl()
+    ]);
+}
+
 
 
 }

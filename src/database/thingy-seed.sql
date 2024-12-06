@@ -629,18 +629,32 @@ VALUES
     (10, 9, CURRENT_DATE),
     (11, 10, CURRENT_DATE),
     (12, 11, CURRENT_DATE),
-    (16, 11, CURRENT_DATE);
+    (16, 11, CURRENT_DATE),
+    (2,1, CURRENT_DATE),
+    (3,1, CURRENT_DATE),
+    (4,1, CURRENT_DATE),
+    (5,1, CURRENT_DATE),
+    (6,1, CURRENT_DATE),
+    (7,1, CURRENT_DATE);
 
 
-INSERT INTO group_membership_request (id_user, id_group, request_status, requested_at)
+INSERT INTO group_membership_request (id_user, id_group, request_status, requested_at, is_invite)
 VALUES 
-    (2, 1, 'pending', CURRENT_DATE),
-    (5, 4, 'pending', CURRENT_DATE),
-    (9, 8, 'pending', CURRENT_DATE),
-    (13, 11, 'pending', CURRENT_DATE),
-    (14, 11, 'pending', CURRENT_DATE),
-    (15, 10, 'rejected', CURRENT_DATE),
-    (16, 2, 'pending', CURRENT_DATE);
+    (5, 4, 'pending', CURRENT_DATE,FALSE),
+    (9, 8, 'pending', CURRENT_DATE,FALSE),
+    (13, 11, 'pending', CURRENT_DATE,FALSE),
+    (14, 11, 'pending', CURRENT_DATE,FALSE),
+    (15, 10, 'rejected', CURRENT_DATE,FALSE),
+    (16, 2, 'pending', CURRENT_DATE,FALSE),
+    (8,1,'pending',CURRENT_DATE,FALSE),
+    (9,1,'pending',CURRENT_DATE,FALSE),
+    (10,1,'pending',CURRENT_DATE,FALSE),
+    (11,1,'pending',CURRENT_DATE,TRUE),
+    (12,1,'pending',CURRENT_DATE,TRUE),
+    (13,1,'pending',CURRENT_DATE,TRUE),
+    (14,1,'pending',CURRENT_DATE,TRUE),
+    (15,1,'pending',CURRENT_DATE,TRUE),
+    (16,1,'pending',CURRENT_DATE,TRUE);
 
 -- Insert posts
 INSERT INTO post (content, visibility, id_user, id_group, image_url)

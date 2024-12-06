@@ -108,9 +108,10 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
     Route::delete('/groups/invite/{inviteId}/cancel', 'cancelInvite')->name('groups.cancelInvite');
     Route::post('/groups/invite/{id}/accept', 'acceptInvite')->name('groups.acceptInvite');
     Route::post('/groups/invite/{id}/reject', 'rejectInvite')->name('groups.rejectInvite');
-
-
-
+    Route::get('/groups/{groupId}/members', 'getMembers')->name('groups.getMembers');
+    Route::delete('/groups/{groupId}/members/{memberId}', 'removeMember')->name('groups.removeMember');
+    Route::get('/groups/{groupId}/join-requests',  'getJoinRequests')->name('groups.getJoinRequests');
+    Route::get('/groups/{groupId}/invites', 'getInvites')->name('groups.getInvites');
 });
 
 Route::controller(GroupController::class)->middleware('auth')->group(function () {

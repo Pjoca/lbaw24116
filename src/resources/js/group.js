@@ -106,15 +106,15 @@ async function acceptMembershipRequest(requestId) {
         const data = await response.json();
 
         // Remove the request from the list dynamically
-        const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+        const requestElement = document.querySelector(`#join-request-${requestId}`);
         if (requestElement) {
             requestElement.remove();
         }
 
         // Check if there are remaining requests
-        const remainingRequests = document.querySelectorAll('[data-request-id]');
+        const remainingRequests = document.querySelectorAll('#join-requests-list > li');
         if (remainingRequests.length === 0) {
-            const requestListContainer = document.querySelector('#requests-list');
+            const requestListContainer = document.querySelector('#join-requests-list');
             if (requestListContainer) {
                 requestListContainer.innerHTML = '<p class="text-gray-500">No membership requests received.</p>';
             }
@@ -126,6 +126,7 @@ async function acceptMembershipRequest(requestId) {
         window.showFeedbackMessage('red', 'An error occurred while accepting the membership request.');
     }
 }
+
 
 window.acceptMembershipRequest = acceptMembershipRequest;
 
@@ -144,15 +145,15 @@ async function rejectMembershipRequest(requestId) {
         const data = await response.json();
 
         // Remove the request from the list dynamically
-        const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+        const requestElement = document.querySelector(`#join-request-${requestId}`);
         if (requestElement) {
             requestElement.remove();
         }
 
         // Check if there are remaining requests
-        const remainingRequests = document.querySelectorAll('[data-request-id]');
+        const remainingRequests = document.querySelectorAll('#join-requests-list > li');
         if (remainingRequests.length === 0) {
-            const requestListContainer = document.querySelector('#requests-list');
+            const requestListContainer = document.querySelector('#join-requests-list');
             if (requestListContainer) {
                 requestListContainer.innerHTML = '<p class="text-gray-500">No membership requests received.</p>';
             }
@@ -240,10 +241,19 @@ async function cancelInvite(inviteId) {
         if (!response.ok) throw new Error('Failed to cancel invite');
         const data = await response.json();
 
-        // Remove the invite dynamically from the list
-        const inviteElement = document.querySelector(`[data-invite-id="${inviteId}"]`);
+        // Correct the selector to target the element properly
+        const inviteElement = document.querySelector(`#invite-${inviteId}`);
         if (inviteElement) {
             inviteElement.remove();
+        }
+
+        // Check if there are remaining invites
+        const remainingInvites = document.querySelectorAll('#invites-list > li');
+        if (remainingInvites.length === 0) {
+            const invitesListContainer = document.querySelector('#invites-list');
+            if (invitesListContainer) {
+                invitesListContainer.innerHTML = '<p class="text-gray-500">No pending invites.</p>';
+            }
         }
 
         window.showFeedbackMessage('green', 'Invite canceled successfully!');
@@ -253,10 +263,11 @@ async function cancelInvite(inviteId) {
     }
 }
 
+
 window.cancelInvite = cancelInvite;
 
 
-function removeMember(memberId, groupId) {
+function removeMember(groupId, memberId) {
     if (!confirm("Are you sure you want to remove this member?")) {
         return;
     }
@@ -277,6 +288,7 @@ function removeMember(memberId, groupId) {
         return response.json();
     })
     .then(data => {
+        // Display success feedback
         window.showFeedbackMessage('green', 'Member removed successfully!');
 
         // Remove the member dynamically from the DOM
@@ -287,9 +299,138 @@ function removeMember(memberId, groupId) {
     })
     .catch(error => {
         console.error("Error:", error.message);
+        // Display error feedback
         window.showFeedbackMessage('red', error.message);
     });
 }
 
 
 window.removeMember = removeMember;
+
+
+let nextPageUrl = null;
+
+function openModal(modalId) {
+    console.log(`Opening modal: ${modalId}`);
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        console.error(`Modal with ID ${modalId} not found.`);
+    }
+}
+
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('hidden');
+}
+
+function loadMoreMembers(groupId) {
+    const modal = document.getElementById('members-modal');
+    const nextPageUrl = modal.getAttribute('data-next-page-url');
+
+    // Debugging step 1: Log the nextPageUrl
+    console.log('Fetching members from:', nextPageUrl);
+
+    if (!nextPageUrl) {
+        console.error('No nextPageUrl found');
+        return;
+    }
+
+    fetch(nextPageUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            console.log('Response status:', response.status); // Log response status
+            return response.text(); // Parse as text first
+        })
+        .then(data => {
+            console.log('Raw response:', data); // Log raw response
+            const jsonData = JSON.parse(data); // Attempt to parse as JSON
+            const membersList = document.getElementById('members-list');
+            membersList.insertAdjacentHTML('beforeend', jsonData.html);
+    
+            if (jsonData.hasMorePages) {
+                modal.setAttribute('data-next-page-url', jsonData.nextPageUrl);
+            } else {
+                document.getElementById('load-more-members').remove();
+            }
+        })
+        .catch(error => console.error('Error loading members:', error));
+}
+
+
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.loadMoreMembers = loadMoreMembers;
+
+
+function loadMoreJoinRequests(groupId) {
+    const modal = document.getElementById('join-requests-modal');
+    const nextPageUrl = modal.getAttribute('data-next-page-url');
+
+    if (!nextPageUrl) return;
+
+    fetch(nextPageUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            const requestsList = document.getElementById('join-requests-list');
+            requestsList.insertAdjacentHTML('beforeend', data.html);
+
+            if (data.hasMorePages) {
+                modal.setAttribute('data-next-page-url', data.nextPageUrl);
+            } else {
+                document.getElementById('load-more-join-requests').remove();
+            }
+        })
+        .catch(error => console.error('Error loading more join requests:', error));
+}
+
+
+window.loadMoreJoinRequests = loadMoreJoinRequests;
+
+
+function loadMoreInvites(groupId) {
+    const modal = document.getElementById('invites-modal');
+    const nextPageUrl = modal.getAttribute('data-next-page-url');
+
+    if (!nextPageUrl) return;
+
+    fetch(nextPageUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load more invites');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const invitesList = document.getElementById('invites-list');
+            invitesList.insertAdjacentHTML('beforeend', data.html);
+
+            if (data.hasMorePages) {
+                modal.setAttribute('data-next-page-url', data.nextPageUrl);
+            } else {
+                document.getElementById('load-more-invites').remove();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more invites:', error.message);
+            window.showFeedbackMessage('red', 'Error loading more invites');
+        });
+}
+
+
+window.loadMoreInvites = loadMoreInvites;
