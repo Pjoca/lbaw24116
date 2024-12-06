@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Post;
 use Illuminate\Support\Facades\Auth;
-
 
 class CommentController extends Controller
 {
@@ -56,28 +56,25 @@ public function destroy($id)
 }
 public function store(Request $request, $postId)
 {
-    $validated = $request->validate([
-        'content' => 'required|string|max:1000',
-    ]);
+    $request->validate(['content' => 'required|string']);
 
-    $comment = Comment::create([
-        'content' => $validated['content'],
-        'id_user' => Auth::id(),
+    $comment = new Comment([
+        'content' => $request->input('content'),
+        'id_user' => auth()->id(),
         'id_post' => $postId,
     ]);
+    $comment->save();
 
-    return response()->json([
-        'success' => true,
-        'comment' => [
-            'id' => $comment->id,
-            'content' => $comment->content,
-            'user_name' => Auth::user()->name,
-            'user_image' => Auth::user()->image_url 
-                ? asset('storage/' . Auth::user()->image_url) 
-                : asset('users/images/default.png'),
-        ],
-        'is_owner' => true,
-    ]);
+    // return response()->json([
+    //     'success' => true,
+    //     'comment' => [
+    //         'id' => $comment->id,
+    //         'content' => $comment->content,
+    //         'user_name' => $comment->user->name,
+    //         'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
+    //     ],
+    // ]);
+    return redirect()->intended('/timeline/public');
 }
 
 
