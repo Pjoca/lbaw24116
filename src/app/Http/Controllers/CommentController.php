@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class CommentController extends Controller
 {
@@ -54,25 +56,30 @@ public function destroy($id)
 }
 public function store(Request $request, $postId)
 {
-    $request->validate(['content' => 'required|string']);
+    $validated = $request->validate([
+        'content' => 'required|string|max:1000',
+    ]);
 
-    $comment = new Comment([
-        'content' => $request->input('content'),
-        'id_user' => auth()->id(),
+    $comment = Comment::create([
+        'content' => $validated['content'],
+        'id_user' => Auth::id(),
         'id_post' => $postId,
     ]);
-    $comment->save();
 
     return response()->json([
         'success' => true,
         'comment' => [
             'id' => $comment->id,
             'content' => $comment->content,
-            'user_name' => $comment->user->name,
-            'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
+            'user_name' => Auth::user()->name,
+            'user_image' => Auth::user()->image_url 
+                ? asset('storage/' . Auth::user()->image_url) 
+                : asset('users/images/default.png'),
         ],
+        'is_owner' => true,
     ]);
 }
+
 
 }
 

@@ -1,8 +1,6 @@
 <head>
-   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
-
 
 <article class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-300 transform hover:scale-105" data-id="{{ $post->id }}">
     <header class="flex items-center justify-between mb-4">
@@ -20,132 +18,144 @@
                 <p class="text-sm text-gray-500">{{ $post->created_at->toFormattedDateString() }}</p>
             </div>
         </div>
-
-        <!-- Dropdown Menu -->
-        @if (Auth::check() && Auth::user()->id == $post->id_user)
-            <div class="relative">
-                <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dropdownMenuButton-{{ $post->id }}" aria-haspopup="true" aria-expanded="false">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 4a2 2 0 100-4 2 2 0 000 4zM10 10a2 2 0 100-4 2 2 0 000 4zM10 16a2 2 0 100-4 2 2 0 000 4z"></path>
-                    </svg>
-                </button>
-                <div id="dropdownMenu-{{ $post->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                    <!-- Trigger Modal Instead of Redirect -->
-                    <button 
-                        onclick="showEditPostModal(
-                            {{ $post->id }}, 
-                            {{ json_encode($post->content) }}, 
-                            {{ json_encode($post->visibility) }}
-                        )"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                        Edit
-                    </button>
-                    <!-- Form for delete action -->
-                    <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este post?');" class="block px-4 py-2">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700 w-full text-left">
-                            <i class="fa fa-trash"></i> Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-        @endif
     </header>
 
-
-    <!-- Imagem -->
+    <!-- Image -->
     @if ($post->image_url)
         <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover">
     @endif
 
-    <!-- Conteúdo -->
+    <!-- Content -->
     <p class="text-lg text-gray-800 mb-1">{{ $post->content }}</p>
 
     <!-- LIKE -->
-   <!-- Botão de Like/Unlike -->
-<div class="flex items-center">
-    <button onclick="toggleLike({{ $post->id }})" class="flex items-center like-button" id="like-button-{{ $post->id }}">
-        @if($post->likes()->where('id_user', Auth::id())->exists())
-            <i class="fas fa-heart text-2xl mr-2 text-red-500"></i>
-            <span>Remove like</span>
-        @else
-            <i class="far fa-heart text-2xl mr-2 text-gray-500"></i>
-            <span>Like</span>
-        @endif
-    </button>
-    <!-- Contagem de Likes -->
-    <span class="ml-4 text-gray-600" id="like-count-{{ $post->id }}">
-        {{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }}
-    </span>
-</div>
+    <div class="flex items-center">
+        <button onclick="toggleLike({{ $post->id }})" class="flex items-center like-button" id="like-button-{{ $post->id }}">
+            @if($post->likes()->where('id_user', Auth::id())->exists())
+                <i class="fas fa-heart text-2xl mr-2 text-red-500"></i>
+                <span>Remove like</span>
+            @else
+                <i class="far fa-heart text-2xl mr-2 text-gray-500"></i>
+                <span>Like</span>
+            @endif
+        </button>
+        <span class="ml-4 text-gray-600" id="like-count-{{ $post->id }}">
+            {{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }}
+        </span>
+    </div>
 
-
-    <!-- Seção de Comentários com rolagem infinita -->
+    <!-- Comments Section -->
     <div class="mt-6">
         <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
 
         <div id="comments-section-{{ $post->id }}" class="mt-4 overflow-y-auto max-h-[400px] p-2">
-            <!-- Comentários já carregados -->
             @foreach($post->comments as $comment)
-    <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-{{ $comment->id }}">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center">
-                <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
-                <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
-            </div>
-
-            @if(Auth::check() && Auth::id() === $comment->user->id)
-                <div class="flex space-x-2">
-                    <!-- Editar -->
-                    <button type="button" onclick="openInlineEdit({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
-                        <i class="fas fa-edit"></i> Editar
-                    </button>
-
-                    <!-- Excluir -->
-                    <button onclick="deleteComment({{ $comment->id }})" class="text-red-500 hover:text-red-700">
-                        <i class="fas fa-trash-alt"></i> Excluir
-                    </button>
-
+                <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-{{ $comment->id }}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
+                            <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
+                        </div>
+                        @if(Auth::check() && Auth::id() === $comment->user->id)
+                            <div class="flex space-x-2">
+                                <button type="button" onclick="openInlineEdit({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button onclick="deleteComment({{ $comment->id }})" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                    <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
                 </div>
-            @endif
+            @endforeach
         </div>
 
-        <!-- Comentário original -->
-        <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
-
-        <!-- Formulário de edição oculto -->
-        <form id="editForm-{{ $comment->id }}" class="hidden mt-2" onsubmit="saveInlineEdit(event, {{ $comment->id }})">
-    @csrf
-    @method('PUT')
-    <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
-    <div class="flex justify-end mt-2">
-        <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
-    </div>
-</form>
-
-    </div>
-@endforeach
-
-        </div>
-
-        <!-- Formulário para adicionar um comentário -->
+        <!-- Add Comment Form -->
         @auth
-            <form action="{{ route('comments.store', $post->id) }}" method="POST" class="mt-4">
+            <form id="comment-form-{{ $post->id }}" action="{{ route('comments.store', $post->id) }}" method="POST" class="mt-4">
                 @csrf
-                <textarea name="content" class="w-full p-3 border rounded-lg" placeholder="Escreva um comentário..." required></textarea>
-                <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg mt-2">Comentar</button>
+                <textarea name="content" class="w-full p-3 border rounded-lg" placeholder="Write a comment..." required></textarea>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg mt-2">Comment</button>
             </form>
         @endauth
     </div>
-
-
-
-
 </article>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const commentForm = document.getElementById("comment-form-{{ $post->id }}");
+
+        if (commentForm) {
+            commentForm.addEventListener("submit", function (e) {
+                e.preventDefault(); // Prevent page reload on submit
+
+                const formData = new FormData(commentForm);
+                const commentsSection = document.getElementById("comments-section-{{ $post->id }}");
+
+                fetch(commentForm.action, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: formData,
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to post the comment.");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Add the new comment to the top of the comments section
+                            const newComment = document.createElement("div");
+                            newComment.className = "bg-gray-100 p-4 rounded-lg mb-2";
+                            newComment.id = `comment-${data.comment.id}`;
+                            newComment.innerHTML = `
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img src="${data.comment.user_image}" class="w-8 h-8 rounded-full mr-3">
+                                        <span class="font-semibold text-gray-800">${data.comment.user_name}</span>
+                                    </div>
+                                    ${
+                                        data.is_owner
+                                            ? `
+                                        <div class="flex space-x-2">
+                                            <button type="button" onclick="openInlineEdit(${data.comment.id}, '${data.comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button onclick="deleteComment(${data.comment.id})" class="text-red-500 hover:text-red-700">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </div>
+                                    `
+                                            : ""
+                                    }
+                                </div>
+                                <p class="mt-2 text-gray-700" id="commentContent-${data.comment.id}">${data.comment.content}</p>
+                            `;
+
+                            commentsSection.appendChild(newComment);
+
+                            // Clear the comment input
+                            commentForm.querySelector("textarea[name='content']").value = "";
+
+                            // Scroll to the bottom of the comments section
+                            commentsSection.scrollTop = commentsSection.scrollHeight;
+                        } else {
+                            alert("Failed to post the comment.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error posting the comment:", error);
+                        alert("An error occurred while posting the comment.");
+                    });
+            });
+        }
+    });
+
     function updateComment(commentId) {
     const content = document.getElementById(`edit-content-${commentId}`).value;
 
@@ -221,7 +231,7 @@ function deleteComment(commentId) {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'  // CSRF protection
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'  
         },
     })
     
@@ -273,5 +283,4 @@ function saveInlineEdit(event, commentId) {
         alert('Ocorreu um erro ao editar o comentário. Tente novamente.');
     });
 }
-
 </script>
