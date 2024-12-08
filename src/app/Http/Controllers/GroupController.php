@@ -53,24 +53,36 @@ public function show($id)
     ));
 }
 
+
 public function index(Request $request)
 {
-    if ($request->ajax()) {
-        $groups = Group::orderBy('created_at', 'desc')->paginate(4);
-        $html = '';
-
-        // Loop through each group and pass it to the group-card partial
-        foreach ($groups as $group) {
-            $html .= view('partials.group-card', ['group' => $group])->render();
+    if ($request->ajax() && $request->has('section')) {
+        $section = $request->get('section');
+        
+        if ($section === 'your-groups') {
+            $groups = Group::whereHas('memberships', function($query) {
+                $query->where('id_user', auth()->id());
+            })->orderBy('created_at', 'desc')->paginate(4);
+        } elseif ($section === 'explore-groups') {
+            $groups = Group::whereDoesntHave('memberships', function($query) {
+                $query->where('id_user', auth()->id());
+            })->orderBy('created_at', 'desc')->paginate(4);
         }
 
+        $html = view('partials.group-card', ['groups' => $groups])->render();
         return response()->json(['html' => $html]);
     }
 
-    $groups = Group::orderBy('created_at', 'desc')->paginate(12);
-    return view('pages.groups', compact('groups'));
-}
+    $yourGroups = Group::whereHas('memberships', function($query) {
+        $query->where('id_user', auth()->id());
+    })->orderBy('created_at', 'desc')->paginate(8);
 
+    $exploreGroups = Group::whereDoesntHave('memberships', function($query) {
+        $query->where('id_user', auth()->id());
+    })->orderBy('created_at', 'desc')->paginate(8);
+
+    return view('pages.groups', compact('yourGroups', 'exploreGroups'));
+}
 
 
 }
