@@ -77,7 +77,7 @@ class PostController extends Controller
         $validated = $request->validate([
             'content' => 'required|string',
             'visibility' => 'required|in:public,private,group',
-            'id_group' => 'nullable|integer|exists:groups,id',
+            'id_group' => 'nullable|integer|exists:group,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image
         ]);
 

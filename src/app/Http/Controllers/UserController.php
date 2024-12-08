@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Post;
 use App\Models\FriendshipRequest;
+use App\Models\GroupMembershipRequest;
 
 class UserController extends Controller
 {
@@ -61,12 +63,22 @@ class UserController extends Controller
         }
     }
 
-    // Fetch friend requests only for the profile owner
+    // Fetch friend requests and group invites only for the profile owner
     $friendRequests = [];
+    $groupInvites = [];
     if ($isOwnProfile) {
         $friendRequests = FriendshipRequest::where('id_receiver', Auth::id())
             ->with('sender') // Load sender details
             ->get();
+
+        $groupInvites = GroupMembershipRequest::where('id_user', Auth::id())
+            ->where('is_invite', true)
+            ->where('request_status', 'pending')
+            ->with('group') // Load group details
+            ->get();
+
+        // Log the group invites for debugging
+        Log::info('Group invites fetched:', ['groupInvites' => $groupInvites->toArray()]);
     }
 
     return view('pages.profile', [
@@ -77,8 +89,11 @@ class UserController extends Controller
         'hasIncomingFriendRequest' => $hasIncomingFriendRequest,
         'incomingFriendRequestId' => $incomingFriendRequestId,
         'friendRequests' => $friendRequests, // Pass friend requests
+        'groupInvites' => $groupInvites, // Pass group invites
     ]);
 }
+
+
 
 
     /**

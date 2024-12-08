@@ -11,6 +11,8 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
+use App\Http\Controllers\GroupMembershipController;
+use App\Http\Controllers\GroupController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
@@ -98,6 +100,39 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::post('/friends/accept/{id}', 'accept');
         Route::delete('/friends/reject/{id}', 'reject');
     });
+
+
+
+Route::controller(GroupMembershipController::class)->middleware('auth')->group(function () {
+    Route::post('/groups/{id}/join', 'requestMembership')->name('groups.join');
+    Route::delete('/groups/{id}/leave', 'leaveGroup')->name('groups.leave');
+    Route::delete('/groups/{id}/cancel', 'cancelMembershipRequest')->name('groups.cancel');
+    Route::post('/groups/request/{id}/accept', 'acceptMembershipRequest')->name('groups.acceptRequest');
+    Route::post('/groups/request/{id}/reject', 'rejectMembershipRequest')->name('groups.rejectRequest');
+    Route::post('/groups/{groupId}/invite', 'sendInvite')->name('groups.invite');
+    Route::delete('/groups/invite/{inviteId}/cancel', 'cancelInvite')->name('groups.cancelInvite');
+    Route::post('/groups/invite/{id}/accept', 'acceptInvite')->name('groups.acceptInvite');
+    Route::post('/groups/invite/{id}/reject', 'rejectInvite')->name('groups.rejectInvite');
+    Route::get('/groups/{groupId}/members', 'getMembers')->name('groups.getMembers');
+    Route::delete('/groups/{groupId}/members/{memberId}', 'removeMember')->name('groups.removeMember');
+    Route::get('/groups/{groupId}/join-requests',  'getJoinRequests')->name('groups.getJoinRequests');
+    Route::get('/groups/{groupId}/invites', 'getInvites')->name('groups.getInvites');
+});
+
+Route::controller(GroupController::class)->middleware('auth')->group(function () {
+    Route::get('/groups/{id}', 'show')->name('groups.show');
+});
+
+
+
+
+
+
+
+
+
+
+
     
     
 Route::middleware('auth')->group(function () {
