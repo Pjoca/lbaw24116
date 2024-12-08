@@ -439,7 +439,8 @@ window.loadMoreInvites = loadMoreInvites;
 async function loadInitialMembers(groupId) {
     const modal = document.getElementById('members-modal');
     const membersList = document.getElementById('members-list');
-    const loadMoreButton = document.getElementById('load-more-members');
+    const loadMoreButtonContainer = modal.querySelector('.mt-4');
+    let loadMoreButton = document.getElementById('load-more-members');
 
     try {
         const response = await fetch(`/groups/${groupId}/members`, {
@@ -452,7 +453,20 @@ async function loadInitialMembers(groupId) {
         membersList.innerHTML = data.html;
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
-        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+        if (data.hasMorePages) {
+            if (!loadMoreButton) {
+                loadMoreButton = document.createElement('button');
+                loadMoreButton.id = 'load-more-members';
+                loadMoreButton.textContent = 'Load More';
+                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
+                loadMoreButton.onclick = () => loadMoreMembers(groupId);
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            } else {
+                loadMoreButton.classList.remove('hidden');
+            }
+        } else if (loadMoreButton) {
+            loadMoreButton.classList.add('hidden');
+        }
     } catch (error) {
         console.error('Error loading members:', error.message);
     }
@@ -460,10 +474,13 @@ async function loadInitialMembers(groupId) {
 
 
 
+
+
 async function loadInitialJoinRequests(groupId) {
     const modal = document.getElementById('join-requests-modal');
     const requestsList = document.getElementById('join-requests-list');
-    const loadMoreButton = document.getElementById('load-more-join-requests');
+    const loadMoreButtonContainer = modal.querySelector('.mt-4');
+    let loadMoreButton = document.getElementById('load-more-join-requests');
 
     try {
         const response = await fetch(`/groups/${groupId}/join-requests`, {
@@ -476,17 +493,32 @@ async function loadInitialJoinRequests(groupId) {
         requestsList.innerHTML = data.html;
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
-        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+        if (data.hasMorePages) {
+            if (!loadMoreButton) {
+                loadMoreButton = document.createElement('button');
+                loadMoreButton.id = 'load-more-join-requests';
+                loadMoreButton.textContent = 'Load More';
+                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
+                loadMoreButton.onclick = () => loadMoreJoinRequests(groupId);
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            } else {
+                loadMoreButton.classList.remove('hidden');
+            }
+        } else if (loadMoreButton) {
+            loadMoreButton.classList.add('hidden');
+        }
     } catch (error) {
         console.error('Error loading join requests:', error.message);
     }
 }
 
 
+
 async function loadInitialInvites(groupId) {
     const modal = document.getElementById('invites-modal');
     const invitesList = document.getElementById('invites-list');
-    const loadMoreButton = document.getElementById('load-more-invites');
+    const loadMoreButtonContainer = modal.querySelector('.mt-4');
+    let loadMoreButton = document.getElementById('load-more-invites');
 
     try {
         const response = await fetch(`/groups/${groupId}/invites`, {
@@ -499,11 +531,26 @@ async function loadInitialInvites(groupId) {
         invitesList.innerHTML = data.html;
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
-        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+        if (data.hasMorePages) {
+            if (!loadMoreButton) {
+                loadMoreButton = document.createElement('button');
+                loadMoreButton.id = 'load-more-invites';
+                loadMoreButton.textContent = 'Load More';
+                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
+                loadMoreButton.onclick = () => loadMoreInvites(groupId);
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            } else {
+                loadMoreButton.classList.remove('hidden');
+            }
+        } else if (loadMoreButton) {
+            loadMoreButton.classList.add('hidden');
+        }
     } catch (error) {
         console.error('Error loading invites:', error.message);
     }
 }
+
+
 
 
 window.loadInitialMembers = loadInitialMembers;
