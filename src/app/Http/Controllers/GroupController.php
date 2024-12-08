@@ -96,5 +96,24 @@ public function show($id)
     ));
 }
 
+public function index(Request $request)
+{
+    if ($request->ajax()) {
+        $groups = Group::orderBy('created_at', 'desc')->paginate(4);
+        $html = '';
+
+        // Loop through each group and pass it to the group-card partial
+        foreach ($groups as $group) {
+            $html .= view('partials.group-card', ['group' => $group])->render();
+        }
+
+        return response()->json(['html' => $html]);
+    }
+
+    $groups = Group::orderBy('created_at', 'desc')->paginate(12);
+    return view('pages.groups', compact('groups'));
+}
+
+
 
 }

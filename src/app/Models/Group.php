@@ -22,6 +22,7 @@ class Group extends Model
         'visibility',
         'created_at',
         'id_owner',
+        'image_url',
     ];
 
     // Relationships

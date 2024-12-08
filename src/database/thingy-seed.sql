@@ -82,6 +82,7 @@ CREATE TABLE friendship_request (
 CREATE TABLE "group" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    image_url TEXT,
     description TEXT,
     visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE,
@@ -616,7 +617,23 @@ VALUES
 ('Tech Geeks', 'Discussing latest in tech.', 'public', 8),
 ('Gaming Squad', 'Playing and discussing games.', 'private', 9),
 ('Art Enthusiasts', 'Discussing art and exhibitions.', 'public', 10),
-('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14);
+('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14),
+('Politica', 'Grupo de discussão política', 'public', 15),
+('Benfica', 'Grupo de apoio ao Benfica', 'public', 14),
+('Sporting', 'Grupo de apoio ao Sporting', 'public', 14),
+('Portimonense', 'Grupo de apoio ao Portimonense', 'public', 14),
+('Boavista', 'Grupo de apoio ao Boavista', 'public', 14),
+('Braga', 'Grupo de apoio ao Braga', 'public', 14),
+('Famalicão', 'Grupo de apoio ao Famalicão', 'public', 14),
+('Gil Vicente', 'Grupo de apoio ao Gil Vicente', 'public', 14),
+('Marítimo', 'Grupo de apoio ao Marítimo', 'public', 14),
+('Moreirense', 'Grupo de apoio ao Moreirense', 'public', 14),
+('Nacional', 'Grupo de apoio ao Nacional', 'public', 14),
+('P. Ferreira', 'Grupo de apoio ao P. Ferreira', 'public', 14),
+('Santa Clara', 'Grupo de apoio ao Santa Clara', 'public', 14),
+('Tondela', 'Grupo de apoio ao Tondela', 'public', 14),
+('V. Guimarães', 'Grupo de apoio ao V. Guimarães', 'public', 14),
+('V. Setúbal', 'Grupo de apoio ao V. Setúbal', 'public', 14);
 
 -- Insert group memberships
 INSERT INTO group_membership (id_user, id_group, joined_at)
