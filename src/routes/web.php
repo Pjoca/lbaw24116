@@ -121,6 +121,7 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
 
 Route::controller(GroupController::class)->middleware('auth')->group(function () {
     Route::get('/groups/{id}', 'show')->name('groups.show');
+    Route::get('/groups', 'index')->name('groups.index');
 });
 
 
@@ -158,8 +159,6 @@ Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name
 
 Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
 
-Route::put('/comments/{id}', [CommentController::class, 'update'])->name('comments.update');
-
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
 
 Route::post('/posts/{post}/like-toggle', [PostController::class, 'toggleLike'])->middleware('auth');
@@ -168,7 +167,6 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middlewa
 
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
-Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
 
 Route::get('/matchmaking', [MatchmakingController::class, 'index'])->name('matchmaking.index');
 

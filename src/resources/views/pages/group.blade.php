@@ -16,22 +16,28 @@
                     @if ($isMember)
                         <button 
                             type="button" 
-                            onclick="leaveGroup({{ $group->id }})" 
-                            class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600 transition">
+                            id="group-action-button"
+                            data-group-id="{{ $group->id }}" 
+                            class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600 transition"
+                            onclick="leaveGroup({{ $group->id }})">
                             Leave Group
                         </button>
                     @elseif ($hasRequestedMembership)
                         <button 
                             type="button" 
-                            onclick="cancelMembershipRequest({{ $group->id }})" 
-                            class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition">
+                            id="group-action-button"
+                            data-group-id="{{ $group->id }}" 
+                            class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
+                            onclick="cancelMembershipRequest({{ $group->id }})">
                             Cancel Membership Request
                         </button>
                     @else
                         <button 
                             type="button" 
-                            onclick="joinGroup({{ $group->id }})" 
-                            class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition">
+                            id="group-action-button"
+                            data-group-id="{{ $group->id }}" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+                            onclick="joinGroup({{ $group->id }})">
                             Request to Join
                         </button>
                     @endif
@@ -40,36 +46,25 @@
 
             <!-- Manage Modals Buttons (Visible to Owner Only) -->
             @if (Auth::id() === $group->owner->id)
-                @include('modals.join-requests-modal', [
-                    'joinRequests' => $joinRequests, 
-                    'hasMoreJoinRequests' => $hasMoreJoinRequests
-                ])
-                @include('modals.members-modal', [
-                    'members' => $members, 
-                    'hasMoreMembers' => $hasMoreMembers
-                ])
-                @include('modals.invites-modal', [
-                    'invites' => $invites, 
-                    'hasMoreInvites' => $hasMoreInvites
-                ])
+                @include('modals.join-requests-modal')
+                @include('modals.members-modal')
+                @include('modals.invites-modal')
 
                 <button 
-                    type="button" 
-                    onclick="openModal('join-requests-modal')" 
+                    onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
                     class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
                     Manage Join Requests
                 </button>
 
                 <button 
-                    type="button" 
-                    onclick="openModal('invites-modal')" 
+                    onclick="openModal('invites-modal'); loadInitialInvites({{ $group->id }})" 
                     class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
                     Manage Invites
                 </button>
 
                 <button 
-                    onclick="openModal('members-modal')" 
-                    class="mt-6 bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600 transition">
+                    onclick="openModal('members-modal'); loadInitialMembers({{ $group->id }})" 
+                    class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
                     Manage Members
                 </button>
             @endif
