@@ -13,11 +13,7 @@
                 <!-- Join Requests dynamically loaded here -->
             </ul>
         </div>
-        <button 
-            id="load-more-join-requests" 
-            onclick="loadMoreJoinRequests({{ $group->id }})" 
-            class="mt-4 w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition hidden">
-            Load More
-        </button>
+        <div class="mt-4">
+        </div>
     </div>
 </div>
