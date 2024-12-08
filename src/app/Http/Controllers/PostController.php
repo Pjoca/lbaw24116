@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -64,9 +65,7 @@ class PostController extends Controller
         return view('pages.timeline', compact('posts'));
     }
 
-
-
-
+    
     /**
      * Create a new post by an authenticated user. Access: USR
      */
@@ -203,10 +202,121 @@ public function delete($id)
         ->with('success', 'Post deleted successfully!');
 }
 
+public function like($postId)
+{
+    if (Auth::check()) {
+        $post = Post::findOrFail($postId);
 
+        // Verifica se o usuário já curtiu o post
+        if (!$post->likes()->where('id_user', Auth::id())->exists()) {
+            // Lógica para curtir o post
+            $post->likes()->create([
+                'id_user' => Auth::id(),
+                'id_post' => $post->id,
+                'visibility' => 'public', // Ou como for necessário
+            ]);
+        }
 
+        // Recupera a URL da página anterior (pode ser a timeline ou outra)
+        $previousUrl = url()->previous();
 
+        // Redireciona de volta para a página anterior (onde o usuário estava)
+        return redirect($previousUrl)->with('success', 'Você curtiu o post!');
+    }
 
+    return redirect()->route('login')->with('error', 'Você precisa estar logado!');
 }
+
+    
+    public function unlike($postId)
+{
+    
+    if (Auth::check()) {
+        $post = Post::findOrFail($postId);
+
+       
+        $like = $post->likes()->where('id_user', Auth::id())->first();  // Alterar 'user_id' para 'id_user'
+
+        if ($like) {
+            
+            $like->delete();
+        }
+    }
+
+    return redirect()->back(); 
+}
+
+public function getComments($postId)
+{
+    $post = Post::findOrFail($postId);
+
+    // Pega os 3 primeiros comentários
+    $comments = $post->comments()->latest()->take(3)->get();
+
+    return response()->json([
+        'comments' => $comments,
+        'total_comments' => $post->comments()->count()
+    ]);
+}
+
+public function loadMoreComments($postId, $offset)
+{
+    $post = Post::findOrFail($postId);
+
+    // Carrega mais 3 comentários a partir do offset
+    $comments = $post->comments()->latest()->skip($offset)->take(3)->get();
+
+    // Retorna os comentários em formato JSON
+    return response()->json([
+        'comments' => $comments->map(function ($comment) {
+            return [
+                'user_image_url' => $comment->user->image_url ?? 'users/images/default.png',
+                'user_name' => $comment->user->name,
+                'content' => $comment->content,
+            ];
+        }),
+    ]);
+}
+
+
+
+public function storeComment(Request $request, $postId)
+{
+    $validated = $request->validate([
+        'content' => 'required|string|max:1000',
+    ]);
+
+    $comment = new Comment();
+    $comment->content = $validated['content'];
+    $comment->id_user = Auth::id();
+    $comment->id_post = $postId;
+    $comment->save();
+
+    return redirect()->back();
+}
+
+public function toggleLike(Request $request, Post $post)
+{
+    $user = Auth::user();
+
+    // Verifica se o usuário já deu like
+    if ($post->likes()->where('id_user', $user->id)->exists()) {
+        // Remove o like existente
+        $post->likes()->where('id_user', $user->id)->delete();
+        $liked = false;
+    } else {
+        // Adiciona um novo like
+        $post->likes()->create(['id_user' => $user->id]);
+        $liked = true;
+    }
+
+    // Retorna a contagem atualizada de likes em JSON
+    return response()->json([
+        'liked' => $liked,
+        'likesCount' => $post->likes()->count()
+    ]);
+}
+
+}   
 
 
