@@ -45,54 +45,11 @@ public function show($id)
             ->get();
     }
 
-    // Fetch members of the group excluding the group owner
-    $members = $group->memberships()
-        ->where('id_user', '!=', $group->id_owner) // Exclude the group owner
-        ->with('user')
-        ->orderBy('joined_at', 'desc') // Use joined_at for ordering
-        ->simplePaginate(5);
-
-    $hasMoreMembers = $members->hasMorePages();
-
-    // Fetch join requests for the group (only accessible by the owner)
-    $joinRequests = collect();
-    $hasMoreJoinRequests = false;
-
-    // Fetch invites for the group (only accessible by the owner)
-    $invites = collect();
-    $hasMoreInvites = false;
-
-    if ($group->id_owner === $user->id) {
-        $joinRequestsQuery = GroupMembershipRequest::where('id_group', $group->id)
-            ->where('request_status', 'pending')
-            ->where('is_invite', false) // Only join requests
-            ->with('user')
-            ->orderBy('requested_at', 'desc');
-
-        $joinRequests = $joinRequestsQuery->simplePaginate(5);
-        $hasMoreJoinRequests = $joinRequests->hasMorePages();
-
-        $invitesQuery = GroupMembershipRequest::where('id_group', $group->id)
-            ->where('request_status', 'pending')
-            ->where('is_invite', true) // Only invites
-            ->with('user')
-            ->orderBy('requested_at', 'desc');
-
-        $invites = $invitesQuery->simplePaginate(5);
-        $hasMoreInvites = $invites->hasMorePages();
-    }
-
     return view('pages.group', compact(
         'group',
         'isMember',
         'posts',
-        'members',
-        'hasMoreMembers',
         'hasRequestedMembership',
-        'joinRequests',
-        'hasMoreJoinRequests',
-        'invites',
-        'hasMoreInvites'
     ));
 }
 

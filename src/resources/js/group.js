@@ -434,3 +434,78 @@ function loadMoreInvites(groupId) {
 
 
 window.loadMoreInvites = loadMoreInvites;
+
+
+async function loadInitialMembers(groupId) {
+    const modal = document.getElementById('members-modal');
+    const membersList = document.getElementById('members-list');
+    const loadMoreButton = document.getElementById('load-more-members');
+
+    try {
+        const response = await fetch(`/groups/${groupId}/members`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch members.');
+
+        const data = await response.json();
+        membersList.innerHTML = data.html;
+        modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
+
+        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+    } catch (error) {
+        console.error('Error loading members:', error.message);
+    }
+}
+
+
+
+async function loadInitialJoinRequests(groupId) {
+    const modal = document.getElementById('join-requests-modal');
+    const requestsList = document.getElementById('join-requests-list');
+    const loadMoreButton = document.getElementById('load-more-join-requests');
+
+    try {
+        const response = await fetch(`/groups/${groupId}/join-requests`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch join requests.');
+
+        const data = await response.json();
+        requestsList.innerHTML = data.html;
+        modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
+
+        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+    } catch (error) {
+        console.error('Error loading join requests:', error.message);
+    }
+}
+
+
+async function loadInitialInvites(groupId) {
+    const modal = document.getElementById('invites-modal');
+    const invitesList = document.getElementById('invites-list');
+    const loadMoreButton = document.getElementById('load-more-invites');
+
+    try {
+        const response = await fetch(`/groups/${groupId}/invites`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch invites.');
+
+        const data = await response.json();
+        invitesList.innerHTML = data.html;
+        modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
+
+        loadMoreButton.classList.toggle('hidden', !data.hasMorePages);
+    } catch (error) {
+        console.error('Error loading invites:', error.message);
+    }
+}
+
+
+window.loadInitialMembers = loadInitialMembers;
+window.loadInitialJoinRequests = loadInitialJoinRequests;
+window.loadInitialInvites = loadInitialInvites;
