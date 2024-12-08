@@ -36,7 +36,7 @@
                             type="button" 
                             id="group-action-button"
                             data-group-id="{{ $group->id }}" 
-                            class="{{ $group->visibility === 'public' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600' }} text-white px-4 py-2 rounded shadow transition" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
                             onclick="joinGroup({{ $group->id }})">
                             {{ $group->visibility === 'public' ? 'Join Group' : 'Request to Join' }}
                         </button>
@@ -44,55 +44,70 @@
                 </div>
             @endauth
 
-            <!-- Manage Modals Buttons (Visible to Owner Only) -->
+            <!-- Admin Management Buttons (Visible to Owner Only) -->
             @if (Auth::id() === $group->owner->id)
-                @include('modals.join-requests-modal')
-                @include('modals.members-modal')
-                @include('modals.invites-modal')
+                <div class="mt-6">
+                    @include('modals.join-requests-modal')
+                    @include('modals.invites-modal')
 
-                <button 
-                    onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
-                    class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                    Manage Join Requests
-                </button>
+                    <button 
+                        onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
+                        class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                        Manage Join Requests
+                    </button>
 
-                <button 
-                    onclick="openModal('invites-modal'); loadInitialInvites({{ $group->id }})" 
-                    class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                    Manage Invites
-                </button>
-
-                <button 
-                    onclick="openModal('members-modal'); loadInitialMembers({{ $group->id }})" 
-                    class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                    Manage Members
-                </button>
+                    <button 
+                        onclick="openModal('invites-modal'); loadInitialInvites({{ $group->id }})" 
+                        class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                        Manage Invites
+                    </button>
+                </div>
             @endif
         </div>
 
-        <!-- Group Posts Timeline -->
-        @if (!$isMember)
-            <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-lg text-center max-w-4xl mx-auto">
-                <p class="text-yellow-600 font-semibold">You must be a member of this group to view posts.</p>
+        <!-- Tab Navigation Bar -->
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-4 mb-6">
+            <div class="flex justify-center">
+                <button 
+                    id="timeline-tab" 
+                    onclick="showSection('timeline')" 
+                    class="w-1/2 text-center text-lg font-bold py-3 border-b-4 border-teal-500">
+                    Timeline
+                </button>
+                <button 
+                    id="members-tab" 
+                    onclick="showSection('members'); loadInitialMembers({{ $group->id }})" 
+                    class="w-1/2 text-center text-lg font-bold py-3 border-b-4 border-gray-300 hover:border-teal-500">
+                    Members
+                </button>
             </div>
-        @else
-            <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-                <h2 class="text-2xl font-bold mb-4">Timeline</h2>
-                <div id="posts-container" class="space-y-6">
-                    @if ($posts->isEmpty())
-                        <p class="text-center text-gray-500">No posts have been shared in this group yet.</p>
-                    @else
-                        @each('partials.post', $posts, 'post')
-                    @endif
-                </div>
-                <div id="loader" class="hidden text-center py-4">
-                    <div class="flex justify-center items-center">
-                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
-                        <span class="ml-4 text-gray-600 font-medium">Loading...</span>
-                    </div>
+        </div>
+
+        <!-- Group Posts Timeline Section -->
+        <div id="timeline-section" class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Timeline</h2>
+            <div id="posts-container" class="space-y-6">
+                @if ($posts->isEmpty())
+                    <p class="text-center text-gray-500">No posts have been shared in this group yet.</p>
+                @else
+                    @each('partials.post', $posts, 'post')
+                @endif
+            </div>
+        </div>
+
+        <!-- Group Members Section -->
+        <div id="members-section" class="hidden max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Members</h2>
+            <ul id="members-list" class="space-y-2"></ul>
+
+            <!-- Loader -->
+            <div id="members-loader" class="hidden text-center py-4">
+                <div class="flex justify-center items-center">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                    <span class="ml-4 text-gray-600 font-medium">Loading...</span>
                 </div>
             </div>
-        @endif
+        </div>
 
         <!-- Button to Create New Post -->
         @if (Auth::check() && $isMember)
@@ -102,9 +117,6 @@
             </a>
         @endif
     </div>
-
-    <!-- Include Modals -->
-    @include('modals.edit-post-modal')
 
     <!-- Include JavaScript -->
     @vite('resources/js/group.js')
