@@ -607,7 +607,7 @@ VALUES
 -- Insert groups
 INSERT INTO "group" (name, description, visibility, id_owner)
 VALUES 
-('Hiking Enthusiasts', 'A group for people who love hiking.', 'public', 1),
+('Hiking Enthusiasts', 'A group for people who love hiking.', 'private', 1),
 ('Book Club', 'Discussing our favorite books.', 'private', 2),
 ('Music Lovers', 'Sharing music recommendations.', 'public', 3),
 ('Movie Buffs', 'Discussing favorite movies.', 'public', 4),

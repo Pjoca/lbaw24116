@@ -23,12 +23,26 @@ class GroupMembershipController extends Controller
         $group = Group::findOrFail($groupId);
 
         // Check if the user is already a member or has a pending request
-        if (GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists() ||
-            GroupMembershipRequest::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
-            return response()->json(['error' => 'Already a member or request pending'], 400);
+        if (GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
+            return response()->json(['error' => 'You are already a member of this group'], 400);
         }
 
-        // Create a membership request
+        if (GroupMembershipRequest::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
+            return response()->json(['error' => 'Membership request is already pending'], 400);
+        }
+
+        if ($group->visibility === 'public') {
+            // Automatically create the membership if the group is public
+            GroupMembership::create([
+                'id_user' => $user->id,
+                'id_group' => $groupId,
+                'joined_at' => now(),
+            ]);
+
+            return response()->json(['success' => 'You have successfully joined the group', 'reload' => true], 200);
+        }
+
+        // Create a membership request for private groups
         GroupMembershipRequest::create([
             'id_user' => $user->id,
             'id_group' => $groupId,

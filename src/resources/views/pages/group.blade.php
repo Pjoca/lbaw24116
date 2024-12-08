@@ -36,9 +36,9 @@
                             type="button" 
                             id="group-action-button"
                             data-group-id="{{ $group->id }}" 
-                            class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
+                            class="{{ $group->visibility === 'public' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600' }} text-white px-4 py-2 rounded shadow transition" 
                             onclick="joinGroup({{ $group->id }})">
-                            Request to Join
+                            {{ $group->visibility === 'public' ? 'Join Group' : 'Request to Join' }}
                         </button>
                     @endif
                 </div>
