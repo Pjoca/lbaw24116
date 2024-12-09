@@ -482,34 +482,68 @@ window.loadInitialInvites = loadInitialInvites;
 
 
 function showSection(section) {
-    const timelineTab = document.getElementById('timeline-tab');
-    const membersTab = document.getElementById('members-tab');
-    const timelineSection = document.getElementById('timeline-section');
-    const membersSection = document.getElementById('members-section');
+    const sections = {
+        'timeline': {
+            tab: document.getElementById('timeline-tab'),
+            section: document.getElementById('timeline-section')
+        },
+        'members': {
+            tab: document.getElementById('members-tab'),
+            section: document.getElementById('members-section')
+        },
+        'your-groups': {
+            tab: document.getElementById('your-groups-tab'),
+            section: document.getElementById('your-groups-section')
+        },
+        'explore-groups': {
+            tab: document.getElementById('explore-groups-tab'),
+            section: document.getElementById('explore-groups-section')
+        }
+    };
 
-    if (section === 'timeline') {
-        timelineSection.classList.remove('hidden');
-        membersSection.classList.add('hidden');
-        timelineTab.classList.add('border-teal-500');
-        timelineTab.classList.remove('border-gray-300');
-        membersTab.classList.add('border-gray-300');
-        membersTab.classList.remove('border-teal-500');
-    } else if (section === 'members') {
-        membersSection.classList.remove('hidden');
-        timelineSection.classList.add('hidden');
-        membersTab.classList.add('border-teal-500');
-        membersTab.classList.remove('border-gray-300');
-        timelineTab.classList.add('border-gray-300');
-        timelineTab.classList.remove('border-teal-500');
+    // Hide all sections and remove active class from tabs
+    Object.keys(sections).forEach(key => {
+        const tabElement = sections[key].tab;
+        const sectionElement = sections[key].section;
+
+        if (tabElement && sectionElement) {
+            sectionElement.classList.add('hidden');
+            tabElement.classList.add('border-gray-300');
+            tabElement.classList.remove('border-teal-500');
+        }
+    });
+
+    // Show the selected section and mark the corresponding tab as active
+    if (sections[section]) {
+        const { tab, section: sectionElement } = sections[section];
+        
+        if (sectionElement) sectionElement.classList.remove('hidden');
+        if (tab) {
+            tab.classList.add('border-teal-500');
+            tab.classList.remove('border-gray-300');
+        }
     }
 }
 
-// Show Timeline by default on page load
+// Show the default section for each tab system
 document.addEventListener('DOMContentLoaded', function () {
-    showSection('timeline');
+    // For the Timeline / Members tabs
+    const timelineSection = document.getElementById('timeline-section');
+    const membersSection = document.getElementById('members-section');
+    if (timelineSection && membersSection) {
+        showSection('timeline');
+    }
+
+    // For the Your Groups / Explore Groups tabs
+    const yourGroupsSection = document.getElementById('your-groups-section');
+    const exploreGroupsSection = document.getElementById('explore-groups-section');
+    if (yourGroupsSection && exploreGroupsSection) {
+        showSection('your-groups');
+    }
 });
 
 window.showSection = showSection;
+
 
 
 let nextPageUrlMembers = null;
@@ -642,3 +676,5 @@ window.addEventListener('scroll', () => {
 
 window.loadInitialMembers = loadInitialMembers;
 window.loadMoreMembers = loadMoreMembers;
+
+

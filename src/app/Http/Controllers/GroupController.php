@@ -62,27 +62,33 @@ public function index(Request $request)
         if ($section === 'your-groups') {
             $groups = Group::whereHas('memberships', function($query) {
                 $query->where('id_user', auth()->id());
-            })->orderBy('created_at', 'desc')->paginate(4);
+            })->orderBy('created_at', 'desc')->paginate(12);
         } elseif ($section === 'explore-groups') {
             $groups = Group::whereDoesntHave('memberships', function($query) {
                 $query->where('id_user', auth()->id());
-            })->orderBy('created_at', 'desc')->paginate(4);
+            })->orderBy('created_at', 'desc')->paginate(12);
         }
 
-        $html = view('partials.group-card', ['groups' => $groups])->render();
+        // Render each group as a separate partial with $group variable
+        $html = '';
+        foreach ($groups as $group) {
+            $html .= view('partials.group-card', ['group' => $group])->render();
+        }
+
         return response()->json(['html' => $html]);
     }
 
     $yourGroups = Group::whereHas('memberships', function($query) {
         $query->where('id_user', auth()->id());
-    })->orderBy('created_at', 'desc')->paginate(8);
+    })->orderBy('created_at', 'desc')->paginate(12);
 
     $exploreGroups = Group::whereDoesntHave('memberships', function($query) {
         $query->where('id_user', auth()->id());
-    })->orderBy('created_at', 'desc')->paginate(8);
+    })->orderBy('created_at', 'desc')->paginate(12);
 
     return view('pages.groups', compact('yourGroups', 'exploreGroups'));
 }
+
 
 
 }

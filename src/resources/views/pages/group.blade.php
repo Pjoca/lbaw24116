@@ -66,48 +66,59 @@
         </div>
 
         <!-- Tab Navigation Bar -->
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-4 mb-6">
+        <div class="max-w-4xl mx-auto shadow-lg mb-6">
             <div class="flex justify-center">
+                <!-- Timeline Button -->
                 <button 
                     id="timeline-tab" 
                     onclick="showSection('timeline')" 
-                    class="w-1/2 text-center text-lg font-bold py-3 border-b-4 border-teal-500">
+                    class="{{ $isMember || Auth::id() === $group->owner->id ? 'w-1/2' : 'w-full' }} text-center text-lg font-bold py-3 border-b-4 border-teal-500">
                     Timeline
                 </button>
-                <button 
-                    id="members-tab" 
-                    onclick="showSection('members'); loadInitialMembers({{ $group->id }})" 
-                    class="w-1/2 text-center text-lg font-bold py-3 border-b-4 border-gray-300 hover:border-teal-500">
-                    Members
-                </button>
+
+                @if ($isMember || Auth::id() === $group->owner->id)
+                    <!-- Members Button (Only shown for members or owners) -->
+                    <button 
+                        id="members-tab" 
+                        onclick="showSection('members'); loadInitialMembers({{ $group->id }})" 
+                        class="w-1/2 text-center text-lg font-bold py-3 border-b-4 border-gray-300 hover:border-teal-500">
+                        Members
+                    </button>
+                @endif
             </div>
         </div>
 
         <!-- Group Posts Timeline Section -->
         <div id="timeline-section" class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-4">Timeline</h2>
-            <div id="posts-container" class="space-y-6">
-                @if ($posts->isEmpty())
-                    <p class="text-center text-gray-500">No posts have been shared in this group yet.</p>
-                @else
-                    @each('partials.post', $posts, 'post')
-                @endif
-            </div>
+            @if (!$isMember && Auth::id() !== $group->owner->id)
+                <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
+                    <p class="text-yellow-600 font-semibold">You must be a member of this group to view posts.</p>
+                </div>
+            @else
+                <div id="posts-container" class="space-y-6">
+                    @if ($posts->isEmpty())
+                        <p class="text-center text-gray-500">No posts have been shared in this group yet.</p>
+                    @else
+                        @each('partials.post', $posts, 'post')
+                    @endif
+                </div>
+            @endif
         </div>
 
-        <!-- Group Members Section -->
-        <div id="members-section" class="hidden max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-4">Members</h2>
-            <ul id="members-list" class="space-y-2"></ul>
+        @if ($isMember || Auth::id() === $group->owner->id)
+            <!-- Group Members Section -->
+            <div id="members-section" class="hidden max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+                <ul id="members-list" class="space-y-2"></ul>
 
-            <!-- Loader -->
-            <div id="members-loader" class="hidden text-center py-4">
-                <div class="flex justify-center items-center">
-                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
-                    <span class="ml-4 text-gray-600 font-medium">Loading...</span>
+                <!-- Loader -->
+                <div id="members-loader" class="hidden text-center py-4">
+                    <div class="flex justify-center items-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                        <span class="ml-4 text-gray-600 font-medium">Loading...</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
 
         <!-- Button to Create New Post -->
         @if (Auth::check() && $isMember)
