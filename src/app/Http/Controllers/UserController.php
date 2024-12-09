@@ -96,49 +96,52 @@ class UserController extends Controller
 
 
 
-    /**
-     * Search users.
-     */
 /**
  * Search users.
  */
 public function search(Request $request)
 {
-    $query = $request->input('query');
+    $query = $request->input('query'); // Capture query input
     $limit = $request->input('limit', null);
 
-    $users = User::select('*')
-        ->selectRaw('
-            CASE
-                WHEN LOWER(name) = ? THEN 1
-                WHEN LOWER(name) LIKE ? THEN 2
-                WHEN LOWER(name) LIKE ? THEN 3
-                ELSE 4
-            END AS priority
-        ', [
-            strtolower($query),
-            strtolower($query) . '%',
-            '%' . strtolower($query) . '%',
-        ])
-        ->where(function ($q) use ($query) {
-            $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
-              ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
-              ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
-        });
+    // If no query is provided, return an empty collection
+    if (empty($query)) {
+        $users = collect(); // Empty collection
+    } 
+    else {
+        $users = User::select('*')
+            ->selectRaw('
+                CASE
+                    WHEN LOWER(name) = ? THEN 1
+                    WHEN LOWER(name) LIKE ? THEN 2
+                    WHEN LOWER(name) LIKE ? THEN 3
+                    ELSE 4
+                END AS priority
+            ', [
+                strtolower($query),
+                strtolower($query) . '%',
+                '%' . strtolower($query) . '%',
+            ])
+            ->where(function ($q) use ($query) {
+                $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
+                  ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
+                  ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
+            });
 
-    // Add visibility condition for guest users
-    if (!Auth::check()) {
-        $users->where('visibility', 'public');
+        // Add visibility condition for guest users
+        if (!Auth::check()) {
+            $users->where('visibility', 'public');
+        }
+
+        $users->orderBy('priority')
+              ->orderBy('name');
+
+        if ($limit) {
+            $users = $users->take($limit);
+        }
+
+        $users = $users->get();
     }
-
-    $users->orderBy('priority')
-          ->orderBy('name');
-
-    if ($limit) {
-        $users = $users->take($limit);
-    }
-
-    $users = $users->get();
 
     if ($request->ajax()) {
         // Return the partial only
@@ -148,6 +151,7 @@ public function search(Request $request)
     // Fallback for non-AJAX requests
     return view('search.results', compact('users', 'query'));
 }
+
 
     /**
      * Update the profile information of the authenticated user.
