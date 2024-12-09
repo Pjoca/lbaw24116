@@ -678,3 +678,69 @@ window.loadInitialMembers = loadInitialMembers;
 window.loadMoreMembers = loadMoreMembers;
 
 
+
+async function openEditGroupModal(groupId) {
+    try {
+        const response = await fetch(`/groups/${groupId}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch group data');
+
+        const data = await response.json();
+        console.log('Group Data:', data);
+
+        // Populate the modal form fields with group data
+        document.getElementById('edit-group-name').value = data.name;
+        document.getElementById('edit-group-description').value = data.description;
+        document.getElementById('edit-group-visibility').value = data.visibility;
+
+        const previewImage = document.getElementById('preview-image');
+        const previewContainer = document.getElementById('preview-container');
+
+        if (data.image_url) {
+            const imageUrl = `${window.location.origin}/storage/${data.image_url}`;
+            previewImage.src = imageUrl;
+            previewContainer.classList.remove('hidden');
+        } else {
+            previewContainer.classList.add('hidden');
+            previewImage.src = '#';
+        }
+
+        // Show the modal
+        openModal('edit-group-modal');
+    } catch (error) {
+        console.error('Error fetching group data:', error);
+    }
+}
+
+// Function to handle form submission for group edit
+async function handleEditGroupSubmission(event, groupId) {
+    event.preventDefault();
+
+    const editGroupForm = document.getElementById('edit-group-form');
+    const formData = new FormData(editGroupForm); // Use FormData to handle file uploads
+
+    try {
+        const response = await fetch(`/groups/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('Failed to update group');
+
+        // Redirect to the updated group's page
+        window.location.href = `/groups/${groupId}`;
+    } catch (error) {
+        console.error('Error updating group:', error);
+    }
+}
+
+window.openEditGroupModal = openEditGroupModal;
+window.handleEditGroupSubmission = handleEditGroupSubmission;

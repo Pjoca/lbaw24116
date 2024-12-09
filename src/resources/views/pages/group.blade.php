@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="container mx-auto py-8 relative">
+        
         <!-- Group Details -->
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8">
             <!-- Group Info -->
@@ -17,7 +18,6 @@
                         <button 
                             type="button" 
                             id="group-action-button"
-                            data-group-id="{{ $group->id }}" 
                             class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600 transition"
                             onclick="leaveGroup({{ $group->id }})">
                             Leave Group
@@ -26,7 +26,6 @@
                         <button 
                             type="button" 
                             id="group-action-button"
-                            data-group-id="{{ $group->id }}" 
                             class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
                             onclick="cancelMembershipRequest({{ $group->id }})">
                             Cancel Membership Request
@@ -35,7 +34,6 @@
                         <button 
                             type="button" 
                             id="group-action-button"
-                            data-group-id="{{ $group->id }}" 
                             class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
                             onclick="joinGroup({{ $group->id }})">
                             {{ $group->visibility === 'public' ? 'Join Group' : 'Request to Join' }}
@@ -49,6 +47,13 @@
                 <div class="mt-6">
                     @include('modals.join-requests-modal')
                     @include('modals.invites-modal')
+                    @include('modals.edit-group-modal')
+
+                    <button 
+                        class="bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition"
+                        onclick="openEditGroupModal({{ $group->id }})">
+                        Edit Group
+                    </button>
 
                     <button 
                         onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
