@@ -96,10 +96,10 @@ class UserController extends Controller
 
 
 
-/**
- * Search users.
- */
-public function search(Request $request)
+    /**
+     * Search users.
+     */
+    public function search(Request $request)
 {
     $query = $request->input('query'); // Capture query input
     $limit = $request->input('limit', null);
@@ -151,7 +151,6 @@ public function search(Request $request)
     // Fallback for non-AJAX requests
     return view('search.results', compact('users', 'query'));
 }
-
 
     /**
      * Update the profile information of the authenticated user.
