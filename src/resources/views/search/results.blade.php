@@ -21,7 +21,9 @@
     <!-- Results Section -->
 
     @if(empty($query))
-        <p class="text-gray-500"></p>
+        <p class="text-gray-500">
+            
+        </p>
     @else
         <h2 class="text-xl font-bold mb-4">Search Results for "{{ $query }}"</h2>
         @if($users->isEmpty())
