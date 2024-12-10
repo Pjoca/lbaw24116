@@ -414,7 +414,14 @@ async function loadInitialJoinRequests(groupId) {
         if (!response.ok) throw new Error('Failed to fetch join requests.');
 
         const data = await response.json();
-        requestsList.innerHTML = data.html;
+        requestsList.innerHTML = ''; // Clear old content
+
+        if (!data.html || data.html.trim() === '') {
+            requestsList.innerHTML = `<p class="text-gray-500 text-center">No join requests yet.</p>`;
+        } else {
+            requestsList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
+
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
         if (data.hasMorePages) {
@@ -437,7 +444,6 @@ async function loadInitialJoinRequests(groupId) {
 }
 
 
-
 async function loadInitialInvites(groupId) {
     const modal = document.getElementById('invites-modal');
     const invitesList = document.getElementById('invites-list');
@@ -452,7 +458,14 @@ async function loadInitialInvites(groupId) {
         if (!response.ok) throw new Error('Failed to fetch invites.');
 
         const data = await response.json();
-        invitesList.innerHTML = data.html;
+        invitesList.innerHTML = ''; // Clear old content
+
+        if (!data.html || data.html.trim() === '') {
+            invitesList.innerHTML = `<p class="text-gray-500 text-center">No invites sent yet.</p>`;
+        } else {
+            invitesList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
+
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
         if (data.hasMorePages) {
@@ -582,17 +595,15 @@ async function loadInitialMembers(groupId) {
         const data = await response.json();
         console.log('Response JSON data:', data);
 
-        if (!data.html || data.html.trim() === '') {
-            console.warn('No members loaded. Empty response.');
-            loader.classList.add('hidden'); // Hide loader
-            return;
-        }
-
-        console.log('Clearing old members from membersList');
         membersList.innerHTML = ''; // Clear old content
 
-        console.log('Inserting new HTML into membersList');
-        membersList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        if (!data.html || data.html.trim() === '') {
+            console.warn('No members loaded. Empty response.');
+            membersList.innerHTML = `<p class="text-gray-500 text-center">No members in this group yet.</p>`;
+        } else {
+            console.log('Inserting new HTML into membersList');
+            membersList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
 
         nextPageUrlMembers = data.nextPageUrl;
 

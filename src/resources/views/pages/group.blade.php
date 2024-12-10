@@ -4,16 +4,36 @@
     <div class="container mx-auto py-8 relative">
         
         <!-- Group Details -->
-        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8">
+        <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 relative">
+            
+            <!-- Edit Group Button (only for group owner) -->
+            @if (Auth::id() === $group->owner->id)
+                <button 
+                    class="absolute top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition"
+                    onclick="openEditGroupModal({{ $group->id }})">
+                    Edit Group
+                </button>
+            @endif
+
+            <!-- Group Image -->
+            <div class="flex justify-center mb-4">
+                <img src="{{ $group->image_url ? asset('storage/' . $group->image_url) : asset('storage/images/default-group.png') }}" 
+                     alt="{{ $group->name }}" 
+                     class="w-24 h-24 rounded-full shadow-md">
+            </div>
+
             <!-- Group Info -->
-            <h1 class="text-3xl font-bold mb-4">{{ $group->name }}</h1>
-            <p class="mb-2"><strong>Description:</strong> {{ $group->description }}</p>
-            <p class="mb-2"><strong>Visibility:</strong> {{ ucfirst($group->visibility) }}</p>
-            <p class="mb-4"><strong>Owner:</strong> {{ $group->owner->name }}</p>
+            <h1 class="text-2xl font-bold mb-4 text-center">{{ $group->name }}</h1>
+
+            <div class="text-left">
+                <p class="mb-2 text-center"><strong>Description:</strong> {{ $group->description }}</p>
+                <p class="mb-2 text-center"><strong>Visibility:</strong> {{ ucfirst($group->visibility) }}</p>
+                <p class="mb-4 text-center"><strong>Owner:</strong> {{ $group->owner->name }}</p>
+            </div>
 
             <!-- Membership Actions -->
             @auth
-                <div class="mt-6">
+                <div class="mt-4 flex justify-center">
                     @if ($isMember)
                         <button 
                             type="button" 
@@ -49,23 +69,19 @@
                     @include('modals.invites-modal')
                     @include('modals.edit-group-modal')
 
-                    <button 
-                        class="bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition"
-                        onclick="openEditGroupModal({{ $group->id }})">
-                        Edit Group
-                    </button>
+                    <div class="flex justify-center">
+                        <button 
+                            onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
+                            class="bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                            Manage Join Requests
+                        </button>
 
-                    <button 
-                        onclick="openModal('join-requests-modal'); loadInitialJoinRequests({{ $group->id }})" 
-                        class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                        Manage Join Requests
-                    </button>
-
-                    <button 
-                        onclick="openModal('invites-modal'); loadInitialInvites({{ $group->id }})" 
-                        class="mt-6 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                        Manage Invites
-                    </button>
+                        <button 
+                            onclick="openModal('invites-modal'); loadInitialInvites({{ $group->id }})" 
+                            class="ml-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                            Manage Invites
+                        </button>
+                    </div>
                 </div>
             @endif
         </div>

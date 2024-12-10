@@ -296,7 +296,6 @@ public function getMembers(Request $request, $groupId)
     $group = Group::findOrFail($groupId);
 
     $members = GroupMembership::where('id_group', $groupId)
-        ->where('id_user', '!=', $group->id_owner) // Exclude the owner
         ->with('user') // Assuming the GroupMembership model has a 'user' relationship
         ->orderBy('joined_at', 'desc')
         ->simplePaginate(5); // Load 10 members at a time
