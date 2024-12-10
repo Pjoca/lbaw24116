@@ -14,15 +14,18 @@
                 </button>
             </div>
             <ul id="conversation-list" class="divide-y divide-gray-200 max-h-[60vh] overflow-y-auto">
-                @foreach ($contacts as $contact)
-                <li class="p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item" data-contact-id="{{ $contact->id }}">
-                    <img src="{{ asset('storage/' . $contact['image_url']) }}" alt="{{ $contact['name'] }}" class="w-12 h-12 rounded-full object-cover">
-                    <div>
-                        <p class="font-semibold text-gray-800">{{ $contact->name }}</p>
-                    </div>
-                </li>
-                @endforeach
+                @forelse ($contacts as $contact)
+                    <li class="p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item" data-contact-id="{{ $contact->id }}">
+                        <img src="{{ asset('storage/' . $contact['image_url']) }}" alt="{{ $contact['name'] }}" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <p class="font-semibold text-gray-800">{{ $contact->name }}</p>
+                        </div>
+                    </li>
+                @empty
+                    <li class="no-conversations text-gray-500 italic p-4">No conversations yet. Start one!</li>
+                @endforelse
             </ul>
+
         </div>
 
         <!-- Painel de mensagens -->

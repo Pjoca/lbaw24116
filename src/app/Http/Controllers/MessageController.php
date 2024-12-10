@@ -13,58 +13,51 @@ class MessageController extends Controller
 {
     $userId = Auth::id();
 
-    // Fetch relevant contacts
-    $messages = Message::where('id_sender', $userId)
+    $contacts = Message::where('id_sender', $userId)
         ->orWhere('id_receiver', $userId)
-        ->get();
-
-    $contactIds = $messages->pluck('id_sender')
-        ->merge($messages->pluck('id_receiver'))
-        ->unique()
-        ->filter(function ($id) use ($userId) {
-            return $id != $userId;
+        ->with(['sender', 'receiver'])
+        ->orderBy('created_at', 'desc') 
+        ->get()
+        ->unique(function ($message) use ($userId) {
+            
+            return $message->id_sender === $userId ? $message->id_receiver : $message->id_sender;
+        })
+        ->map(function ($message) use ($userId) {
+            
+            $contact = $message->id_sender === $userId ? $message->receiver : $message->sender;
+            $contact->last_message_at = $message->created_at;
+            return $contact;
         });
-
-    $contacts = User::whereIn('id', $contactIds)->get();
-
     
+    $existingContactIds = $contacts->pluck('id');
     $friends = User::where('id', '!=', $userId)
-                   ->whereNotIn('id', $contactIds) 
+                   ->whereNotIn('id', $existingContactIds)
                    ->get();
 
     return view('pages.messages', compact('contacts', 'friends'));
 }
 
+
 public function startConversation(Request $request)
 {
-    $userId = Auth::id(); // Authenticated user
+    $userId = Auth::id();
     $friendId = $request->input('friend_id');
 
-    
     if ($userId == $friendId || !User::find($friendId)) {
         return response()->json(['error' => 'Invalid friend ID'], 400);
     }
 
-    
-    // $existingConversation = Message::where(function ($query) use ($userId, $friendId) {
-    //     $query->where('id_sender', $userId)
-    //           ->where('id_receiver', $friendId);
-    // })->orWhere(function ($query) use ($userId, $friendId) {
-    //     $query->where('id_sender', $friendId)
-    //           ->where('id_receiver', $userId);
-    // })->exists();
+    $contact = User::find($friendId);
 
-    // if ($existingConversation) {
-    //     return response()->json(['success' => true, 'message' => 'Conversation already exists.']);
-    // }
-
-    // Respond without creating a placeholder message
-    return response()->json(['success' => true, 'message' => 'New conversation started.']);
+    return response()->json([
+        'success' => true,
+        'contact' => [
+            'id' => $contact->id,
+            'name' => $contact->name,
+            'image_url' => asset('storage/' . ($contact->image_url ?? 'users/images/default.png')),
+        ],
+    ]);
 }
-
-
-
-
 
 
 public function getMessages($contactId)

@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const friendItem = event.target.closest(".friend-item");
             if (friendItem) {
                 const friendId = friendItem.getAttribute("data-friend-id");
-
+    
                 try {
                     const response = await fetch(`/messages/start-conversation`, {
                         method: "POST",
@@ -172,36 +172,38 @@ document.addEventListener("DOMContentLoaded", () => {
                         },
                         body: JSON.stringify({ friend_id: friendId }),
                     });
-
+    
                     if (!response.ok) {
                         throw new Error("Failed to start conversation.");
                     }
-
+    
                     const result = await response.json();
                     if (result.success) {
-                        // Close the modal
-                        newConversationModal.classList.add("hidden");
-
-                        // Add the new contact to the conversation list dynamically
+                        const contact = result.contact;
+    
+                        
+                        const noConversationsPlaceholder = document.querySelector("#conversation-list .no-conversations");
+                        if (noConversationsPlaceholder) {
+                            noConversationsPlaceholder.remove();
+                        }
+    
+                        // Adicionar a nova conversa no topo da lista
                         const newContact = document.createElement("li");
                         newContact.className = "p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item";
-                        newContact.setAttribute("data-contact-id", friendId);
+                        newContact.setAttribute("data-contact-id", contact.id);
                         newContact.innerHTML = `
-                            <img src="/path/to/default-profile.jpg" alt="Friend" class="w-12 h-12 rounded-full object-cover">
+                            <img src="${contact.image_url}" alt="${contact.name}" class="w-12 h-12 rounded-full object-cover">
                             <div>
-                                <p class="font-semibold text-gray-800">${friendItem.querySelector('span').innerText}</p>
+                                <p class="font-semibold text-gray-800">${contact.name}</p>
                             </div>
                         `;
-                        conversationList.appendChild(newContact);
-
-                        // Set the current contact and initialize the conversation box
-                        currentContactId = friendId;
-                        messageList.innerHTML = ""; // Clear messages
-                        messagePanel.querySelector("#placeholder").classList.add("hidden");
-                        messageList.classList.remove("hidden");
-                        messageInputPanel.classList.remove("hidden");
-
-                        // Trigger click to refresh UI
+    
+                        const conversationList = document.getElementById("conversation-list");
+                        conversationList.prepend(newContact); 
+    
+                        
+                        newConversationModal.classList.add("hidden");
+    
                         newContact.click();
                     }
                 } catch (error) {
@@ -210,6 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
-    }
+    }    
 });
 
