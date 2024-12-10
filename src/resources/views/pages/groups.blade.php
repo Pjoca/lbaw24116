@@ -1,8 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
+
+    
+    
     <div class="container mx-auto py-4">
         
+        @if(Auth::check())
+        @include('modals.create-group-modal')
+        <div class="max-w-5xl mx-auto flex justify-end mb-4">
+            <button 
+                onclick="openModal('create-group-modal')" 
+                class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg"
+            >
+                + Create Group
+            </button>
+        </div>
+        @endif
+
         <!-- Tab Navigation Bar -->
         <div class="max-w-5xl mx-auto shadow-lg rounded-lg pt-2  mb-4">
             <div class="flex justify-center">
@@ -23,6 +38,7 @@
                 </button>
             </div>
         </div>
+        
 
         <!-- Your Groups Section -->
         <div id="your-groups-section" class="max-w-5xl mx-auto">

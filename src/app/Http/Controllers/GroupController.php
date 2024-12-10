@@ -95,27 +95,36 @@ public function index(Request $request)
 }
 
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'visibility' => 'required|in:public,private',
-            'image_url' => 'nullable|url',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'visibility' => 'required|in:public,private',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image
+    ]);
 
-        $group = Group::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'visibility' => $request->visibility,
-            'image_url' => $request->image_url,
-            'id_owner' => Auth::id(),
-            'created_at' => now(),
-        ]);
-
-        return redirect()->route('groups.show', $group->id)
-            ->with('success', 'Group created successfully!');
+    // Handle image upload
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('group-images', 'public');
     }
+
+    Log::info('Image path: ' . $imagePath);
+
+    $group = Group::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'visibility' => $request->visibility,
+        'image_url' => $imagePath,
+        'id_owner' => Auth::id(),
+        'created_at' => now(),
+    ]);
+
+    return redirect()->route('groups.show', $group->id)
+        ->with('success', 'Group created successfully!');
+}
+
 
 
     public function update(Request $request, $id)
