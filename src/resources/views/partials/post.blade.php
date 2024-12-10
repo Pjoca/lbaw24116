@@ -78,54 +78,65 @@
             {{ $post->likes->count() }} {{ Str::plural('like', $post->likes->count()) }}
         </span>
     </div>
-
+@php
+    // Carrega os primeiros 3 comentários ordenados por ID (ascendente)
+    $initialComments = $post->comments()->orderBy('id', 'asc')->take(3)->get();
+    $totalComments = $post->comments()->count();
+@endphp
     <!-- Seção de Comentários -->
-    <div class="mt-6">
-        <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
+<div class="mt-6">
+    <h3 class="text-lg font-semibold text-gray-800">Comments</h3>
 
-        <div id="comments-section-{{ $post->id }}" class="mt-4 overflow-y-auto max-h-[400px] p-2">
-            @foreach($post->comments as $comment)
-                <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-{{ $comment->id }}">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
-                            <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
-                        </div>
-
-                        @if(Auth::check() && Auth::id() === $comment->id_user)
-                            <div class="flex space-x-2">
-                                <button type="button" onclick="openInlineEdit({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                                <button onclick="deleteComment({{ $comment->id }})" class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash-alt"></i> Excluir
-                                </button>
-                            </div>
-                        @endif
+    <div id="comments-section-{{ $post->id }}" class="mt-4 overflow-y-auto max-h-[400px] p-2">
+        @foreach($initialComments as $comment)
+            <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-{{ $comment->id }}">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
+                        <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
                     </div>
-                    <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
-                    <form id="editForm-{{ $comment->id }}" class="hidden mt-2" onsubmit="saveInlineEdit(event, {{ $comment->id }})">
-                        @csrf
-                        @method('PUT')
-                        <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
-                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+
+                    @if(Auth::check() && Auth::id() === $comment->id_user)
+                        <div class="flex space-x-2">
+                            <button type="button" onclick="openInlineEdit({{ $comment->id }}, '{{ addslashes($comment->content) }}')" class="text-blue-500 hover:text-blue-700">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button onclick="deleteComment({{ $comment->id }})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash-alt"></i> Excluir
+                            </button>
                         </div>
-                    </form>
+                    @endif
                 </div>
-            @endforeach
-        </div>
-
-        @auth
-            <form action="{{ route('comments.store', $post->id) }}" method="POST" class="mt-4 comment-form">
-                @csrf
-                <textarea name="content" class="w-full p-3 border rounded-lg" placeholder="Write a comment..." required></textarea>
-                <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg mt-2">Comment</button>
-            </form>
-        @endauth
-
+                <p class="mt-2 text-gray-700" id="commentContent-{{ $comment->id }}">{{ $comment->content }}</p>
+                <form id="editForm-{{ $comment->id }}" class="hidden mt-2" onsubmit="saveInlineEdit(event, {{ $comment->id }})">
+                    @csrf
+                    @method('PUT')
+                    <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-{{ $comment->id }}"></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button type="button" onclick="cancelInlineEdit({{ $comment->id }})" class="mr-2 text-gray-600">Cancelar</button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        @endforeach
     </div>
+
+    @if($totalComments > 3)
+        <button id="load-more-comments-{{ $post->id }}" data-post-id="{{ $post->id }}" data-page="2" class="mt-2 px-4 py-2 bg-gray-200 rounded">
+            Load More
+        </button>
+    @endif
+
+    @auth
+        <form action="{{ route('comments.store', $post->id) }}" method="POST" class="mt-4 comment-form">
+            @csrf
+            <textarea name="content" class="w-full p-3 border rounded-lg" placeholder="Escreva um comentário..." required></textarea>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg mt-2">Comentar</button>
+        </form>
+    @endauth
+
+</div>
+
     @vite('resources/js/comments.js')
 </article>
 </body>

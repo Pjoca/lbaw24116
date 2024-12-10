@@ -92,4 +92,39 @@ class CommentController extends Controller
     ]);
 }
 
+public function loadComments(Request $request, $postId)
+    {
+        $page = $request->input('page', 1);
+        $perPage = 3;
+
+        // Ordena pelos IDs dos comentários para manter a ordem de criação (assumindo que IDs crescentes correspondem a comentários mais recentes)
+        $comments = Comment::where('id_post', $postId)
+                          ->orderBy('id', 'asc') // Você pode mudar para 'desc' se preferir a ordem inversa
+                          ->skip(($page - 1) * $perPage)
+                          ->take($perPage)
+                          ->get();
+
+        // Formata os comentários para a resposta JSON
+        $formattedComments = $comments->map(function($comment) {
+            return [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'user_name' => $comment->user->name,
+                'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
+                'editable' => (Auth::check() && Auth::id() === $comment->id_user),
+            ];
+        });
+
+        // Verifica se existem mais comentários para carregar
+        $totalComments = Comment::where('id_post', $postId)->count();
+        $loadedComments = $page * $perPage;
+        $hasMore = $loadedComments < $totalComments;
+
+        return response()->json([
+            'success' => true,
+            'comments' => $formattedComments,
+            'hasMore' => $hasMore,
+        ]);
+    }
+
 }

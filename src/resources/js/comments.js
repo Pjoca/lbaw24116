@@ -151,6 +151,13 @@ document.querySelectorAll('form.comment-form').forEach(commentForm => {
                 commentSection.appendChild(newComment);
                 // Limpa o campo do comentário
                 commentForm.querySelector('textarea[name="content"]').value = '';
+
+                // Atualiza o botão "Load More" se necessário
+                const loadMoreButton = document.getElementById(`load-more-comments-${postId}`);
+                if (loadMoreButton) {
+                    // Opcional: Incrementar a contagem total de comentários
+                    // Aqui, assumimos que o backend lida com isso corretamente
+                }
             } else {
                 alert('Falha ao adicionar comentário.');
             }
@@ -158,5 +165,75 @@ document.querySelectorAll('form.comment-form').forEach(commentForm => {
             console.error('Erro ao adicionar o comentário:', error);
             alert('Ocorreu um erro ao adicionar o comentário. Tente novamente.');
         }
+    });
+});
+
+// Função para carregar mais comentários
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('button[id^="load-more-comments-"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            let page = parseInt(this.dataset.page, 10);
+
+            fetch(`/posts/${postId}/comments?page=${page}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const commentsSection = document.getElementById(`comments-section-${postId}`);
+                    data.comments.forEach(comment => {
+                        const newComment = document.createElement("div");
+                        newComment.classList.add("bg-gray-100", "p-4", "rounded-lg", "mb-2");
+                        newComment.id = `comment-${comment.id}`;
+                        newComment.innerHTML = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="${comment.user_image}" class="w-8 h-8 rounded-full mr-3">
+                                    <span class="font-semibold text-gray-800">${comment.user_name}</span>
+                                </div>
+                                ${comment.editable ? `
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="openInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button onclick="deleteComment(${comment.id})" class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash-alt"></i> Excluir
+                                    </button>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <p class="mt-2 text-gray-700" id="commentContent-${comment.id}">${comment.content}</p>
+                            <form id="editForm-${comment.id}" class="hidden mt-2" onsubmit="saveInlineEdit(event, ${comment.id})">
+                                <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-${comment.id}"></textarea>
+                                <div class="flex justify-end mt-2">
+                                    <button type="button" onclick="cancelInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
+                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+                                </div>
+                            </form>
+                        `;
+                        commentsSection.appendChild(newComment);
+                    });
+
+                    if (data.hasMore) {
+                        // Atualiza o número da página para a próxima requisição
+                        button.dataset.page = page + 1;
+                    } else {
+                        // Remove o botão "Load More" se não houver mais comentários
+                        button.remove();
+                    }
+                } else {
+                    alert('Falha ao carregar mais comentários.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar mais comentários:', error);
+                alert('Ocorreu um erro ao carregar mais comentários. Tente novamente.');
+            });
+        });
     });
 });
