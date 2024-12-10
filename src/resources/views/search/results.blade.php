@@ -4,6 +4,11 @@
 
     <div class="relative">
         <form id="search-form" action="{{ route('users.search') }}" method="GET" class="flex gap-2">
+            <select name="type" class="border border-gray-300 rounded-lg px-4 py-2 text-sm">
+                <option value="all">All</option>
+                <option value="users">Users</option>
+                <option value="groups">Groups</option>
+            </select>
                 <input 
                     type="text" 
                     id="search-query"
@@ -28,6 +33,7 @@
         <h2 class="text-xl font-bold mb-4">Search Results for "{{ $query }}"</h2>
         @if($users->isEmpty())
             <p class="text-gray-500">No users found matching your search.</p>
+
         @else
             <ul class="divide-y divide-gray-200 w-full max-w-2xl">
                 @foreach($users as $user)
