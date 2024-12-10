@@ -151,7 +151,8 @@ Route::post('/messages/start-conversation', [MessageController::class, 'startCon
 Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
 Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
 
-Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+// Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::post('/comments/{postId}', [CommentController::class, 'store'])->name('comments.store');
 Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
