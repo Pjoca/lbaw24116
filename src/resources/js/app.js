@@ -333,7 +333,7 @@ addEventListeners();
 
 
 function toggleSidebar() {
-    const sidebar = document.getElementById('friend-requests-sidebar');
+    const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('-translate-x-full');
 }
 
@@ -471,3 +471,69 @@ async function rejectFriendRequest(requestId) {
 
 window.acceptFriendRequest = acceptFriendRequest;
 window.rejectFriendRequest = rejectFriendRequest;
+
+
+
+async function acceptGroupInvite(inviteId) {
+    try {
+        const response = await fetch(`/groups/invite/${inviteId}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to accept invite');
+        }
+
+        const data = await response.json();
+
+        // Remove the invite dynamically
+        const inviteElement = document.querySelector(`#group-invites-list li[data-invite-id="${inviteId}"]`);
+        if (inviteElement) {
+            inviteElement.remove();
+        }
+
+        window.showFeedbackMessage('green', data.success || 'Invite accepted successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', error.message || 'An error occurred while accepting the invite.');
+    }
+}
+
+// Function to reject a group invite
+async function rejectGroupInvite(inviteId) {
+    try {
+        const response = await fetch(`/groups/invite/${inviteId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to reject invite');
+        }
+
+        const data = await response.json();
+
+        // Remove the invite dynamically
+        const inviteElement = document.querySelector(`#group-invites-list li[data-invite-id="${inviteId}"]`);
+        if (inviteElement) {
+            inviteElement.remove();
+        }
+
+        window.showFeedbackMessage('green', data.success || 'Invite rejected successfully!');
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', error.message || 'An error occurred while rejecting the invite.');
+    }
+}
+
+window.acceptGroupInvite = acceptGroupInvite;
+window.rejectGroupInvite = rejectGroupInvite;

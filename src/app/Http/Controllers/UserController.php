@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\Models\Post;
 use App\Models\FriendshipRequest;
+use App\Models\GroupMembershipRequest;
 
 class UserController extends Controller
 {
@@ -61,12 +63,22 @@ class UserController extends Controller
         }
     }
 
-    // Fetch friend requests only for the profile owner
+    // Fetch friend requests and group invites only for the profile owner
     $friendRequests = [];
+    $groupInvites = [];
     if ($isOwnProfile) {
         $friendRequests = FriendshipRequest::where('id_receiver', Auth::id())
             ->with('sender') // Load sender details
             ->get();
+
+        $groupInvites = GroupMembershipRequest::where('id_user', Auth::id())
+            ->where('is_invite', true)
+            ->where('request_status', 'pending')
+            ->with('group') // Load group details
+            ->get();
+
+        // Log the group invites for debugging
+        Log::info('Group invites fetched:', ['groupInvites' => $groupInvites->toArray()]);
     }
 
     return view('pages.profile', [
@@ -77,53 +89,60 @@ class UserController extends Controller
         'hasIncomingFriendRequest' => $hasIncomingFriendRequest,
         'incomingFriendRequestId' => $incomingFriendRequestId,
         'friendRequests' => $friendRequests, // Pass friend requests
+        'groupInvites' => $groupInvites, // Pass group invites
     ]);
 }
+
+
 
 
     /**
      * Search users.
      */
-/**
- * Search users.
- */
-public function search(Request $request)
+    public function search(Request $request)
 {
-    $query = $request->input('query');
+    $query = $request->input('query'); // Capture query input
+    $type = $request->input('type');
     $limit = $request->input('limit', null);
 
-    $users = User::select('*')
-        ->selectRaw('
-            CASE
-                WHEN LOWER(name) = ? THEN 1
-                WHEN LOWER(name) LIKE ? THEN 2
-                WHEN LOWER(name) LIKE ? THEN 3
-                ELSE 4
-            END AS priority
-        ', [
-            strtolower($query),
-            strtolower($query) . '%',
-            '%' . strtolower($query) . '%',
-        ])
-        ->where(function ($q) use ($query) {
-            $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
-              ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
-              ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
-        });
+    // If no query is provided, return an empty collection
+    if (empty($query)) {
+        $users = collect(); // Empty collection
+    } 
+    else {
+        $users = User::select('*')
+            ->selectRaw('
+                CASE
+                    WHEN LOWER(name) = ? THEN 1
+                    WHEN LOWER(name) LIKE ? THEN 2
+                    WHEN LOWER(name) LIKE ? THEN 3
+                    ELSE 4
+                END AS priority
+            ', [
+                strtolower($query),
+                strtolower($query) . '%',
+                '%' . strtolower($query) . '%',
+            ])
+            ->where(function ($q) use ($query) {
+                $q->whereRaw('LOWER(name) = ?', [strtolower($query)])
+                  ->orWhereRaw('LOWER(name) LIKE ?', [strtolower($query) . '%'])
+                  ->orWhereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%']);
+            });
 
-    // Add visibility condition for guest users
-    if (!Auth::check()) {
-        $users->where('visibility', 'public');
+        // Add visibility condition for guest users
+        if (!Auth::check()) {
+            $users->where('visibility', 'public');
+        }
+
+        $users->orderBy('priority')
+              ->orderBy('name');
+
+        if ($limit) {
+            $users = $users->take($limit);
+        }
+
+        $users = $users->get();
     }
-
-    $users->orderBy('priority')
-          ->orderBy('name');
-
-    if ($limit) {
-        $users = $users->take($limit);
-    }
-
-    $users = $users->get();
 
     if ($request->ajax()) {
         // Return the partial only
@@ -212,6 +231,5 @@ public function search(Request $request)
 
         return view('pages.edit', compact('user'));
     }
-
 
 }

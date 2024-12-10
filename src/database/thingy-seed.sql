@@ -82,6 +82,7 @@ CREATE TABLE friendship_request (
 CREATE TABLE "group" (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    image_url TEXT,
     description TEXT,
     visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
     created_at DATE DEFAULT CURRENT_DATE,
@@ -92,9 +93,18 @@ CREATE TABLE group_membership (
     id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
     id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
     joined_at DATE DEFAULT CURRENT_DATE,
-    PRIMARY KEY (id_user, id_group),
-    group_status group_membership_type NOT NULL DEFAULT 'pending'
+    PRIMARY KEY (id_user, id_group)
 );
+
+CREATE TABLE group_membership_request (
+    id SERIAL PRIMARY KEY,
+    id_user INT REFERENCES "user"(id) ON DELETE CASCADE,
+    id_group INT REFERENCES "group"(id) ON DELETE CASCADE,
+    request_status group_membership_type NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+    requested_at DATE DEFAULT CURRENT_DATE,
+    is_invite BOOLEAN DEFAULT FALSE -- Distinguishes invites from user requests
+);
+
 
 CREATE TABLE post (
     id SERIAL PRIMARY KEY,
@@ -330,6 +340,24 @@ EXECUTE FUNCTION trg_update_last_login_func();
 
 -----------------------
 
+CREATE OR REPLACE FUNCTION add_owner_to_membership()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insert the owner into the group_membership table
+    INSERT INTO group_membership (id_user, id_group, joined_at)
+    VALUES (NEW.id_owner, NEW.id, CURRENT_DATE);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER after_group_insert
+AFTER INSERT ON "group"
+FOR EACH ROW
+EXECUTE FUNCTION add_owner_to_membership();
+
+----------------------
+
 
 CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
 RETURNS TRIGGER AS $$
@@ -432,6 +460,28 @@ BEFORE INSERT ON friendship_request
 FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_friendship_request();
 
+
+------------
+
+CREATE OR REPLACE FUNCTION trg_check_unique_group_request()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM group_membership_request 
+        WHERE id_user = NEW.id_user AND id_group = NEW.id_group
+    ) THEN
+        RAISE EXCEPTION 'Group membership request already exists for this user and group';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_unique_group_request
+BEFORE INSERT ON group_membership_request
+FOR EACH ROW
+EXECUTE FUNCTION trg_check_unique_group_request();
 
 ------------
 
@@ -557,7 +607,7 @@ VALUES
 -- Insert groups
 INSERT INTO "group" (name, description, visibility, id_owner)
 VALUES 
-('Hiking Enthusiasts', 'A group for people who love hiking.', 'public', 1),
+('Hiking Enthusiasts', 'A group for people who love hiking.', 'private', 1),
 ('Book Club', 'Discussing our favorite books.', 'private', 2),
 ('Music Lovers', 'Sharing music recommendations.', 'public', 3),
 ('Movie Buffs', 'Discussing favorite movies.', 'public', 4),
@@ -567,27 +617,61 @@ VALUES
 ('Tech Geeks', 'Discussing latest in tech.', 'public', 8),
 ('Gaming Squad', 'Playing and discussing games.', 'private', 9),
 ('Art Enthusiasts', 'Discussing art and exhibitions.', 'public', 10),
-('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14);
+('Super Dragões', 'Grupo de apoio ao FC Porto', 'public', 14),
+('Politica', 'Grupo de discussão política', 'public', 15),
+('Benfica', 'Grupo de apoio ao Benfica', 'public', 14),
+('Sporting', 'Grupo de apoio ao Sporting', 'public', 14),
+('Portimonense', 'Grupo de apoio ao Portimonense', 'public', 14),
+('Boavista', 'Grupo de apoio ao Boavista', 'public', 14),
+('Braga', 'Grupo de apoio ao Braga', 'public', 14),
+('Famalicão', 'Grupo de apoio ao Famalicão', 'public', 14),
+('Gil Vicente', 'Grupo de apoio ao Gil Vicente', 'public', 14),
+('Marítimo', 'Grupo de apoio ao Marítimo', 'public', 14),
+('Moreirense', 'Grupo de apoio ao Moreirense', 'public', 14),
+('Nacional', 'Grupo de apoio ao Nacional', 'public', 14),
+('P. Ferreira', 'Grupo de apoio ao P. Ferreira', 'public', 14),
+('Santa Clara', 'Grupo de apoio ao Santa Clara', 'public', 14),
+('Tondela', 'Grupo de apoio ao Tondela', 'public', 14),
+('V. Guimarães', 'Grupo de apoio ao V. Guimarães', 'public', 14),
+('V. Setúbal', 'Grupo de apoio ao V. Setúbal', 'public', 14);
 
 -- Insert group memberships
-INSERT INTO group_membership (id_user, id_group, group_status)
+INSERT INTO group_membership (id_user, id_group, joined_at)
 VALUES 
-(1, 1, 'accepted'),
-(2, 1, 'pending'),
-(3, 2, 'accepted'),
-(4, 3, 'accepted'),
-(5, 4, 'accepted'),
-(6, 5, 'pending'),
-(7, 6, 'accepted'),
-(8, 7, 'accepted'),
-(9, 8, 'accepted'),
-(10, 9, 'pending'),
-(11, 10, 'accepted'),
-(12, 11, 'accepted'),
-(13, 11, 'accepted'),
-(14, 11, 'accepted'),
-(15, 11, 'accepted'),
-(16, 11, 'accepted');
+    (3, 2, CURRENT_DATE),
+    (4, 3, CURRENT_DATE),
+    (6, 5, CURRENT_DATE),
+    (7, 6, CURRENT_DATE),
+    (8, 7, CURRENT_DATE),
+    (10, 9, CURRENT_DATE),
+    (11, 10, CURRENT_DATE),
+    (12, 11, CURRENT_DATE),
+    (16, 11, CURRENT_DATE),
+    (2,1, CURRENT_DATE),
+    (3,1, CURRENT_DATE),
+    (4,1, CURRENT_DATE),
+    (5,1, CURRENT_DATE),
+    (6,1, CURRENT_DATE),
+    (7,1, CURRENT_DATE);
+
+
+INSERT INTO group_membership_request (id_user, id_group, request_status, requested_at, is_invite)
+VALUES 
+    (5, 4, 'pending', CURRENT_DATE,FALSE),
+    (9, 8, 'pending', CURRENT_DATE,FALSE),
+    (13, 11, 'pending', CURRENT_DATE,FALSE),
+    (14, 11, 'pending', CURRENT_DATE,FALSE),
+    (15, 10, 'rejected', CURRENT_DATE,FALSE),
+    (16, 2, 'pending', CURRENT_DATE,FALSE),
+    (8,1,'pending',CURRENT_DATE,FALSE),
+    (9,1,'pending',CURRENT_DATE,FALSE),
+    (10,1,'pending',CURRENT_DATE,FALSE),
+    (11,1,'pending',CURRENT_DATE,TRUE),
+    (12,1,'pending',CURRENT_DATE,TRUE),
+    (13,1,'pending',CURRENT_DATE,TRUE),
+    (14,1,'pending',CURRENT_DATE,TRUE),
+    (15,1,'pending',CURRENT_DATE,TRUE),
+    (16,1,'pending',CURRENT_DATE,TRUE);
 
 -- Insert posts
 INSERT INTO post (content, visibility, id_user, id_group, image_url)
