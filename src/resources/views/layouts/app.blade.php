@@ -14,7 +14,7 @@
         @vite('resources/js/app.js')
         @include('components.alert')
         <main class="p-4">
-            <!-- Header -->
+            <!--  Header -->
             <header class="flex flex-col md:flex-row justify-between items-center bg-teal-400 text-white p-4 rounded-lg mb-6">
                 <h1>
                     <a href="{{ url('/timeline') }}" class="text-xl font-bold uppercase hover:text-teal-300 transition">
@@ -30,7 +30,7 @@
                                         type="text" 
                                         id="search-query"
                                         name="query" 
-                                        placeholder="Search" 
+                                        placeholder="Quick Search" 
                                         class="w-full bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-teal-400 focus:outline-none placeholder-gray-500" 
                                         autocomplete="off" 
                                         required>
@@ -40,6 +40,11 @@
                                 </div>
                             </div>
                         </li>
+                        <li>
+                                <a href="{{ route('users.search') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
+                                    Search
+                                </a>
+                            </li>
                         @if (Auth::check())
                             <li>
                                 <a href="{{ route('groups.index') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
