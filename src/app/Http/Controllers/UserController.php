@@ -102,6 +102,7 @@ class UserController extends Controller
     public function search(Request $request)
 {
     $query = $request->input('query'); // Capture query input
+    $type = $request->input('type');
     $limit = $request->input('limit', null);
 
     // If no query is provided, return an empty collection
@@ -230,6 +231,5 @@ class UserController extends Controller
 
         return view('pages.edit', compact('user'));
     }
-
 
 }
