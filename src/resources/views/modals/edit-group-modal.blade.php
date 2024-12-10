@@ -1,0 +1,65 @@
+<div id="edit-group-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+        <h2 class="text-2xl font-bold mb-4">Edit Group</h2>
+
+        <!-- Close Modal Button -->
+        <button onclick="closeModal('edit-group-modal')" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Form -->
+        <form id="edit-group-form" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+
+            <!-- Name -->
+            <div class="mb-4">
+                <label for="edit-group-name" class="block font-bold mb-2">Group Name</label>
+                <input type="text" id="edit-group-name" name="name" 
+                       class="w-full border border-gray-300 rounded p-2" required>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <label for="edit-group-description" class="block font-bold mb-2">Description</label>
+                <textarea id="edit-group-description" name="description" 
+                          class="w-full border border-gray-300 rounded p-2" required></textarea>
+            </div>
+
+            <!-- Visibility -->
+            <div class="mb-4">
+                <label for="edit-group-visibility" class="block font-bold mb-2">Visibility</label>
+                <select id="edit-group-visibility" name="visibility" 
+                        class="w-full border border-gray-300 rounded p-2" required>
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+
+            <!-- Group Image -->
+            <div class="mb-4">
+                <label for="image" class="block font-bold mb-2">Group Image</label>
+
+                <!-- Image Input -->
+                <input type="file" id="image" name="image" accept="image/*" 
+                       class="w-full border border-gray-300 rounded p-2">
+                
+                <!-- Image Preview Container -->
+                <div id="preview-container" class="mt-4 hidden">
+                    <p class="font-semibold mb-2">Image Preview</p>
+                    <img id="preview-image" src="#" 
+                         class="w-32 h-32 rounded-full border border-gray-200 object-cover">
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-right">
+                <button type="submit" class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

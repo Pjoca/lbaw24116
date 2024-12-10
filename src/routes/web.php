@@ -122,6 +122,8 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
 Route::controller(GroupController::class)->middleware('auth')->group(function () {
     Route::get('/groups/{id}', 'show')->name('groups.show');
     Route::get('/groups', 'index')->name('groups.index');
+    Route::post('/groups', 'store')->name('groups.store');
+    Route::put('/groups/{id}',  'update')->name('groups.update');
 });
 
 

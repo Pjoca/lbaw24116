@@ -23,12 +23,26 @@ class GroupMembershipController extends Controller
         $group = Group::findOrFail($groupId);
 
         // Check if the user is already a member or has a pending request
-        if (GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists() ||
-            GroupMembershipRequest::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
-            return response()->json(['error' => 'Already a member or request pending'], 400);
+        if (GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
+            return response()->json(['error' => 'You are already a member of this group'], 400);
         }
 
-        // Create a membership request
+        if (GroupMembershipRequest::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
+            return response()->json(['error' => 'Membership request is already pending'], 400);
+        }
+
+        if ($group->visibility === 'public') {
+            // Automatically create the membership if the group is public
+            GroupMembership::create([
+                'id_user' => $user->id,
+                'id_group' => $groupId,
+                'joined_at' => now(),
+            ]);
+
+            return response()->json(['success' => 'You have successfully joined the group', 'reload' => true], 200);
+        }
+
+        // Create a membership request for private groups
         GroupMembershipRequest::create([
             'id_user' => $user->id,
             'id_group' => $groupId,
@@ -281,20 +295,13 @@ public function getMembers(Request $request, $groupId)
 {
     $group = Group::findOrFail($groupId);
 
-    $user = Auth::user();
-    if ($group->id_owner !== $user->id && !GroupMembership::where('id_user', $user->id)->where('id_group', $groupId)->exists()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
-
-    $query = GroupMembership::where('id_group', $groupId)
-        ->where('id_user', '!=', $group->id_owner)
-        ->with('user')
-        ->orderBy('joined_at', 'desc');
-
-    $members = $query->simplePaginate(5);
+    $members = GroupMembership::where('id_group', $groupId)
+        ->with('user') // Assuming the GroupMembership model has a 'user' relationship
+        ->orderBy('joined_at', 'desc')
+        ->simplePaginate(5); // Load 10 members at a time
 
     return response()->json([
-        'html' => view('partials.members-renderer', compact('members', 'group'))->render(),
+        'html' => view('partials.members-renderer', ['members' => $members, 'group' => $group])->render(),
         'hasMorePages' => $members->hasMorePages(),
         'nextPageUrl' => $members->nextPageUrl()
     ]);

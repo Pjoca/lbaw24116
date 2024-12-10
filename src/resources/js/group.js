@@ -9,17 +9,24 @@ async function joinGroup(groupId) {
         });
 
         if (!response.ok) throw new Error('Failed to join group');
+
         const data = await response.json();
 
-        // Update the button dynamically
+        if (data.reload) {
+            // If reload is true, reload the page to reflect changes
+            window.location.reload();
+            return;
+        }
+
+        // Update the button dynamically if membership request is sent
         const button = document.querySelector(`[data-group-id="${groupId}"]`);
         if (button) {
             button.textContent = 'Cancel Membership Request';
-            button.className = 'bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 transition';
+            button.className = 'bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition';
             button.setAttribute('onclick', `cancelMembershipRequest(${groupId})`);
         }
 
-        window.showFeedbackMessage('green', 'Membership request sent successfully!');
+        window.showFeedbackMessage('green', data.success);
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while sending the membership request.');
@@ -27,38 +34,6 @@ async function joinGroup(groupId) {
 }
 
 window.joinGroup = joinGroup;
-
-
-async function leaveGroup(groupId) {
-    try {
-        const response = await fetch(`/groups/${groupId}/leave`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-        });
-
-        if (!response.ok) throw new Error('Failed to leave group');
-        const data = await response.json();
-
-        // Update the button dynamically
-        const button = document.querySelector(`[data-group-id="${groupId}"]`);
-        if (button) {
-            button.textContent = 'Request to Join';
-            button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
-            button.setAttribute('onclick', `joinGroup(${groupId})`);
-        }
-
-        window.showFeedbackMessage('green', 'Successfully left the group!');
-        location.reload();
-    } catch (error) {
-        console.error(error);
-        window.showFeedbackMessage('red', 'An error occurred while leaving the group.');
-    }
-}
-
-window.leaveGroup = leaveGroup;
 
 
 async function cancelMembershipRequest(groupId) {
@@ -78,7 +53,7 @@ async function cancelMembershipRequest(groupId) {
         const button = document.querySelector(`[data-group-id="${groupId}"]`);
         if (button) {
             button.textContent = 'Request to Join';
-            button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
+            button.className = 'bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition';
             button.setAttribute('onclick', `joinGroup(${groupId})`);
         }
 
@@ -90,6 +65,30 @@ async function cancelMembershipRequest(groupId) {
 }
 
 window.cancelMembershipRequest = cancelMembershipRequest;
+
+
+async function leaveGroup(groupId) {
+    try {
+        const response = await fetch(`/groups/${groupId}/leave`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to leave group');
+        const data = await response.json();
+
+        window.showFeedbackMessage('green', 'Successfully left the group!');
+        window.location.reload();
+    } catch (error) {
+        console.error(error);
+        window.showFeedbackMessage('red', 'An error occurred while leaving the group.');
+    }
+}
+
+window.leaveGroup = leaveGroup;
 
 // Function to accept a membership request
 async function acceptMembershipRequest(requestId) {
@@ -327,47 +326,9 @@ function closeModal(modalId) {
     modal.classList.add('hidden');
 }
 
-function loadMoreMembers(groupId) {
-    const modal = document.getElementById('members-modal');
-    const nextPageUrl = modal.getAttribute('data-next-page-url');
-
-    // Debugging step 1: Log the nextPageUrl
-    console.log('Fetching members from:', nextPageUrl);
-
-    if (!nextPageUrl) {
-        console.error('No nextPageUrl found');
-        return;
-    }
-
-    fetch(nextPageUrl, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-        .then(response => {
-            console.log('Response status:', response.status); // Log response status
-            return response.text(); // Parse as text first
-        })
-        .then(data => {
-            console.log('Raw response:', data); // Log raw response
-            const jsonData = JSON.parse(data); // Attempt to parse as JSON
-            const membersList = document.getElementById('members-list');
-            membersList.insertAdjacentHTML('beforeend', jsonData.html);
-    
-            if (jsonData.hasMorePages) {
-                modal.setAttribute('data-next-page-url', jsonData.nextPageUrl);
-            } else {
-                document.getElementById('load-more-members').remove();
-            }
-        })
-        .catch(error => console.error('Error loading members:', error));
-}
-
-
 
 window.openModal = openModal;
 window.closeModal = closeModal;
-window.loadMoreMembers = loadMoreMembers;
 
 
 function loadMoreJoinRequests(groupId) {
@@ -436,43 +397,6 @@ function loadMoreInvites(groupId) {
 window.loadMoreInvites = loadMoreInvites;
 
 
-async function loadInitialMembers(groupId) {
-    const modal = document.getElementById('members-modal');
-    const membersList = document.getElementById('members-list');
-    const loadMoreButtonContainer = modal.querySelector('.mt-4');
-    let loadMoreButton = document.getElementById('load-more-members');
-
-    try {
-        const response = await fetch(`/groups/${groupId}/members`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        });
-
-        if (!response.ok) throw new Error('Failed to fetch members.');
-
-        const data = await response.json();
-        membersList.innerHTML = data.html;
-        modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
-
-        if (data.hasMorePages) {
-            if (!loadMoreButton) {
-                loadMoreButton = document.createElement('button');
-                loadMoreButton.id = 'load-more-members';
-                loadMoreButton.textContent = 'Load More';
-                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
-                loadMoreButton.onclick = () => loadMoreMembers(groupId);
-                loadMoreButtonContainer.appendChild(loadMoreButton);
-            } else {
-                loadMoreButton.classList.remove('hidden');
-            }
-        } else if (loadMoreButton) {
-            loadMoreButton.classList.add('hidden');
-        }
-    } catch (error) {
-        console.error('Error loading members:', error.message);
-    }
-}
-
-
 
 
 
@@ -490,7 +414,14 @@ async function loadInitialJoinRequests(groupId) {
         if (!response.ok) throw new Error('Failed to fetch join requests.');
 
         const data = await response.json();
-        requestsList.innerHTML = data.html;
+        requestsList.innerHTML = ''; // Clear old content
+
+        if (!data.html || data.html.trim() === '') {
+            requestsList.innerHTML = `<p class="text-gray-500 text-center">No join requests yet.</p>`;
+        } else {
+            requestsList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
+
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
         if (data.hasMorePages) {
@@ -513,7 +444,6 @@ async function loadInitialJoinRequests(groupId) {
 }
 
 
-
 async function loadInitialInvites(groupId) {
     const modal = document.getElementById('invites-modal');
     const invitesList = document.getElementById('invites-list');
@@ -528,7 +458,14 @@ async function loadInitialInvites(groupId) {
         if (!response.ok) throw new Error('Failed to fetch invites.');
 
         const data = await response.json();
-        invitesList.innerHTML = data.html;
+        invitesList.innerHTML = ''; // Clear old content
+
+        if (!data.html || data.html.trim() === '') {
+            invitesList.innerHTML = `<p class="text-gray-500 text-center">No invites sent yet.</p>`;
+        } else {
+            invitesList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
+
         modal.setAttribute('data-next-page-url', data.nextPageUrl || '');
 
         if (data.hasMorePages) {
@@ -553,6 +490,268 @@ async function loadInitialInvites(groupId) {
 
 
 
-window.loadInitialMembers = loadInitialMembers;
 window.loadInitialJoinRequests = loadInitialJoinRequests;
 window.loadInitialInvites = loadInitialInvites;
+
+
+function showSection(section) {
+    const sections = {
+        'timeline': {
+            tab: document.getElementById('timeline-tab'),
+            section: document.getElementById('timeline-section')
+        },
+        'members': {
+            tab: document.getElementById('members-tab'),
+            section: document.getElementById('members-section')
+        },
+        'your-groups': {
+            tab: document.getElementById('your-groups-tab'),
+            section: document.getElementById('your-groups-section')
+        },
+        'explore-groups': {
+            tab: document.getElementById('explore-groups-tab'),
+            section: document.getElementById('explore-groups-section')
+        }
+    };
+
+    // Hide all sections and remove active class from tabs
+    Object.keys(sections).forEach(key => {
+        const tabElement = sections[key].tab;
+        const sectionElement = sections[key].section;
+
+        if (tabElement && sectionElement) {
+            sectionElement.classList.add('hidden');
+            tabElement.classList.add('border-gray-300');
+            tabElement.classList.remove('border-teal-500');
+        }
+    });
+
+    // Show the selected section and mark the corresponding tab as active
+    if (sections[section]) {
+        const { tab, section: sectionElement } = sections[section];
+        
+        if (sectionElement) sectionElement.classList.remove('hidden');
+        if (tab) {
+            tab.classList.add('border-teal-500');
+            tab.classList.remove('border-gray-300');
+        }
+    }
+}
+
+// Show the default section for each tab system
+document.addEventListener('DOMContentLoaded', function () {
+    // For the Timeline / Members tabs
+    const timelineSection = document.getElementById('timeline-section');
+    const membersSection = document.getElementById('members-section');
+    if (timelineSection && membersSection) {
+        showSection('timeline');
+    }
+
+    // For the Your Groups / Explore Groups tabs
+    const yourGroupsSection = document.getElementById('your-groups-section');
+    const exploreGroupsSection = document.getElementById('explore-groups-section');
+    if (yourGroupsSection && exploreGroupsSection) {
+        showSection('your-groups');
+    }
+});
+
+window.showSection = showSection;
+
+
+
+let nextPageUrlMembers = null;
+let isLoading = false;
+
+async function loadInitialMembers(groupId) {
+    console.log('loadInitialMembers called for groupId:', groupId);
+
+    const membersList = document.getElementById('members-list');
+    const loader = document.getElementById('members-loader');
+
+    if (!membersList) {
+        console.error('No element with id="members-list" found.');
+        return;
+    }
+
+    try {
+        console.log('Displaying loader');
+        loader.classList.remove('hidden');
+        
+        // Cache-busting URL to prevent stale responses
+        const fetchUrl = `/groups/${groupId}/members?timestamp=${new Date().getTime()}`;
+        console.log('Fetching members from URL:', fetchUrl);
+
+        const response = await fetch(fetchUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        console.log(`Response status: ${response.status} - ${response.statusText}`);
+        
+        if (!response.ok) {
+            console.error('Network error occurred while fetching members:', response.statusText);
+            throw new Error(`Failed to fetch members. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Response JSON data:', data);
+
+        membersList.innerHTML = ''; // Clear old content
+
+        if (!data.html || data.html.trim() === '') {
+            console.warn('No members loaded. Empty response.');
+            membersList.innerHTML = `<p class="text-gray-500 text-center">No members in this group yet.</p>`;
+        } else {
+            console.log('Inserting new HTML into membersList');
+            membersList.insertAdjacentHTML('beforeend', data.html); // Insert new content
+        }
+
+        nextPageUrlMembers = data.nextPageUrl;
+
+        if (!data.hasMorePages) {
+            console.log('No more pages to load. Hiding loader.');
+            loader.classList.add('hidden');
+        } else {
+            console.log('There are more pages to load.');
+        }
+    } catch (error) {
+        console.error('Error loading members:', error.message);
+        console.error('Stack Trace:', error.stack);
+    } finally {
+        console.log('Hiding loader');
+        loader.classList.add('hidden');
+    }
+}
+
+async function loadMoreMembers(groupId) {
+    if (!nextPageUrlMembers || isLoading) return;
+
+    console.log('Loading more members from URL:', nextPageUrlMembers);
+    const membersList = document.getElementById('members-list');
+    const loader = document.getElementById('members-loader');
+
+    if (!membersList) {
+        console.error('No element with id="members-list" found.');
+        return;
+    }
+
+    try {
+        isLoading = true;
+        loader.classList.remove('hidden');
+
+        const response = await fetch(nextPageUrlMembers, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        if (!response.ok) {
+            console.error('Network error occurred while fetching more members:', response.statusText);
+            throw new Error(`Failed to fetch more members. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Response JSON data for more members:', data);
+
+        if (!data.html || data.html.trim() === '') {
+            console.warn('No more members loaded. Empty response.');
+            loader.classList.add('hidden');
+            return;
+        }
+
+        membersList.insertAdjacentHTML('beforeend', data.html); // Insert new members
+        nextPageUrlMembers = data.nextPageUrl;
+
+        if (!data.hasMorePages) {
+            console.log('No more pages to load.');
+            loader.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading more members:', error.message);
+        console.error('Stack Trace:', error.stack);
+    } finally {
+        loader.classList.add('hidden');
+        isLoading = false;
+    }
+}
+
+window.addEventListener('scroll', () => {
+    const membersSection = document.getElementById('members-section');
+    if (!membersSection || membersSection.classList.contains('hidden')) return;
+
+    const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+
+    if (nearBottom && nextPageUrlMembers) {
+        const groupId = document.getElementById('group-action-button').dataset.groupId;
+        loadMoreMembers(groupId);
+    }
+});
+
+
+window.loadInitialMembers = loadInitialMembers;
+window.loadMoreMembers = loadMoreMembers;
+
+
+
+async function openEditGroupModal(groupId) {
+    try {
+        const response = await fetch(`/groups/${groupId}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch group data');
+
+        const data = await response.json();
+        console.log('Group Data:', data);
+
+        // Populate the modal form fields with group data
+        document.getElementById('edit-group-name').value = data.name;
+        document.getElementById('edit-group-description').value = data.description;
+        document.getElementById('edit-group-visibility').value = data.visibility;
+
+        const previewImage = document.getElementById('preview-image');
+        const previewContainer = document.getElementById('preview-container');
+
+        if (data.image_url) {
+            const imageUrl = `${window.location.origin}/storage/${data.image_url}`;
+            previewImage.src = imageUrl;
+            previewContainer.classList.remove('hidden');
+        } else {
+            previewContainer.classList.add('hidden');
+            previewImage.src = '#';
+        }
+
+        // Show the modal
+        openModal('edit-group-modal');
+    } catch (error) {
+        console.error('Error fetching group data:', error);
+    }
+}
+
+// Function to handle form submission for group edit
+async function handleEditGroupSubmission(event, groupId) {
+    event.preventDefault();
+
+    const editGroupForm = document.getElementById('edit-group-form');
+    const formData = new FormData(editGroupForm); // Use FormData to handle file uploads
+
+    try {
+        const response = await fetch(`/groups/${groupId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('Failed to update group');
+
+        // Redirect to the updated group's page
+        window.location.href = `/groups/${groupId}`;
+    } catch (error) {
+        console.error('Error updating group:', error);
+    }
+}
+
+window.openEditGroupModal = openEditGroupModal;
+window.handleEditGroupSubmission = handleEditGroupSubmission;
