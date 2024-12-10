@@ -38,7 +38,18 @@ public function show($id)
     $hasRequestedMembership = GroupMembershipRequest::where('id_user', $user->id)
         ->where('id_group', $group->id)
         ->where('request_status', 'pending')
+        ->where('is_invite',false)
         ->exists();
+
+    // Check if the authenticated user has a pending invite
+    $invite = GroupMembershipRequest::where('id_user', $user->id)
+        ->where('id_group', $group->id)
+        ->where('request_status', 'pending')
+        ->where('is_invite', true)
+        ->first();
+
+    $hasInvite = !is_null($invite);
+    $inviteId = $invite ? $invite->id : null;
 
     // Check if the authenticated user is a member of the group
     $isMember = GroupMembership::where('id_user', $user->id)
@@ -54,9 +65,12 @@ public function show($id)
         'group',
         'isMember',
         'posts',
-        'hasRequestedMembership'
+        'hasRequestedMembership',
+        'hasInvite',
+        'inviteId'
     ));
 }
+
 
 
 public function index(Request $request)
