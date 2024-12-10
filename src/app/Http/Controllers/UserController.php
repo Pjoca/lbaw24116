@@ -92,10 +92,6 @@ class UserController extends Controller
         'groupInvites' => $groupInvites, // Pass group invites
     ]);
 }
-
-
-
-
     /**
      * Search users.
      */

@@ -47,8 +47,17 @@
             </ul>
         @endif    
         
-        @if(!$users->isEmpty())
-            <p class="text-gray-500"></p>
+        @if(!$groups->isEmpty())
+            <ul class="divide-y divide-gray-200 w-full max-w-2xl">
+                @foreach($groups as $group)
+                    <li class="py-4 flex items-center justify-between">
+                        <span class="font-medium">{{ $group->name }}</span>
+                        <a href="{{ route('groups.show', $group->id) }}" class="text-teal-600 hover:underline">
+                            View Group
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
 
         @else
             <p class="text-gray-500">Nothing found matching your search.</p>
