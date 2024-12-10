@@ -202,12 +202,13 @@ async function sendGroupInvite(groupId) {
         if (invitesList) {
             const newInviteItem = document.createElement('li');
             newInviteItem.className = 'flex items-center justify-between';
+            newInviteItem.id = `invite-${data.invite_id}`;
             newInviteItem.innerHTML = `
                 <span>${data.username}</span>
                 <div class="space-x-2">
                     <button onclick="cancelInvite(${data.invite_id})" 
                             class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
-                        Cancel Invite
+                        Cancel
                     </button>
                 </div>
             `;
