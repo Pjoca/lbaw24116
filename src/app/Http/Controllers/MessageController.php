@@ -60,37 +60,41 @@ public function startConversation(Request $request)
 }
 
 
-public function getMessages($contactId)
+public function getMessages(Request $request, $contactId)
 {
     $userId = Auth::id();
+    $perPage = 10;
+    $page = $request->input('page', 1);
 
-    try {
-        // Buscar mensagens entre o usuário autenticado e o contato fornecido
-        $messages = Message::where(function ($query) use ($userId, $contactId) {
-                $query->where('id_sender', $userId)
-                      ->where('id_receiver', $contactId);
-            })
-            ->orWhere(function ($query) use ($userId, $contactId) {
-                $query->where('id_sender', $contactId)
-                      ->where('id_receiver', $userId);
-            })
-            ->orderBy('created_at', 'asc')
-            ->get();
+    // Buscar mensagens entre o usuário autenticado e o contato
+    $query = Message::where(function ($query) use ($userId, $contactId) {
+            $query->where('id_sender', $userId)
+                  ->where('id_receiver', $contactId);
+        })
+        ->orWhere(function ($query) use ($userId, $contactId) {
+            $query->where('id_sender', $contactId)
+                  ->where('id_receiver', $userId);
+        })
+        ->orderBy('created_at', 'desc'); // Mensagens mais recentes primeiro
 
-        // Formatar as mensagens para JSON
-        $formattedMessages = $messages->map(function ($message) use ($userId) {
-            return [
-                'content' => $message->content,
-                'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
-                'created_at' => $message->created_at->format('Y-m-d H:i:s'),
-            ];
-        });
+    // Paginação das mensagens
+    $messages = $query->paginate($perPage, ['*'], 'page', $page);
 
-        return response()->json($formattedMessages);
-    } catch (\Exception $e) {
-        \Log::error('Failed to load messages: ' . $e->getMessage());
-        return response()->json(['error' => 'Failed to load messages'], 500);
-    }
+    // As mensagens estão em ordem decrescente, vamos revertê-las para mandar
+    // em ordem cronológica (da mais antiga para a mais recente)
+    $formattedMessages = collect($messages->items())->map(function ($message) use ($userId) {
+        return [
+            'content' => $message->content,
+            'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
+            'created_at' => $message->created_at->format('Y-m-d H:i:s'),
+        ];
+    })->reverse()->values();
+
+    return response()->json([
+        'data' => $formattedMessages,
+        'current_page' => $messages->currentPage(),
+        'last_page' => $messages->lastPage(),
+    ]);
 }
 
 
