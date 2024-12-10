@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="relative">
-        <form id="search-form" action="{{ route('users.search') }}" method="GET" class="flex gap-2">
+        <form id="search-form" action="{{ route('search') }}" method="GET" class="flex gap-2">
             <select name="type" class="border border-gray-300 rounded-lg px-4 py-2 text-sm">
                 <option value="users">Users</option>
                 <option value="groups">Groups</option>

@@ -13,6 +13,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\GroupMembershipController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
@@ -81,7 +82,9 @@ Route::controller(PostController::class)->group(function () {
 });
 
 // Search
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
+Route::get('/search/groups', [GroupController::class, 'search'])->name('groups.search');
 
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
