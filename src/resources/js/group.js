@@ -20,6 +20,7 @@ async function joinGroup(groupId) {
 
         // Update the button dynamically if membership request is sent
         const button = document.querySelector(`[data-group-id="${groupId}"]`);
+        console.log('Button:', button);
         if (button) {
             button.textContent = 'Cancel Membership Request';
             button.className = 'bg-gray-500 text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition';
@@ -704,7 +705,7 @@ async function openEditGroupModal(groupId) {
         const data = await response.json();
         console.log('Group Data:', data);
 
-        // Populate the modal form fields with group data
+
         document.getElementById('edit-group-name').value = data.name;
         document.getElementById('edit-group-description').value = data.description;
         document.getElementById('edit-group-visibility').value = data.visibility;
@@ -721,14 +722,13 @@ async function openEditGroupModal(groupId) {
             previewImage.src = '#';
         }
 
-        // Show the modal
+
         openModal('edit-group-modal');
     } catch (error) {
         console.error('Error fetching group data:', error);
     }
 }
 
-// Function to handle form submission for group edit
 async function handleEditGroupSubmission(event, groupId) {
     event.preventDefault();
 
@@ -746,7 +746,6 @@ async function handleEditGroupSubmission(event, groupId) {
 
         if (!response.ok) throw new Error('Failed to update group');
 
-        // Redirect to the updated group's page
         window.location.href = `/groups/${groupId}`;
     } catch (error) {
         console.error('Error updating group:', error);
@@ -755,3 +754,56 @@ async function handleEditGroupSubmission(event, groupId) {
 
 window.openEditGroupModal = openEditGroupModal;
 window.handleEditGroupSubmission = handleEditGroupSubmission;
+
+
+
+async function acceptInvite(inviteId) {
+    try {
+        const response = await fetch(`/groups/invite/${inviteId}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to accept invite');
+
+        const data = await response.json();
+
+        window.showFeedbackMessage('green', 'Invite accepted successfully!');
+
+        window.location.reload();
+    } catch (error) {
+        console.error('Error accepting invite:', error);
+        window.showFeedbackMessage('red', 'An error occurred while accepting the invite.');
+    }
+}
+
+window.acceptInvite = acceptInvite;
+
+
+async function rejectInvite(inviteId) {
+    try {
+        const response = await fetch(`/groups/invite/${inviteId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!response.ok) throw new Error('Failed to reject invite');
+
+        const data = await response.json();
+
+        window.showFeedbackMessage('green', 'Invite rejected successfully!');
+
+        window.location.reload();
+    } catch (error) {
+        console.error('Error rejecting invite:', error);
+        window.showFeedbackMessage('red', 'An error occurred while rejecting the invite.');
+    }
+}
+
+window.rejectInvite = rejectInvite;

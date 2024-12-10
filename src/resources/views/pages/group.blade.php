@@ -37,6 +37,7 @@
                     @if ($isMember)
                         <button 
                             type="button" 
+                            data-group-id="{{ $group->id }}"
                             id="group-action-button"
                             class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600 transition"
                             onclick="leaveGroup({{ $group->id }})">
@@ -45,14 +46,32 @@
                     @elseif ($hasRequestedMembership)
                         <button 
                             type="button" 
+                            data-group-id="{{ $group->id }}"
                             id="group-action-button"
-                            class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
+                            class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition7"
                             onclick="cancelMembershipRequest({{ $group->id }})">
                             Cancel Membership Request
                         </button>
+                    @elseif ($hasInvite)
+                        <div class="border-2 border-dashed border-gray-400 rounded-md px-5 py-3 bg-gray-50 text-center">
+                            <p class="text-gray-700 mb-3 text-base font-medium">
+                                You've been invited to join this group.
+                            </p>
+                            <div class="flex items-center justify-center space-x-4">
+                                <button type="button" onclick="acceptInvite({{ $inviteId }})" 
+                                        class="bg-green-500 text-white text-base px-4 py-2 rounded-md hover:bg-green-600 transition">
+                                    Accept
+                                </button>
+                                <button type="button" onclick="rejectInvite({{ $inviteId }})" 
+                                        class="bg-red-500 text-white text-base px-4 py-2 rounded-md hover:bg-red-600 transition">
+                                    Reject
+                                </button>
+                            </div>
+                        </div>
                     @else
                         <button 
                             type="button" 
+                            data-group-id="{{ $group->id }}"
                             id="group-action-button"
                             class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition"
                             onclick="joinGroup({{ $group->id }})">
