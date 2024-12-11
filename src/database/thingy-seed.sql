@@ -147,12 +147,10 @@ CREATE TABLE report (
 
 CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
-    seen BOOLEAN DEFAULT FALSE,
     created_at DATE DEFAULT CURRENT_DATE,
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_related_post INT REFERENCES post(id) ON DELETE CASCADE,
-    id_related_comment INT REFERENCES comment(id) ON DELETE CASCADE,
-    id_related_group INT REFERENCES "group"(id)
+    message_content TEXT,
+    onclick_url TEXT
 );
 
 CREATE TABLE message (
@@ -162,44 +160,6 @@ CREATE TABLE message (
     id_sender INT REFERENCES "user"(id),
     id_receiver INT REFERENCES "user"(id),
     visibility visibility_type NOT NULL DEFAULT 'public'
-);
-
-
-CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type user_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-
-CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type comment_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type group_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type post_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type like_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type message_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
 );
 
 CREATE TABLE admin (
@@ -755,39 +715,6 @@ VALUES
 ('Congrats on your new job!', 9, 10, 'public'),
 ('See you soon!', 10, 1, 'public'),
 ('Se houver penalti contra o benfica amanhã pago um jantar a todos os membros do grupo', 14, 11, 'public');
-
-
-INSERT INTO notification (id_user, id_related_post, id_related_comment, id_related_group, seen)
-VALUES 
-(1, 1, NULL, 1, FALSE),
-(2, 2, 1, NULL, FALSE),
-(3, NULL, NULL, NULL, TRUE),
-(4, 2, NULL, 2, FALSE),
-(5, NULL, 2, NULL, FALSE),
-(6, 5, NULL, 5, FALSE),
-(7, 6, NULL, 6, FALSE),
-(8, 7, NULL, 7, FALSE),
-(9, 8, NULL, 8, FALSE),
-(10, 9, NULL, 9, FALSE),
-(11, 10, NULL, 10, FALSE),
-(14, 11, NULL, 11, FALSE);
-
--- Insert specific user notifications
-INSERT INTO user_notification (id_notification, type)
-VALUES 
-(1, 'received_friend_request'),
-(3, 'match');
-
--- Insert specific comment notifications
-INSERT INTO comment_notification (id_notification, type)
-VALUES 
-(5, 'commented_on_post');
-
-
--- Insert specific group notifications
-INSERT INTO group_notification (id_notification, type)
-VALUES 
-(6, 'invited_to_group');
 
 
 INSERT INTO friendship (id_user1, id_user2, created_at)
