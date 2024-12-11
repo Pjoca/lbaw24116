@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Post;
+use App\Models\Comment;
 
 class SearchController extends Controller
 {
@@ -150,5 +151,111 @@ class SearchController extends Controller
         }*/
     
         return view('search.results', compact('groups', 'query'));
+    }
+
+    public function searchPosts(Request $request)
+    {
+        $query = $request->input('query'); // Capture query input
+        $type = $request->input('type');
+        //$limit = $request->input('limit', null);
+    
+        // If no query is provided, return an empty collection
+        if (empty($query)) {
+            $posts = collect(); // Empty collection
+        } 
+        else {
+            $posts = Post::select('*')
+                ->selectRaw('
+                    CASE
+                        WHEN LOWER(content) = ? THEN 1
+                        WHEN LOWER(content) LIKE ? THEN 2
+                        WHEN LOWER(content) LIKE ? THEN 3
+                        ELSE 4
+                    END AS priority
+                ', [
+                    strtolower($query),
+                    strtolower($query) . '%',
+                    '%' . strtolower($query) . '%',
+                ])
+                ->where(function ($q) use ($query) {
+                    $q->whereRaw('LOWER(content) = ?', [strtolower($query)])
+                      ->orWhereRaw('LOWER(content) LIKE ?', [strtolower($query) . '%'])
+                      ->orWhereRaw('LOWER(content) LIKE ?', ['%' . strtolower($query) . '%']);
+                });
+    
+            // Add visibility condition for guest users
+            if (!Auth::check()) {
+                $users->where('visibility', 'public');
+            }
+    
+            $posts->orderBy('priority')
+                  ->orderBy('content');
+    
+            /*if ($limit) {
+                $users = $users->take($limit);
+            }*/
+    
+            $posts = $posts->get();
+        }
+    
+        /*if ($request->ajax()) {
+            // Return the partial only
+            return response(view('partials.search-results', compact('users'))->render());
+        }*/
+    
+        return view('search.results', compact('posts', 'query'));
+    }
+
+    public function searchComments(Request $request)
+    {
+        $query = $request->input('query'); // Capture query input
+        $type = $request->input('type');
+        //$limit = $request->input('limit', null);
+    
+        // If no query is provided, return an empty collection
+        if (empty($query)) {
+            $comments = collect(); // Empty collection
+        } 
+        else {
+            $comments = Group::select('*')
+                ->selectRaw('
+                    CASE
+                        WHEN LOWER(content) = ? THEN 1
+                        WHEN LOWER(content) LIKE ? THEN 2
+                        WHEN LOWER(content) LIKE ? THEN 3
+                        ELSE 4
+                    END AS priority
+                ', [
+                    strtolower($query),
+                    strtolower($query) . '%',
+                    '%' . strtolower($query) . '%',
+                ])
+                ->where(function ($q) use ($query) {
+                    $q->whereRaw('LOWER(content) = ?', [strtolower($query)])
+                      ->orWhereRaw('LOWER(content) LIKE ?', [strtolower($query) . '%'])
+                      ->orWhereRaw('LOWER(content) LIKE ?', ['%' . strtolower($query) . '%']);
+                });
+    
+            // Add visibility condition for guest users
+            if (!Auth::check()) {
+                $users->where('visibility', 'public');
+            }
+    
+            $comments->orderBy('priority')
+                  ->orderBy('name');
+    
+            /*if ($limit) {
+                $users = $users->take($limit);
+            }*/
+    
+            $comments = $comments->get();
+        }
+    
+        /*if ($request->ajax()) {
+            // Return the partial only
+            return response(view('partials.search-results', compact('users'))->render());
+        }*/
+    
+        return view('search.results', compact('comments', 'query'));
     }
 }
