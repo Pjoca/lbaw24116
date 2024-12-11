@@ -1,4 +1,16 @@
 import './bootstrap';
+import Pusher from 'pusher-js';
+
+const pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
+    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+    encrypted: true,
+    authEndpoint: '/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }
+ });
 
 // Modal Handling for User
 const modalHandler = {
@@ -537,3 +549,4 @@ async function rejectGroupInvite(inviteId) {
 
 window.acceptGroupInvite = acceptGroupInvite;
 window.rejectGroupInvite = rejectGroupInvite;
+

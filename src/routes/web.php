@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -127,7 +128,11 @@ Route::controller(GroupController::class)->middleware('auth')->group(function ()
 });
 
 
-
+Route::controller(NotificationController::class)->middleware('auth')->group(function () {
+    Route::post('notifications/add', [NotificationController::class, 'addNotification']);
+    Route::delete('notifications/delete/{id}', [NotificationController::class, 'deleteNotification']);
+    Route::get('notifications/{id_user}', [NotificationController::class, 'getNotifications']);
+});
 
 
 
