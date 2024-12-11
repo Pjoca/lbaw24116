@@ -45,9 +45,9 @@
                     </li>
                 @endforeach
             </ul>
-        @endif    
+            
         
-        @if(!$groups->isEmpty())
+        @elseif(!$groups->isEmpty())
             <ul class="divide-y divide-gray-200 w-full max-w-2xl">
                 @foreach($groups as $group)
                     <li class="py-4 flex items-center justify-between">
@@ -57,7 +57,24 @@
                         </a>
                     </li>
                 @endforeach
-            </ul>
+            </ul>   
+            
+        @elseif(!$posts->isEmpty())
+            <div id="posts-container" class="max-w-3xl mx-auto space-y-8">
+                @each('partials.post', $posts, 'post')
+            </div> 
+
+        @elseif(!$comments->isEmpty())
+            <ul class="divide-y divide-gray-200 w-full max-w-2xl">
+                @foreach($comments as $comment)
+                    <li class="py-4 flex items-center justify-between">
+                        <span class="font-medium">{{ $comment->content }}</span>
+                        <a href="{{ route('comments.get', $comment->id) }}" class="text-teal-600 hover:underline">
+                            DONT CLICK View Comment DONT CLICK
+                        </a>
+                    </li>
+                @endforeach
+            </ul>      
 
         @else
             <p class="text-gray-500">Nothing found matching your search.</p>
