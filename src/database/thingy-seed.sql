@@ -14,25 +14,10 @@ DROP TABLE IF EXISTS comment CASCADE;
 DROP TABLE IF EXISTS "like" CASCADE;
 DROP TABLE IF EXISTS report CASCADE;
 DROP TABLE IF EXISTS notification CASCADE;
-DROP TABLE IF EXISTS user_notification CASCADE;
-DROP TABLE IF EXISTS comment_notification CASCADE;
-DROP TABLE IF EXISTS group_notification CASCADE;
-DROP TABLE IF EXISTS post_notification CASCADE;
-DROP TABLE IF EXISTS like_notification CASCADE;
-DROP TABLE IF EXISTS message_notification CASCADE;
 DROP TABLE IF EXISTS admin CASCADE;
 DROP TABLE IF EXISTS message CASCADE;
 
 -- Drop existing types if they exist
-DROP TYPE IF EXISTS visibility_type CASCADE;
-DROP TYPE IF EXISTS account_status_type CASCADE;
-DROP TYPE IF EXISTS friendship_status_type CASCADE;
-DROP TYPE IF EXISTS report_status_type CASCADE;
-DROP TYPE IF EXISTS user_notification_type CASCADE;
-DROP TYPE IF EXISTS comment_notification_type CASCADE;
-DROP TYPE IF EXISTS group_notification_type CASCADE;
-DROP TYPE IF EXISTS post_notification_type CASCADE;
-DROP TYPE IF EXISTS like_notification_type CASCADE;
 DROP TYPE IF EXISTS message_notification_type CASCADE;
 DROP TYPE IF EXISTS group_membership_type CASCADE;
 
@@ -179,10 +164,6 @@ CREATE INDEX idx_friendship_users ON friendship (id_user1, id_user2);
 
 ----------------------------------
 
-CREATE INDEX idx_notification_user_seen_created_at ON notification (id_user, seen, created_at);
-
-----------------------------------
-
 ALTER TABLE "user" 
 ADD COLUMN user_search_tsv tsvector;
 
@@ -319,35 +300,6 @@ EXECUTE FUNCTION add_owner_to_membership();
 ----------------------
 
 
-CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
-RETURNS TRIGGER AS $$
-DECLARE
-    post_owner INT;
-    notification_id INT;
-BEGIN
-    SELECT id_user INTO post_owner FROM post WHERE id = NEW.id_post;
-
-    IF post_owner IS NOT NULL AND post_owner <> NEW.id_user THEN
-        INSERT INTO notification (id_user, id_related_post, id_related_comment, seen, created_at)
-        VALUES (post_owner, NEW.id_post, NEW.id, FALSE, CURRENT_TIMESTAMP)
-        RETURNING id INTO notification_id; 
-
-        INSERT INTO comment_notification (id_notification, type)
-        VALUES (notification_id, 'commented_on_post'); 
-    END IF;
-
-    RETURN NEW; 
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_comment_on_post_notification
-AFTER INSERT ON comment
-FOR EACH ROW
-EXECUTE FUNCTION trg_comment_on_post_notification_func();
-
-
-----------------------
-
 -- Create the trigger function to transfer group ownership or delete the group
 CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
 RETURNS TRIGGER AS $$
@@ -471,47 +423,6 @@ BEFORE INSERT ON "like"
 FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_like();
 
---------------------------------
-
--- Create the trigger function to delete related notifications
-CREATE OR REPLACE FUNCTION trg_delete_related_notification()
-RETURNS TRIGGER AS $$
-BEGIN
-    DELETE FROM notification WHERE id = OLD.id_notification;
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_user_notification_delete
-AFTER DELETE ON user_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_comment_notification_delete
-AFTER DELETE ON comment_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_group_notification_delete
-AFTER DELETE ON group_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_post_notification_delete
-AFTER DELETE ON post_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_like_notification_delete
-AFTER DELETE ON like_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_message_notification_delete
-AFTER DELETE ON message_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
 -----------------------------------------------
 
 -- Truncate tables
@@ -524,12 +435,6 @@ TRUNCATE friendship CASCADE;
 TRUNCATE friendship_request CASCADE;
 TRUNCATE report CASCADE;
 TRUNCATE notification CASCADE;
-TRUNCATE user_notification CASCADE;
-TRUNCATE comment_notification CASCADE;
-TRUNCATE group_notification CASCADE;
-TRUNCATE post_notification CASCADE;
-TRUNCATE like_notification CASCADE;
-TRUNCATE message_notification CASCADE;
 TRUNCATE message CASCADE;
 TRUNCATE admin CASCADE;
 TRUNCATE "user" CASCADE;

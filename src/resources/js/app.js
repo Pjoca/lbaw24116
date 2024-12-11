@@ -1,8 +1,8 @@
 import './bootstrap';
 import Pusher from 'pusher-js';
 
-const pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     encrypted: true,
     authEndpoint: '/broadcasting/auth',
     auth: {
@@ -10,7 +10,7 @@ const pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     }
- });
+});
 
 // Modal Handling for User
 const modalHandler = {
