@@ -62,7 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
     channel.bind('new-notification', (data) => {
         console.log('New notification received:', data);
 
-        const { message_content, onclick_url } = data.notification;
+        const { id, message_content, onclick_url, created_at } = data.notification;
+
+        // Remove "No new notifications" if it exists
+        const noNotificationsMessage = document.querySelector('.text-center.p-4.text-gray-500');
+        if (noNotificationsMessage) {
+            noNotificationsMessage.remove();
+        }
 
         // Update the notification bell count
         let currentCount = parseInt(notificationCount.textContent) || 0;
@@ -71,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         notificationCount.classList.remove('hidden');
 
         // Create a new notification list item
-        const li = createNotificationItem(onclick_url, message_content, data.notification.created_at);
+        const li = createNotificationItem(id, onclick_url, message_content, created_at);
 
         // Add the new notification to the top of the list
         notificationList.prepend(li);
@@ -85,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-function createNotificationItem(onclick_url, message_content, created_at) {
+function createNotificationItem(id, onclick_url, message_content, created_at) {
     const li = document.createElement('li');
-    li.classList.add('p-4', 'border-b', 'hover:bg-gray-100', 'flex', 'items-start', 'gap-3');
+    li.classList.add('p-4', 'border-b', 'hover:bg-gray-100', 'flex', 'items-center', 'gap-3');
+    li.setAttribute('id', `notification-${id}`);
 
     li.innerHTML = `
         <div class="flex-shrink-0">
@@ -104,11 +110,19 @@ function createNotificationItem(onclick_url, message_content, created_at) {
                 ${formatNotificationDate(created_at)}
             </span>
         </div>
+        <button 
+            class="text-red-500 hover:text-red-700 ml-auto flex items-center"
+            onclick="deleteNotification(${id})"
+            title="Delete Notification"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     `;
 
     return li;
 }
-
 
 function formatNotificationDate(created_at) {
     const notificationDate = new Date(created_at);

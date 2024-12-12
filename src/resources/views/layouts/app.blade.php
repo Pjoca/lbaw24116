@@ -65,20 +65,34 @@
                     <div class="flex items-center gap-4 mt-4 md:mt-0">
                         <!-- Notification Bell -->
                         <div class="relative">
-                            <button id="notification-bell" class="flex items-center gap-1 relative focus:outline-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11c0-3.866-2.239-7-5-7S8 7.134 8 11v3.159c0 .538-.214 1.055-.595 1.436L6 17h9z" />
-                                </svg>
-                                <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" id="notification-arrow" class="h-4 w-4 transform transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                            <button id="notification-bell" class="flex items-center relative focus:outline-none">
+                                <!-- Notification Bell Icon -->
+                                <div class="relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11c0-3.866-2.239-7-5-7S8 7.134 8 11v3.159c0 .538-.214 1.055-.595 1.436L6 17h9z" />
+                                    </svg>
+
+                                    <!-- Notification Count -->
+                                    @php 
+                                        $notificationCount = Auth::user()->notifications->count();
+                                    @endphp
+                                    @if ($notificationCount > 0)
+                                        <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold">
+                                            {{ $notificationCount }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <!-- Dropdown Arrow -->
+                                <svg xmlns="http://www.w3.org/2000/svg" id="notification-arrow" class="h-4 w-4 transform transition-transform ml-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06 0L10 10.939l3.71-3.72a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd" />
                                 </svg>
                             </button>
+
                             <div id="notification-dropdown" class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden">
                                 @include('partials.notifications', ['notifications' => Auth::user()->notifications])
                             </div>
                         </div>
-
                         <!-- Messages -->
                         <a href="{{ route('messages.index') }}" class="relative flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

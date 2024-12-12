@@ -583,3 +583,41 @@ async function rejectGroupInvite(inviteId) {
 window.acceptGroupInvite = acceptGroupInvite;
 window.rejectGroupInvite = rejectGroupInvite;
 
+
+function deleteNotification(notificationId) {
+    const notificationElement = document.getElementById(`notification-${notificationId}`);
+
+    if (!notificationElement) return;
+
+    fetch(`/notifications/delete/${notificationId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to delete the notification');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Remove the notification element from the DOM
+        notificationElement.remove();
+
+        // Check if there are no more notifications in the list
+        const notificationList = document.getElementById('notification-list');
+        if (notificationList.children.length === 0) {
+            notificationList.innerHTML = '<li class="text-center p-4 text-gray-500">No new notifications</li>';
+        }
+
+        console.log('Notification deleted successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error deleting notification:', error);
+    });
+}
+
+
+window.deleteNotification = deleteNotification;
