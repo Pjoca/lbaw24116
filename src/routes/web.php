@@ -20,6 +20,8 @@ use App\Http\Controllers\CommentController;
 
 use App\Http\Controllers\MatchmakingController;
 
+use Illuminate\Http\Request;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -134,20 +136,40 @@ Route::controller(NotificationController::class)->middleware('auth')->group(func
     Route::get('notifications/{id_user}', [NotificationController::class, 'getNotifications']);
 });
 
-Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+
+
+Route::post('/broadcasting/auth', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $userId = Auth::id();
+    $channelName = $request->request->get('channel_name');
+
+    if (!preg_match('/^private-notification\.(\d+)$/', $channelName, $matches)) {
+        return response()->json(['message' => 'Invalid channel name'], 403);
+    }
+
+    $channelUserId = (int) $matches[1];
+
+    if ($userId !== $channelUserId) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
     $pusher = new Pusher\Pusher(
         env('PUSHER_APP_KEY'),
         env('PUSHER_APP_SECRET'),
         env('PUSHER_APP_ID'),
-        array(
+        [
             'cluster' => env('PUSHER_APP_CLUSTER'),
             'useTLS' => false,
             'host' => env('APP_URL'),
             'port' => 6001,
             'scheme' => 'http',
-        )
+        ]
     );
-    return $pusher->socket_auth($request->request->get('channel_name'), $request->request->get('socket_id'));
+
+    return $pusher->socket_auth($channelName, $request->request->get('socket_id'));
 });
 
 
