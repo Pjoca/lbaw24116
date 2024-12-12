@@ -65,7 +65,7 @@
                     <div class="flex items-center gap-4 mt-4 md:mt-0">
                         <!-- Notification Bell -->
                         <div class="relative">
-                            <button id="notification-bell" onclick="toggleNotificationDropdown()" class="flex items-center gap-1 relative focus:outline-none">
+                            <button id="notification-bell" class="flex items-center gap-1 relative focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11c0-3.866-2.239-7-5-7S8 7.134 8 11v3.159c0 .538-.214 1.055-.595 1.436L6 17h9z" />
                                 </svg>

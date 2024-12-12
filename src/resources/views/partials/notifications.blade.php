@@ -1,4 +1,4 @@
-<ul class="max-h-64 overflow-y-auto">
+<ul id="notification-list" class="max-h-64 overflow-y-auto">
     @forelse ($notifications as $notification)
         <li class="p-4 border-b hover:bg-gray-100 flex items-start gap-3">
             <div class="flex-shrink-0">

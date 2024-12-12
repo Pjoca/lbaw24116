@@ -71,9 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         notificationCount.classList.remove('hidden');
 
         // Create a new notification list item
-        const li = document.createElement('li');
-        li.className = 'p-4 border-b hover:bg-gray-100';
-        li.innerHTML = `<a href="${onclick_url}" class="block">${message_content}</a>`;
+        const li = createNotificationItem(onclick_url, message_content, data.notification.created_at);
 
         // Add the new notification to the top of the list
         notificationList.prepend(li);
@@ -86,3 +84,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
+function createNotificationItem(onclick_url, message_content, created_at) {
+    const li = document.createElement('li');
+    li.classList.add('p-4', 'border-b', 'hover:bg-gray-100', 'flex', 'items-start', 'gap-3');
+
+    li.innerHTML = `
+        <div class="flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11c0-3.866-2.239-7-5-7S8 7.134 8 11v3.159c0 .538-.214 1.055-.595 1.436L6 17h9z" />
+            </svg>
+        </div>
+        <div class="flex-1">
+            <a href="${onclick_url ?? '#'}" class="block font-semibold text-black">
+                ${message_content}
+            </a>
+            <span class="text-xs text-gray-500">
+                ${formatNotificationDate(created_at)}
+            </span>
+        </div>
+    `;
+
+    return li;
+}
+
+
+function formatNotificationDate(created_at) {
+    const notificationDate = new Date(created_at);
+    const currentDate = new Date();
+
+    const diffTime = Math.abs(currentDate - notificationDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+        return 'Today';
+    } else {
+        return `${diffDays} days ago`;
+    }
+}
