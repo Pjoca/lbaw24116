@@ -110,10 +110,13 @@ public function accept($senderId, NotificationController $notificationController
             // Delete the friend request
             $request->delete();
 
+            // Find the user who sent the friend request
+            $sender = User::findOrFail($senderId);
+
             // Call addNotification method in the NotificationController
             $notificationController->addNotification(new Request([
                 'id_user' => $senderId,
-                'message_content' => 'Your friend request has been accepted!',
+                'message_content' =>$sender->name . ' accepted your friend request.',
                 'onclick_url' => '/profile/' . $senderId,
             ]));
 

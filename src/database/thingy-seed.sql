@@ -132,7 +132,7 @@ CREATE TABLE report (
 
 CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
-    created_at DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_user INT REFERENCES "user"(id) NOT NULL,
     message_content TEXT,
     onclick_url TEXT

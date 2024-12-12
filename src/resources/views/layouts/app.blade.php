@@ -77,9 +77,7 @@
                                 <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
                             </button>
                             <div id="notification-dropdown" class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden">
-                                <ul id="notification-list" class="max-h-64 overflow-y-auto">
-                                    <li id="empty-notification" class="text-center p-4 text-gray-500">No new notifications</li>
-                                </ul>
+                                @include('partials.notifications', ['notifications' => Auth::user()->notifications])
                             </div>
                         </div>
 
