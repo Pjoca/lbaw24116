@@ -139,10 +139,6 @@ Route::controller(NotificationController::class)->middleware('auth')->group(func
 
 
 
-
-
-    
-    
 Route::middleware('auth')->group(function () {
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 });

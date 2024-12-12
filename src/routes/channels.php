@@ -18,6 +18,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 
-Broadcast::channel('private-notification.{id_user}', function ($user, $id_user) {
-    return (int) $user->id === (int) $id_user;
+Broadcast::channel('private-notification.{userId}', function ($user, $userId) {
+    Log::info('User ID: ' . $user->id);
+    return (int) $user->id === (int) $userId;
 });
