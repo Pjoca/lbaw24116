@@ -12,6 +12,23 @@ const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     }
 });
 
+
+function toggleProfileDropdown() {
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileDropdown.classList.toggle('hidden');
+}
+
+window.toggleProfileDropdown = toggleProfileDropdown;
+
+document.addEventListener('click', (event) => {
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const profileDropdownToggle = document.getElementById('profile-dropdown-toggle');
+
+    if (!profileDropdownToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
+        profileDropdown.classList.add('hidden');
+    }
+});
+
 // Modal Handling for User
 const modalHandler = {
     show(id, name, email, username) {
