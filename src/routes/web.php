@@ -134,7 +134,21 @@ Route::controller(NotificationController::class)->middleware('auth')->group(func
     Route::get('notifications/{id_user}', [NotificationController::class, 'getNotifications']);
 });
 
-
+Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    $pusher = new Pusher\Pusher(
+        env('PUSHER_APP_KEY'),
+        env('PUSHER_APP_SECRET'),
+        env('PUSHER_APP_ID'),
+        array(
+            'cluster' => env('PUSHER_APP_CLUSTER'),
+            'useTLS' => false,
+            'host' => env('APP_URL'),
+            'port' => 6001,
+            'scheme' => 'http',
+        )
+    );
+    return $pusher->socket_auth($request->request->get('channel_name'), $request->request->get('socket_id'));
+});
 
 
 

@@ -19,7 +19,7 @@ class NotificationPolicy
             : Response::deny('You do not have permission to perform this action.');
     }
 
-    public function addAndGet(User $user, Notification $notification): Response
+    public function addAndGet(User $user): Response
     {
         return Auth::check()
             ? Response::allow()

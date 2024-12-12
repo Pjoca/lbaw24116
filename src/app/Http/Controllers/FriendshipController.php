@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\FriendshipRequest;
 use App\Models\Friendship;
 
+use App\Http\Controllers\NotificationController;
+
 class FriendshipController extends Controller
 {
     /**
@@ -88,35 +90,42 @@ public function cancel($id)
     return response()->json(['success' => 'Friend request canceled'], 200);
 }
 
-public function accept($senderId)
-{
-    DB::beginTransaction();
+public function accept($senderId, NotificationController $notificationController)
+    {
+        DB::beginTransaction();
 
-    try {
-        // Find the friendship request
-        $request = FriendshipRequest::where('id_sender', $senderId)
-            ->where('id_receiver', Auth::id())
-            ->first();
+        try {
+            // Find the friendship request
+            $request = FriendshipRequest::where('id_sender', $senderId)
+                ->where('id_receiver', Auth::id())
+                ->first();
 
-        if (!$request) {
-            return response()->json(['error' => 'Friend request not found'], 404);
+            if (!$request) {
+                return response()->json(['error' => 'Friend request not found'], 404);
+            }
+
+            // Create bidirectional friendships
+            Friendship::createFriendship(Auth::id(), $senderId);
+
+            // Delete the friend request
+            $request->delete();
+
+            // Call addNotification method in the NotificationController
+            $notificationController->addNotification(new Request([
+                'id_user' => $senderId,
+                'message_content' => 'Your friend request has been accepted!',
+                'onclick_url' => '/profile/' . $senderId,
+            ]));
+
+            DB::commit();
+
+            return response()->json(['success' => 'Friend request accepted'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error accepting friend request: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while accepting the friend request.'], 500);
         }
-
-        // Create bidirectional friendships
-        Friendship::createFriendship(Auth::id(), $senderId);
-
-        // Delete the friend request
-        $request->delete();
-
-        DB::commit();
-
-        return response()->json(['success' => 'Friend request accepted'], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error accepting friend request: ' . $e->getMessage());
-        return response()->json(['error' => 'An error occurred while accepting the friend request.'], 500);
     }
-}
 
 
 

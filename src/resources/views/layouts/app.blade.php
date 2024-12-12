@@ -43,10 +43,10 @@
                             </div>
                         </li>
                         <li>
-                                <a href="{{ route('users.search') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
-                                    Search
-                                </a>
-                            </li>
+                            <a href="{{ route('users.search') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
+                                Search
+                            </a>
+                        </li>
                         @if (Auth::check())
                             <li>
                                 <a href="{{ route('groups.index') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
@@ -68,6 +68,21 @@
                 </nav>
                 @if (Auth::check())
                     <div class="flex items-center gap-4 mt-4 md:mt-0">
+                        <!-- Notification Bell -->
+                        <div class="relative">
+                            <button id="notification-bell" class="relative focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11c0-3.866-2.239-7-5-7S8 7.134 8 11v3.159c0 .538-.214 1.055-.595 1.436L6 17h9z" />
+                                </svg>
+                                <span id="notification-count" class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
+                            </button>
+                            <div id="notification-dropdown" class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden">
+                                <ul id="notification-list" class="max-h-64 overflow-y-auto">
+                                    <li id="empty-notification" class="text-center p-4 text-gray-500">No new notifications</li>
+                                </ul>
+                            </div>
+                        </div>
+
                         <a href="{{ route('profile.show', ['id' => Auth::id()]) }}" class="text-sm font-bold hover:text-yellow-300 transition">
                             {{ Auth::user()->name }}
                         </a>

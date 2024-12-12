@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Pusher\Pusher;
 
 class NotificationController extends Controller
 {
@@ -20,7 +21,7 @@ class NotificationController extends Controller
         $this->authorize('addAndGet', Notification::class);
 
         $request->validate([
-            'id_user' => 'required|integer|exists:users,id',
+            'id_user' => 'required|integer|exists:user,id',
             'message_content' => 'required|string',
             'onclick_url' => 'nullable|string'
         ]);
@@ -32,8 +33,17 @@ class NotificationController extends Controller
             'created_at' => now(),
         ]);
 
-        $pusher = app('pusher');
-        $pusher->trigger('notification-' . $request->id_user, 'new-notification', [
+        $pusher = new Pusher(
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true
+            ]
+        );
+
+        $pusher->trigger('private-notification.' . $request->id_user, 'new-notification', [
             'notification' => $notification
         ]);
 
