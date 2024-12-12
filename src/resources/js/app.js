@@ -12,6 +12,24 @@ const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     }
 });
 
+window.onload = function() {
+    var reloading = sessionStorage.getItem("reloading");
+    if (reloading) {
+        eval(sessionStorage.getItem("command"));
+        sessionStorage.removeItem("reloading");
+        sessionStorage.removeItem("command");
+    }
+}
+
+function reloadP(command) {
+    sessionStorage.setItem("reloading", "true");
+    sessionStorage.setItem("command", command);
+    document.location.reload();
+}
+
+window.reloadP = reloadP;
+
+
 
 function toggleProfileDropdown() {
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -469,8 +487,7 @@ async function acceptFriendRequest(requestId) {
         });
 
         if (!response.ok) throw new Error('Failed to accept friend request');
-        window.showFeedbackMessage('green', 'Friend request accepted!');
-        location.reload();
+        window,reloadP("showFeedbackMessage('green', 'Friend request accepted!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while accepting the friend request.');
@@ -488,8 +505,7 @@ async function rejectFriendRequest(requestId) {
         });
 
         if (!response.ok) throw new Error('Failed to reject friend request');
-        window.showFeedbackMessage('green', 'Friend request rejected!');
-        location.reload();
+        window.reloadP("showFeedbackMessage('green', 'Friend request rejected!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while rejecting the friend request.');
