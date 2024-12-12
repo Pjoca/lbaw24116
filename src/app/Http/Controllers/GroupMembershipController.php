@@ -12,12 +12,14 @@ use App\Models\GroupMembership;
 use App\Models\GroupMembershipRequest;
 use App\Models\User;
 
+use App\Http\Controllers\NotificationController;
+
 class GroupMembershipController extends Controller
 {
     /**
      * Request to join a group.
      */
-    public function requestMembership($groupId)
+    public function requestMembership($groupId, NotificationController $notificationController)
     {
         $user = Auth::user();
         $group = Group::findOrFail($groupId);
@@ -49,6 +51,13 @@ class GroupMembershipController extends Controller
             'request_status' => 'pending',
             'requested_at' => now(),
         ]);
+
+        // Notify the group owner
+        $notificationController->addNotification(new Request([
+            'id_user' => $group->id_owner,
+            'message_content' => $user->name . ' has requested to join your group ' . $group->name,
+            'onclick_url' => "javascript:goWithCommand('/groups/{$group->id}', \"openModal('join-requests-modal'); loadInitialJoinRequests({$group->id})\")",
+        ]));
 
         return response()->json(['success' => 'Membership request sent successfully'], 200);
     }

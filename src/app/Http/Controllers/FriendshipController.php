@@ -20,7 +20,7 @@ class FriendshipController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function add($id)
+    public function add($id, NotificationController $notificationController)
     {
         $user = Auth::user();
         $friend = User::findOrFail($id);
@@ -39,6 +39,14 @@ class FriendshipController extends Controller
             'status' => 'pending',
             'created_at' => now(),
         ]);
+
+        $sender = User::findOrFail($user->id);
+
+        $notificationController->addNotification(new Request([
+            'id_user' => $id,
+            'message_content' => $sender->name . ' sent you a friend request.',
+            'onclick_url' => '/profile/' . $user->id,
+        ]));
     
         return response()->json(['success' => 'Friend request sent successfully'], 200);
     }
@@ -136,7 +144,7 @@ public function accept($senderId, NotificationController $notificationController
 
 
 
-public function reject($senderId)
+public function reject($senderId, NotificationController $notificationController)
 {
     try {
         // Find the friendship request by sender and receiver
@@ -150,6 +158,13 @@ public function reject($senderId)
 
         // Delete the friend request
         $request->delete();
+
+        $sender = User::findOrFail($senderId);
+
+        $notificationController->addNotification(new Request([
+            'id_user' => $senderId,
+            'message_content' => $sender->name . ' rejected your friend request.',
+        ]));
 
         return response()->json(['success' => 'Friend request rejected'], 200);
     } catch (\Exception $e) {

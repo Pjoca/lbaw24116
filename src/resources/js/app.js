@@ -13,6 +13,7 @@ const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
 });
 
 window.onload = function() {
+    console.log('Is loadInitialJoinRequests defined?', typeof loadInitialJoinRequests);
     var reloading = sessionStorage.getItem("reloading");
     if (reloading) {
         eval(sessionStorage.getItem("command"));
@@ -28,6 +29,15 @@ function reloadP(command) {
 }
 
 window.reloadP = reloadP;
+
+
+function goWithCommand(location, command) {
+    sessionStorage.setItem("reloading", "true");
+    sessionStorage.setItem("command", command);
+    window.location.href = location;
+}
+
+window.goWithCommand = goWithCommand;
 
 
 

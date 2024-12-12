@@ -402,6 +402,7 @@ window.loadMoreInvites = loadMoreInvites;
 
 
 async function loadInitialJoinRequests(groupId) {
+    console.log('Loading join requests for group', groupId);
     const modal = document.getElementById('join-requests-modal');
     const requestsList = document.getElementById('join-requests-list');
     const loadMoreButtonContainer = modal.querySelector('.mt-4');
