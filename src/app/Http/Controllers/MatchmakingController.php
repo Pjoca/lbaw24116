@@ -3,27 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class MatchmakingController extends Controller
 {
+    /**
+     * Exibe o próximo perfil para o matchmaking.
+     */
     public function index()
     {
-        // Dados de exemplo (em produção, use o banco de dados)
-        $profiles = [
-            (object)[
-                'id' => 1,
-                'name' => 'Julia Toth',
-                'image' => 'https://100dayscss.com/codepen/13-1.jpg',
-                'header_image' => 'https://100dayscss.com/codepen/13-1-header.jpg',
-            ],
-            (object)[
-                'id' => 2,
-                'name' => 'John Doe',
-                'image' => 'https://100dayscss.com/codepen/13-2.jpg',
-                'header_image' => 'https://100dayscss.com/codepen/13-2-header.jpg',
-            ],
-        ];
+        $currentUser = auth()->user();
 
-        return view('pages.matchmaking', compact('profiles'));
+        // Obtém o próximo perfil (excluindo o usuário autenticado)
+        // Aqui você pode adicionar filtros (gênero, localização, interesses, etc.)
+        $profile = User::where('id', '!=', $currentUser->id)
+            ->inRandomOrder()
+            ->first();
+
+        // Retorna a view com o próximo perfil
+        return view('pages.matchmaking', compact('profile'));
+    }
+
+    /**
+     * Processa a interação do usuário (like/dislike).
+     */
+    public function interact(Request $request)
+    {
+        $currentUser = auth()->user();
+
+        // Captura o ID do perfil e a ação (like/dislike)
+        $profileId = $request->input('profile_id');
+        $action = $request->input('action'); // "like" ou "dislike"
+
+        // Aqui você pode salvar a interação no banco (como uma tabela de likes ou matches)
+        // Exemplo:
+        // Match::create([
+        //     'user_id' => $currentUser->id,
+        //     'matched_user_id' => $profileId,
+        //     'action' => $action,
+        // ]);
+
+        // Redireciona para o próximo perfil
+        return redirect()->route('matchmaking.index');
     }
 }
