@@ -6,19 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationList = document.getElementById('notification-list');
     let notificationCount = document.getElementById('notification-count');
 
-    // If notificationCount is null, create it dynamically and append it
-    if (!notificationCount) {
-        notificationCount = document.createElement('span');
-        notificationCount.id = 'notification-count';
-        notificationCount.classList.add('absolute', 'top-0', 'right-0', 'bg-red-500', 'text-white', 'rounded-full', 'text-xs', 'w-5', 'h-5', 'flex', 'items-center', 'justify-center', 'hidden');
-        notificationCount.textContent = '0';
-        if (notificationBell) {
-            notificationBell.appendChild(notificationCount);
-        } else {
-            console.warn('Notification bell not found in the DOM.');
-        }
-    }
-
     // Show/Hide the notification dropdown
     notificationBell?.addEventListener('click', () => {
         notificationDropdown?.classList.toggle('hidden');
@@ -113,6 +100,7 @@ function createNotificationItem(id, onclick_url, message_content, created_at) {
     const li = document.createElement('li');
     li.classList.add('p-4', 'border-b', 'hover:bg-gray-100', 'flex', 'items-center', 'gap-3');
     li.setAttribute('id', `notification-${id}`);
+
 
     const safeOnclickUrl = onclick_url ? onclick_url.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '#';
     const isJavaScriptAction = onclick_url && onclick_url.startsWith('javascript:');

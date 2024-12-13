@@ -80,6 +80,10 @@
                                         <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold">
                                             {{ $notificationCount }}
                                         </span>
+                                    @elseif ($notificationCount === 0)
+                                        <span id="notification-count" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">
+                                            {{ $notificationCount }}
+                                        </span>
                                     @endif
                                 </div>
 
