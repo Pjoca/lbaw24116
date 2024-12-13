@@ -56,7 +56,7 @@ class GroupMembershipController extends Controller
         $notificationController->addNotification(new Request([
             'id_user' => $group->id_owner,
             'message_content' => $user->name . ' has requested to join your group ' . $group->name,
-            'onclick_url' => "javascript:goWithCommand('/groups/{$group->id}', \"openModal('join-requests-modal'); loadInitialJoinRequests({$group->id})\")",
+            'onclick_url' => 'javascript:goWithCommand(\'/groups/' . $group->id . '\', "openModal(\'join-requests-modal\'); loadInitialJoinRequests(' . $group->id . ')")',
         ]));
 
         return response()->json(['success' => 'Membership request sent successfully'], 200);
@@ -86,7 +86,7 @@ class GroupMembershipController extends Controller
     /**
      * Accept a membership request.
      */
-    public function acceptMembershipRequest($requestId)
+    public function acceptMembershipRequest($requestId, NotificationController $notificationController)
     {
         DB::beginTransaction();
 
@@ -106,6 +106,12 @@ class GroupMembershipController extends Controller
 
             // Delete the request
             $request->delete();
+
+            $notificationController->addNotification(new Request([
+                'id_user' => $request->id_user,
+                'message_content' => 'Your membership request to join ' . $group->name . ' has been accepted',
+                'onclick_url' => 'groups/' . $group->id,
+            ]));
 
             DB::commit();
 

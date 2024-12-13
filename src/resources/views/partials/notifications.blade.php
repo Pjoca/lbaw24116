@@ -10,7 +10,11 @@
 
             <!-- Notification Content -->
             <div class="flex-1">
-                <a href="{{ $notification->onclick_url ?? '#' }}" class="block font-semibold text-black">
+            <a 
+                href="{{ str_starts_with($notification->onclick_url, 'javascript:') ? '#' : url($notification->onclick_url) }}" 
+                onclick="{{ str_starts_with($notification->onclick_url, 'javascript:') ? substr($notification->onclick_url, 11) : '' }}" 
+                class="block font-semibold text-black"
+            >
                     {{ $notification->message_content }}
                 </a>
                 <span class="text-xs text-gray-500">

@@ -616,6 +616,19 @@ function deleteNotification(notificationId) {
         // Remove the notification element from the DOM
         notificationElement.remove();
 
+        // Decrement the notification counter
+        const notificationCountElement = document.getElementById('notification-count');
+        if (notificationCountElement) {
+            let currentCount = parseInt(notificationCountElement.textContent) || 0;
+            currentCount = Math.max(currentCount - 1, 0); // Ensure it never goes below zero
+            notificationCountElement.textContent = currentCount;
+
+            // Hide the count if it reaches zero
+            if (currentCount === 0) {
+                notificationCountElement.classList.add('hidden');
+            }
+        }
+
         // Check if there are no more notifications in the list
         const notificationList = document.getElementById('notification-list');
         if (notificationList.children.length === 0) {

@@ -4,7 +4,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationBell = document.getElementById('notification-bell');
     const notificationDropdown = document.getElementById('notification-dropdown');
     const notificationList = document.getElementById('notification-list');
-    const notificationCount = document.getElementById('notification-count');
+    let notificationCount = document.getElementById('notification-count');
+
+    // If notificationCount is null, create it dynamically and append it
+    if (!notificationCount) {
+        notificationCount = document.createElement('span');
+        notificationCount.id = 'notification-count';
+        notificationCount.classList.add('absolute', 'top-0', 'right-0', 'bg-red-500', 'text-white', 'rounded-full', 'text-xs', 'w-5', 'h-5', 'flex', 'items-center', 'justify-center', 'hidden');
+        notificationCount.textContent = '0';
+        if (notificationBell) {
+            notificationBell.appendChild(notificationCount);
+        } else {
+            console.warn('Notification bell not found in the DOM.');
+        }
+    }
 
     // Show/Hide the notification dropdown
     notificationBell?.addEventListener('click', () => {
@@ -64,6 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const { id, message_content, onclick_url, created_at } = data.notification;
 
+        console.log('Notification ID:', id);
+        console.log('Notification Message:', message_content);
+        console.log('Notification URL:', onclick_url);
+        console.log('Notification Created At:', created_at);
+
         // Remove "No new notifications" if it exists
         const noNotificationsMessage = document.querySelector('.text-center.p-4.text-gray-500');
         if (noNotificationsMessage) {
@@ -96,6 +114,11 @@ function createNotificationItem(id, onclick_url, message_content, created_at) {
     li.classList.add('p-4', 'border-b', 'hover:bg-gray-100', 'flex', 'items-center', 'gap-3');
     li.setAttribute('id', `notification-${id}`);
 
+    const safeOnclickUrl = onclick_url ? onclick_url.replace(/'/g, '&#39;').replace(/"/g, '&quot;') : '#';
+    const isJavaScriptAction = onclick_url && onclick_url.startsWith('javascript:');
+    const href = isJavaScriptAction ? '#' : new URL(safeOnclickUrl, window.location.origin).href;
+    const onclick = isJavaScriptAction ? safeOnclickUrl : '';
+
     li.innerHTML = `
         <div class="flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -103,7 +126,7 @@ function createNotificationItem(id, onclick_url, message_content, created_at) {
             </svg>
         </div>
         <div class="flex-1">
-            <a href="${onclick_url ?? '#'}" class="block font-semibold text-black">
+            <a href="${href}" ${onclick ? `onclick="${onclick}"` : ''} class="block font-semibold text-black">
                 ${message_content}
             </a>
             <span class="text-xs text-gray-500">
@@ -124,12 +147,20 @@ function createNotificationItem(id, onclick_url, message_content, created_at) {
     return li;
 }
 
+
+
+
 function formatNotificationDate(created_at) {
     const notificationDate = new Date(created_at);
     const currentDate = new Date();
 
-    const diffTime = Math.abs(currentDate - notificationDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Get only the "date" part without the time
+    const notificationDateOnly = new Date(notificationDate.getFullYear(), notificationDate.getMonth(), notificationDate.getDate());
+    const currentDateOnly = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+
+    // Calculate the difference in days
+    const diffTime = currentDateOnly - notificationDateOnly;
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
     if (diffDays === 0) {
         return 'Today';
