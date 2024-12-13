@@ -74,14 +74,23 @@
                 @endif
             </div>
 
-
             <!-- Edit Profile Button (Visible only to the profile owner) -->
             @if (Auth::id() === $user['id'])
-                <div class="mt-4">
-                <button onclick="showEditProfileModal({{ json_encode($user) }})" 
-                        class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
-                    Edit Profile
-                </button>
+                <div class="mt-4 flex gap-4 justify-center">
+                    <button onclick="showEditProfileModal({{ json_encode($user) }})" 
+                            class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                        Edit Profile
+                    </button>
+
+                    <!-- Delete Profile Button -->
+                    <form action="{{ route('profile.delete', ['id' => $user['id']]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your profile? This action cannot be undone.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition">
+                            Delete Profile
+                        </button>
+                    </form>
                 </div>
             @endif
         </div>

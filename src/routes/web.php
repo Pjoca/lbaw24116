@@ -56,10 +56,10 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Profile
 Route::controller(UserController::class)->group(function () {
-    Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
-    Route::get('/profile/{id}/edit', [UserController::class, 'edit'])->middleware('auth')->name('profile.edit');
-    Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update'); // Edit Profile
-    
+    Route::get('/profile/{id}', 'show')->name('profile.show');
+    Route::get('/profile/{id}/edit', 'edit')->middleware('auth')->name('profile.edit');
+    Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update');
+    Route::delete('/users/{id}', 'delete')->name('profile.delete');
 });
 
 // Timeline Default Route

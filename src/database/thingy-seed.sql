@@ -12,7 +12,6 @@ DROP TABLE IF EXISTS group_membership CASCADE;
 DROP TABLE IF EXISTS post CASCADE;
 DROP TABLE IF EXISTS comment CASCADE;
 DROP TABLE IF EXISTS "like" CASCADE;
-DROP TABLE IF EXISTS report CASCADE;
 DROP TABLE IF EXISTS notification CASCADE;
 DROP TABLE IF EXISTS admin CASCADE;
 DROP TABLE IF EXISTS message CASCADE;
@@ -27,7 +26,6 @@ CREATE TYPE group_membership_type AS ENUM ('pending', 'accepted', 'rejected');
 CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group', 'anonymous');
 CREATE TYPE account_status_type AS ENUM ('active', 'offline', 'deleted', 'blocked');
 CREATE TYPE friendship_status_type AS ENUM ('pending', 'accepted', 'rejected');
-CREATE TYPE report_status_type AS ENUM ('pending', 'reviewed', 'resolved');
 CREATE TYPE user_notification_type AS ENUM ('received_friend_request', 'accepted_friend_request', 'match');
 CREATE TYPE comment_notification_type AS ENUM ('replied_to_comment', 'commented_on_post', 'tagged_comment');
 CREATE TYPE group_notification_type AS ENUM ('invited_to_group');
@@ -121,15 +119,6 @@ CREATE TABLE "like" (
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
-CREATE TABLE report (
-    id SERIAL PRIMARY KEY,
-    description TEXT NOT NULL,
-    status report_status_type NOT NULL DEFAULT 'pending',
-    id_user INT REFERENCES "user"(id) NOT NULL,
-    id_reported_post INT REFERENCES post(id) ON DELETE CASCADE,
-    id_reported_comment INT REFERENCES comment(id) ON DELETE CASCADE
-);
-
 CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -148,7 +137,7 @@ CREATE TABLE message (
 );
 
 CREATE TABLE admin (
-    id INT REFERENCES "user"(id) PRIMARY KEY
+    id INT PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE
 );
 
 
@@ -246,26 +235,6 @@ tsvector_update_trigger(group_content_tsv, 'pg_catalog.english', name, descripti
 ----------------------------------
 -- Triggers
 ----------------------------------
-
-CREATE OR REPLACE FUNCTION trg_no_self_report_func()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.id_user = (SELECT id_user FROM post WHERE id = NEW.id_reported_post) THEN
-        RAISE EXCEPTION 'User cannot report their own post';
-    END IF;
-
-    RETURN NEW; 
-END;
-
-
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_no_self_report
-BEFORE INSERT ON report
-FOR EACH ROW
-EXECUTE FUNCTION trg_no_self_report_func();
-
------------------------
 
 CREATE OR REPLACE FUNCTION trg_update_last_login_func()
 RETURNS TRIGGER AS $$
@@ -404,7 +373,15 @@ EXECUTE FUNCTION trg_check_unique_group_request();
 -- Create the trigger function to enforce unique likes
 CREATE OR REPLACE FUNCTION trg_check_unique_like()
 RETURNS TRIGGER AS $$
+DECLARE
+    anonymous_user_id INT;
 BEGIN
+    SELECT id INTO anonymous_user_id FROM "user" WHERE username = 'anonymous' LIMIT 1;
+
+    IF NEW.id_user = anonymous_user_id THEN
+        RETURN NEW;
+    END IF;
+
     IF NEW.id_post IS NOT NULL THEN
         IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_post = NEW.id_post) THEN
             RAISE EXCEPTION 'User has already liked this post';
@@ -437,7 +414,6 @@ TRUNCATE group_membership CASCADE;
 TRUNCATE "group" CASCADE;
 TRUNCATE friendship CASCADE;
 TRUNCATE friendship_request CASCADE;
-TRUNCATE report CASCADE;
 TRUNCATE notification CASCADE;
 TRUNCATE message CASCADE;
 TRUNCATE admin CASCADE;
@@ -449,7 +425,6 @@ ALTER SEQUENCE group_id_seq RESTART WITH 1;
 ALTER SEQUENCE post_id_seq RESTART WITH 1;
 ALTER SEQUENCE comment_id_seq RESTART WITH 1;
 ALTER SEQUENCE like_id_seq RESTART WITH 1;
-ALTER SEQUENCE report_id_seq RESTART WITH 1;
 ALTER SEQUENCE notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE message_id_seq RESTART WITH 1;
 
@@ -458,6 +433,7 @@ INSERT INTO "user" (username, email, name, password, visibility, account_status,
 VALUES 
 ('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
 ('jane_smith', 'jane.smith@up.pt', 'Jane Smith', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'private', 'active', 'users/images/default.png'),
+('anonymous', 'anonymous@up.pt', 'Anonymous', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
 ('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline', 'users/images/default.png'),
 ('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active', 'users/images/default.png'),
 ('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active', 'users/images/default.png'),
@@ -589,20 +565,6 @@ VALUES
 (10, 10),
 (11,10),
 (12,10);
-
--- Insert reports
-INSERT INTO report (description, status, id_user, id_reported_post)
-VALUES 
-('Inappropriate content', 'pending', 3, 1),
-('Spam', 'reviewed', 4, 2),
-('Hate speech', 'resolved', 5, 3),
-('Harassment', 'pending', 6, 4),
-('Misinformation', 'pending', 7, 5),
-('Inappropriate image', 'reviewed', 8, 6),
-('Phishing attempt', 'resolved', 9, 7),
-('Copyright infringement', 'pending', 10, 8),
-('Fake news', 'reviewed', 1, 9),
-('Offensive language', 'resolved', 2, 10);
 
 -- Insert admin
 INSERT INTO admin (id)
