@@ -65,16 +65,21 @@
             </div> 
 
         @elseif(!$comments->isEmpty())
-            <ul class="divide-y divide-gray-200 w-full max-w-2xl">
-                @foreach($comments as $comment)
-                    <li class="py-4 flex items-center justify-between">
-                        <span class="font-medium">{{ $comment->content }}</span>
-                        <a href="{{ route('comments.get', $comment->id) }}" class="text-teal-600 hover:underline">
-                            DONT CLICK View Comment DONT CLICK
-                        </a>
-                    </li>
-                @endforeach
-            </ul>      
+        <div id="comments-container" class="max-w-3xl mx-auto space-y-8">
+            @foreach($comments as $comment)
+                <div class="border rounded-lg p-4 shadow">
+                    <div class="mb-2">
+                        <h3 class="font-bold text-teal-600">Comment</h3>
+                        <p class="text-gray-700">{{ $comment->content }}</p>
+                    </div>
+                    <div class="bg-gray-100 p-2 rounded">
+                        <h4 class="font-semibold text-teal-600">Associated Post:</h4>
+                        @include('partials.post', ['post' => $comment->post])
+                        
+                    </div>
+                </div>
+            @endforeach
+        </div>
 
         @else
             <p class="text-gray-500">Nothing found matching your search.</p>
