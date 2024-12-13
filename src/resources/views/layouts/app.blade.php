@@ -13,7 +13,9 @@
     </head>
     <body class="bg-gray-100 text-gray-800 font-sans">
         @vite('resources/js/app.js')
+        @if(Auth::check())
         @vite('resources/js/notifications.js')
+        @endif
         @include('components.alert')
         <main class="p-4">
             <!--  Header -->

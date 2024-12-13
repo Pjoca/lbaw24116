@@ -164,6 +164,10 @@ CREATE INDEX idx_friendship_users ON friendship (id_user1, id_user2);
 
 ----------------------------------
 
+CREATE INDEX idx_notification_user ON notification (id_user);
+
+----------------------------------
+
 ALTER TABLE "user" 
 ADD COLUMN user_search_tsv tsvector;
 
