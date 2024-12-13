@@ -126,7 +126,7 @@ class GroupMembershipController extends Controller
     /**
      * Reject a membership request.
      */
-    public function rejectMembershipRequest($requestId)
+    public function rejectMembershipRequest($requestId, NotificationController $notificationController)
     {
         try {
             $request = GroupMembershipRequest::findOrFail($requestId);
@@ -139,6 +139,11 @@ class GroupMembershipController extends Controller
 
             // Delete the request
             $request->delete();
+
+            $notificationController->addNotification(new Request([
+                'id_user' => $request->id_user,
+                'message_content' => 'Your membership request to join ' . $group->name . ' has been rejected',
+            ]));
 
             return response()->json(['success' => 'Membership request rejected'], 200);
         } catch (\Exception $e) {
@@ -171,7 +176,7 @@ class GroupMembershipController extends Controller
         return response()->json(['success' => 'You have left the group successfully'], 200);
     }
 
-    public function sendInvite(Request $request, $groupId)
+    public function sendInvite(Request $request, $groupId, NotificationController $notificationController)
     {
         $group = Group::findOrFail($groupId);
     
@@ -207,6 +212,13 @@ class GroupMembershipController extends Controller
             'requested_at' => now(),
             'is_invite' => true, // Mark as an invite
         ]);
+
+        // Notify the user
+        $notificationController->addNotification(new Request([
+            'id_user' => $user->id,
+            'message_content' => 'You have been invited to join ' . $group->name,
+            'onclick_url' => 'groups/' . $groupId,
+        ]));
     
         return response()->json([
             'success' => 'Invite sent successfully',
@@ -235,7 +247,7 @@ public function cancelInvite($inviteId)
     }
 }
 
-public function acceptInvite($inviteId)
+public function acceptInvite($inviteId, NotificationController $notificationController)
 {
     $invite = GroupMembershipRequest::findOrFail($inviteId);
 
@@ -256,6 +268,12 @@ public function acceptInvite($inviteId)
 
         DB::commit();
 
+        $notificationController->addNotification(new Request([
+            'id_user' => $invite->id_group,
+            'message_content' => Auth::user()->name . ' has accepted your invite to join ' . $invite->group->name,
+            'onclick_url' => 'groups/' . $invite->id_group,
+        ]));
+
         return response()->json(['success' => 'Invite accepted successfully'], 200);
     } catch (\Exception $e) {
         DB::rollBack();
@@ -264,7 +282,7 @@ public function acceptInvite($inviteId)
     }
 }
 
-public function rejectInvite($inviteId)
+public function rejectInvite($inviteId, NotificationController $notificationController)
 {
     $invite = GroupMembershipRequest::findOrFail($inviteId);
 
@@ -273,6 +291,12 @@ public function rejectInvite($inviteId)
     }
 
     $invite->delete();
+
+    $notificationController->addNotification(new Request([
+        'id_user' => $invite->id_group,
+        'message_content' => Auth::user()->name . ' has rejected your invite to join ' . $invite->group->name,
+        'onclick_url' => 'groups/' . $invite->id_group,
+    ]));
 
     return response()->json(['success' => 'Invite rejected successfully'], 200);
 }
