@@ -173,7 +173,6 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('co
 Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
 
 
-Route::get('/matchmaking', [MatchmakingController::class, 'index'])->name('matchmaking.index');
 
 
 
