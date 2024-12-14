@@ -85,3 +85,4 @@ window.addEventListener('scroll', () => {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => handleScroll(), 100); // 100ms debounce
 });
+
