@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -19,6 +20,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
 
 use App\Http\Controllers\MatchmakingController;
+
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,10 +57,10 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Profile
 Route::controller(UserController::class)->group(function () {
-    Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
-    Route::get('/profile/{id}/edit', [UserController::class, 'edit'])->middleware('auth')->name('profile.edit');
-    Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update'); // Edit Profile
-    
+    Route::get('/profile/{id}', 'show')->name('profile.show');
+    Route::get('/profile/{id}/edit', 'edit')->middleware('auth')->name('profile.edit');
+    Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update');
+    Route::delete('/profile/{id}', 'delete')->name('profile.delete');
 });
 
 // Timeline Default Route
@@ -130,17 +133,51 @@ Route::controller(GroupController::class)->middleware('auth')->group(function ()
 });
 
 
+Route::controller(NotificationController::class)->middleware('auth')->group(function () {
+    Route::post('notifications/add', [NotificationController::class, 'addNotification']);
+    Route::delete('notifications/delete/{id}', [NotificationController::class, 'deleteNotification']);
+    Route::get('notifications/{id_user}', [NotificationController::class, 'getNotifications']);
+});
+
+
+
+Route::post('/broadcasting/auth', function (Request $request) {
+    if (!Auth::check()) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $userId = Auth::id();
+    $channelName = $request->request->get('channel_name');
+
+    if (!preg_match('/^private-notification\.(\d+)$/', $channelName, $matches)) {
+        return response()->json(['message' => 'Invalid channel name'], 403);
+    }
+
+    $channelUserId = (int) $matches[1];
+
+    if ($userId !== $channelUserId) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $pusher = new Pusher\Pusher(
+        env('PUSHER_APP_KEY'),
+        env('PUSHER_APP_SECRET'),
+        env('PUSHER_APP_ID'),
+        [
+            'cluster' => env('PUSHER_APP_CLUSTER'),
+            'useTLS' => false,
+            'host' => env('APP_URL'),
+            'port' => 6001,
+            'scheme' => 'http',
+        ]
+    );
+
+    return $pusher->socket_auth($channelName, $request->request->get('socket_id'));
+});
 
 
 
 
-
-
-
-
-
-    
-    
 Route::middleware('auth')->group(function () {
 Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
 });

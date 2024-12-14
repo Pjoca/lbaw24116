@@ -14,7 +14,7 @@ async function joinGroup(groupId) {
 
         if (data.reload) {
             // If reload is true, reload the page to reflect changes
-            window.location.reload();
+            window.reloadP(showFeedbackMessage('green', 'Joined group successfully!'));
             return;
         }
 
@@ -81,8 +81,7 @@ async function leaveGroup(groupId) {
         if (!response.ok) throw new Error('Failed to leave group');
         const data = await response.json();
 
-        window.showFeedbackMessage('green', 'Successfully left the group!');
-        window.location.reload();
+        window.reloadP("showFeedbackMessage('green', 'Left group successfully!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while leaving the group.');
@@ -403,6 +402,7 @@ window.loadMoreInvites = loadMoreInvites;
 
 
 async function loadInitialJoinRequests(groupId) {
+    console.log('Loading join requests for group', groupId);
     const modal = document.getElementById('join-requests-modal');
     const requestsList = document.getElementById('join-requests-list');
     const loadMoreButtonContainer = modal.querySelector('.mt-4');
@@ -771,10 +771,8 @@ async function acceptInvite(inviteId) {
         if (!response.ok) throw new Error('Failed to accept invite');
 
         const data = await response.json();
+        window.reloadP("showFeedbackMessage('green', 'Invite accepted successfully!');");
 
-        window.showFeedbackMessage('green', 'Invite accepted successfully!');
-
-        window.location.reload();
     } catch (error) {
         console.error('Error accepting invite:', error);
         window.showFeedbackMessage('red', 'An error occurred while accepting the invite.');
@@ -798,9 +796,7 @@ async function rejectInvite(inviteId) {
 
         const data = await response.json();
 
-        window.showFeedbackMessage('green', 'Invite rejected successfully!');
-
-        window.location.reload();
+        window.reloadP("showFeedbackMessage('green', 'Invite rejected successfully!');");
     } catch (error) {
         console.error('Error rejecting invite:', error);
         window.showFeedbackMessage('red', 'An error occurred while rejecting the invite.');

@@ -113,4 +113,8 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'id_receiver');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'id_user')->orderBy('created_at', 'desc');
+    }
 }
