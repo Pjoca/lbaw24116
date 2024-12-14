@@ -13,12 +13,14 @@ use App\Models\User;
 use App\Models\FriendshipRequest;
 use App\Models\Friendship;
 
+use App\Http\Controllers\NotificationController;
+
 class FriendshipController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function add($id)
+    public function add($id, NotificationController $notificationController)
     {
         $user = Auth::user();
         $friend = User::findOrFail($id);
@@ -37,6 +39,14 @@ class FriendshipController extends Controller
             'status' => 'pending',
             'created_at' => now(),
         ]);
+
+        $sender = User::findOrFail($user->id);
+
+        $notificationController->addNotification(new Request([
+            'id_user' => $id,
+            'message_content' => $sender->name . ' sent you a friend request.',
+            'onclick_url' => '/profile/' . $user->id,
+        ]));
     
         return response()->json(['success' => 'Friend request sent successfully'], 200);
     }
@@ -88,35 +98,45 @@ public function cancel($id)
     return response()->json(['success' => 'Friend request canceled'], 200);
 }
 
-public function accept($senderId)
-{
-    DB::beginTransaction();
+public function accept($senderId, NotificationController $notificationController)
+    {
+        DB::beginTransaction();
 
-    try {
-        // Find the friendship request
-        $request = FriendshipRequest::where('id_sender', $senderId)
-            ->where('id_receiver', Auth::id())
-            ->first();
+        try {
+            // Find the friendship request
+            $request = FriendshipRequest::where('id_sender', $senderId)
+                ->where('id_receiver', Auth::id())
+                ->first();
 
-        if (!$request) {
-            return response()->json(['error' => 'Friend request not found'], 404);
+            if (!$request) {
+                return response()->json(['error' => 'Friend request not found'], 404);
+            }
+
+            // Create bidirectional friendships
+            Friendship::createFriendship(Auth::id(), $senderId);
+
+            // Delete the friend request
+            $request->delete();
+
+            // Find the user who sent the friend request
+            $sender = User::findOrFail($senderId);
+
+            // Call addNotification method in the NotificationController
+            $notificationController->addNotification(new Request([
+                'id_user' => $senderId,
+                'message_content' =>$sender->name . ' accepted your friend request.',
+                'onclick_url' => '/profile/' . $senderId,
+            ]));
+
+            DB::commit();
+
+            return response()->json(['success' => 'Friend request accepted'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error accepting friend request: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while accepting the friend request.'], 500);
         }
-
-        // Create bidirectional friendships
-        Friendship::createFriendship(Auth::id(), $senderId);
-
-        // Delete the friend request
-        $request->delete();
-
-        DB::commit();
-
-        return response()->json(['success' => 'Friend request accepted'], 200);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error accepting friend request: ' . $e->getMessage());
-        return response()->json(['error' => 'An error occurred while accepting the friend request.'], 500);
     }
-}
 
 
 
@@ -124,7 +144,7 @@ public function accept($senderId)
 
 
 
-public function reject($senderId)
+public function reject($senderId, NotificationController $notificationController)
 {
     try {
         // Find the friendship request by sender and receiver
@@ -138,6 +158,13 @@ public function reject($senderId)
 
         // Delete the friend request
         $request->delete();
+
+        $sender = User::findOrFail($senderId);
+
+        $notificationController->addNotification(new Request([
+            'id_user' => $senderId,
+            'message_content' => $sender->name . ' rejected your friend request.',
+        ]));
 
         return response()->json(['success' => 'Friend request rejected'], 200);
     } catch (\Exception $e) {

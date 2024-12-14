@@ -1,4 +1,61 @@
 import './bootstrap';
+import Pusher from 'pusher-js';
+
+const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    encrypted: true,
+    authEndpoint: '/broadcasting/auth',
+    auth: {
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }
+});
+
+window.onload = function() {
+    console.log('Is loadInitialJoinRequests defined?', typeof loadInitialJoinRequests);
+    var reloading = sessionStorage.getItem("reloading");
+    if (reloading) {
+        eval(sessionStorage.getItem("command"));
+        sessionStorage.removeItem("reloading");
+        sessionStorage.removeItem("command");
+    }
+}
+
+function reloadP(command) {
+    sessionStorage.setItem("reloading", "true");
+    sessionStorage.setItem("command", command);
+    document.location.reload();
+}
+
+window.reloadP = reloadP;
+
+
+function goWithCommand(location, command) {
+    sessionStorage.setItem("reloading", "true");
+    sessionStorage.setItem("command", command);
+    window.location.href = location;
+}
+
+window.goWithCommand = goWithCommand;
+
+
+
+function toggleProfileDropdown() {
+    const profileDropdown = document.getElementById('profile-dropdown');
+    profileDropdown.classList.toggle('hidden');
+}
+
+window.toggleProfileDropdown = toggleProfileDropdown;
+
+document.addEventListener('click', (event) => {
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const profileDropdownToggle = document.getElementById('profile-dropdown-toggle');
+
+    if (!profileDropdownToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
+        profileDropdown.classList.add('hidden');
+    }
+});
 
 // Modal Handling for User
 const modalHandler = {
@@ -440,8 +497,7 @@ async function acceptFriendRequest(requestId) {
         });
 
         if (!response.ok) throw new Error('Failed to accept friend request');
-        window.showFeedbackMessage('green', 'Friend request accepted!');
-        location.reload();
+        window,reloadP("showFeedbackMessage('green', 'Friend request accepted!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while accepting the friend request.');
@@ -459,8 +515,7 @@ async function rejectFriendRequest(requestId) {
         });
 
         if (!response.ok) throw new Error('Failed to reject friend request');
-        window.showFeedbackMessage('green', 'Friend request rejected!');
-        location.reload();
+        window.reloadP("showFeedbackMessage('green', 'Friend request rejected!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while rejecting the friend request.');
@@ -537,3 +592,55 @@ async function rejectGroupInvite(inviteId) {
 
 window.acceptGroupInvite = acceptGroupInvite;
 window.rejectGroupInvite = rejectGroupInvite;
+
+
+function deleteNotification(notificationId) {
+    const notificationElement = document.getElementById(`notification-${notificationId}`);
+
+    if (!notificationElement) return;
+
+    fetch(`/notifications/delete/${notificationId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to delete the notification');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Remove the notification element from the DOM
+        notificationElement.remove();
+
+        // Decrement the notification counter
+        const notificationCountElement = document.getElementById('notification-count');
+        if (notificationCountElement) {
+            let currentCount = parseInt(notificationCountElement.textContent) || 0;
+            currentCount = Math.max(currentCount - 1, 0); // Ensure it never goes below zero
+            notificationCountElement.textContent = currentCount;
+
+            // Hide the count if it reaches zero
+            if (currentCount === 0) {
+                notificationCountElement.classList.add('hidden');
+            }
+        }
+
+        // Check if there are no more notifications in the list
+        const notificationList = document.getElementById('notification-list');
+        if (notificationList.children.length === 0) {
+            notificationList.innerHTML = '<li class="text-center p-4 text-gray-500">No new notifications</li>';
+        }
+
+        console.log('Notification deleted successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error deleting notification:', error);
+    });
+}
+
+
+window.deleteNotification = deleteNotification;

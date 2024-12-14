@@ -9,10 +9,14 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Post;
 use App\Models\FriendshipRequest;
 use App\Models\GroupMembershipRequest;
+use App\Models\Message;
+use App\Models\Like;
+use App\Models\Comment;
 
 class UserController extends Controller
 {
@@ -227,5 +231,48 @@ class UserController extends Controller
 
         return view('pages.edit', compact('user'));
     }
+
+    public function delete($id)
+    {
+        DB::beginTransaction();
+
+
+        try {
+            // Find the user to be deleted
+            $user = User::findOrFail($id);
+
+            $this->authorize('update', $user);
+
+            // Get the anonymous user (assume it's user with ID 1)
+            $anonymousUser = User::where('username', 'anonymous')->first();
+            if (!$anonymousUser) {
+                return response()->json(['error' => 'Anonymous user not found.'], 404);
+            }
+
+            // Update all posts created by the user to be owned by the anonymous user
+            Post::where('id_user', $user->id)->update(['id_user' => $anonymousUser->id]);
+
+            // Update all messages sent or received by the user to be linked to the anonymous user
+            Message::where('id_sender', $user->id)->update(['id_sender' => $anonymousUser->id]);
+            Message::where('id_receiver', $user->id)->update(['id_receiver' => $anonymousUser->id]);
+
+            // Update all comments made by the user to be owned by the anonymous user
+            Comment::where('id_user', $user->id)->update(['id_user' => $anonymousUser->id]);
+
+            // Update all likes made by the user to be owned by the anonymous user
+            Like::where('id_user', $user->id)->update(['id_user' => $anonymousUser->id]);
+
+            // Finally, delete the user
+            $user->delete();
+
+            DB::commit();
+
+            return redirect()->route('home')->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while deleting the user: ' . $e->getMessage()], 500);
+        }
+    }
+
 
 }

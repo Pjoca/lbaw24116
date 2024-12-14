@@ -12,27 +12,11 @@ DROP TABLE IF EXISTS group_membership CASCADE;
 DROP TABLE IF EXISTS post CASCADE;
 DROP TABLE IF EXISTS comment CASCADE;
 DROP TABLE IF EXISTS "like" CASCADE;
-DROP TABLE IF EXISTS report CASCADE;
 DROP TABLE IF EXISTS notification CASCADE;
-DROP TABLE IF EXISTS user_notification CASCADE;
-DROP TABLE IF EXISTS comment_notification CASCADE;
-DROP TABLE IF EXISTS group_notification CASCADE;
-DROP TABLE IF EXISTS post_notification CASCADE;
-DROP TABLE IF EXISTS like_notification CASCADE;
-DROP TABLE IF EXISTS message_notification CASCADE;
 DROP TABLE IF EXISTS admin CASCADE;
 DROP TABLE IF EXISTS message CASCADE;
 
 -- Drop existing types if they exist
-DROP TYPE IF EXISTS visibility_type CASCADE;
-DROP TYPE IF EXISTS account_status_type CASCADE;
-DROP TYPE IF EXISTS friendship_status_type CASCADE;
-DROP TYPE IF EXISTS report_status_type CASCADE;
-DROP TYPE IF EXISTS user_notification_type CASCADE;
-DROP TYPE IF EXISTS comment_notification_type CASCADE;
-DROP TYPE IF EXISTS group_notification_type CASCADE;
-DROP TYPE IF EXISTS post_notification_type CASCADE;
-DROP TYPE IF EXISTS like_notification_type CASCADE;
 DROP TYPE IF EXISTS message_notification_type CASCADE;
 DROP TYPE IF EXISTS group_membership_type CASCADE;
 
@@ -42,7 +26,6 @@ CREATE TYPE group_membership_type AS ENUM ('pending', 'accepted', 'rejected');
 CREATE TYPE visibility_type AS ENUM ('public', 'private', 'group', 'anonymous');
 CREATE TYPE account_status_type AS ENUM ('active', 'offline', 'deleted', 'blocked');
 CREATE TYPE friendship_status_type AS ENUM ('pending', 'accepted', 'rejected');
-CREATE TYPE report_status_type AS ENUM ('pending', 'reviewed', 'resolved');
 CREATE TYPE user_notification_type AS ENUM ('received_friend_request', 'accepted_friend_request', 'match');
 CREATE TYPE comment_notification_type AS ENUM ('replied_to_comment', 'commented_on_post', 'tagged_comment');
 CREATE TYPE group_notification_type AS ENUM ('invited_to_group');
@@ -136,23 +119,12 @@ CREATE TABLE "like" (
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
-CREATE TABLE report (
-    id SERIAL PRIMARY KEY,
-    description TEXT NOT NULL,
-    status report_status_type NOT NULL DEFAULT 'pending',
-    id_user INT REFERENCES "user"(id) NOT NULL,
-    id_reported_post INT REFERENCES post(id) ON DELETE CASCADE,
-    id_reported_comment INT REFERENCES comment(id) ON DELETE CASCADE
-);
-
 CREATE TABLE notification (
     id SERIAL PRIMARY KEY,
-    seen BOOLEAN DEFAULT FALSE,
-    created_at DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_user INT REFERENCES "user"(id) NOT NULL,
-    id_related_post INT REFERENCES post(id) ON DELETE CASCADE,
-    id_related_comment INT REFERENCES comment(id) ON DELETE CASCADE,
-    id_related_group INT REFERENCES "group"(id)
+    message_content TEXT,
+    onclick_url TEXT
 );
 
 CREATE TABLE message (
@@ -164,46 +136,8 @@ CREATE TABLE message (
     visibility visibility_type NOT NULL DEFAULT 'public'
 );
 
-
-CREATE TABLE user_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type user_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-
-CREATE TABLE comment_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type comment_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE group_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type group_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE post_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type post_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE like_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type like_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
-CREATE TABLE message_notification (
-    id_notification INT REFERENCES notification(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    type message_notification_type NOT NULL,
-    PRIMARY KEY (id_notification)
-);
-
 CREATE TABLE admin (
-    id INT REFERENCES "user"(id) PRIMARY KEY
+    id INT PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE
 );
 
 
@@ -219,7 +153,7 @@ CREATE INDEX idx_friendship_users ON friendship (id_user1, id_user2);
 
 ----------------------------------
 
-CREATE INDEX idx_notification_user_seen_created_at ON notification (id_user, seen, created_at);
+CREATE INDEX idx_notification_user ON notification (id_user);
 
 ----------------------------------
 
@@ -302,26 +236,6 @@ tsvector_update_trigger(group_content_tsv, 'pg_catalog.english', name, descripti
 -- Triggers
 ----------------------------------
 
-CREATE OR REPLACE FUNCTION trg_no_self_report_func()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.id_user = (SELECT id_user FROM post WHERE id = NEW.id_reported_post) THEN
-        RAISE EXCEPTION 'User cannot report their own post';
-    END IF;
-
-    RETURN NEW; 
-END;
-
-
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_no_self_report
-BEFORE INSERT ON report
-FOR EACH ROW
-EXECUTE FUNCTION trg_no_self_report_func();
-
------------------------
-
 CREATE OR REPLACE FUNCTION trg_update_last_login_func()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -358,35 +272,6 @@ EXECUTE FUNCTION add_owner_to_membership();
 
 ----------------------
 
-
-CREATE OR REPLACE FUNCTION trg_comment_on_post_notification_func()
-RETURNS TRIGGER AS $$
-DECLARE
-    post_owner INT;
-    notification_id INT;
-BEGIN
-    SELECT id_user INTO post_owner FROM post WHERE id = NEW.id_post;
-
-    IF post_owner IS NOT NULL AND post_owner <> NEW.id_user THEN
-        INSERT INTO notification (id_user, id_related_post, id_related_comment, seen, created_at)
-        VALUES (post_owner, NEW.id_post, NEW.id, FALSE, CURRENT_TIMESTAMP)
-        RETURNING id INTO notification_id; 
-
-        INSERT INTO comment_notification (id_notification, type)
-        VALUES (notification_id, 'commented_on_post'); 
-    END IF;
-
-    RETURN NEW; 
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_comment_on_post_notification
-AFTER INSERT ON comment
-FOR EACH ROW
-EXECUTE FUNCTION trg_comment_on_post_notification_func();
-
-
-----------------------
 
 -- Create the trigger function to transfer group ownership or delete the group
 CREATE OR REPLACE FUNCTION trg_transfer_or_delete_group()
@@ -488,7 +373,15 @@ EXECUTE FUNCTION trg_check_unique_group_request();
 -- Create the trigger function to enforce unique likes
 CREATE OR REPLACE FUNCTION trg_check_unique_like()
 RETURNS TRIGGER AS $$
+DECLARE
+    anonymous_user_id INT;
 BEGIN
+    SELECT id INTO anonymous_user_id FROM "user" WHERE username = 'anonymous' LIMIT 1;
+
+    IF NEW.id_user = anonymous_user_id THEN
+        RETURN NEW;
+    END IF;
+
     IF NEW.id_post IS NOT NULL THEN
         IF EXISTS (SELECT 1 FROM "like" WHERE id_user = NEW.id_user AND id_post = NEW.id_post) THEN
             RAISE EXCEPTION 'User has already liked this post';
@@ -511,47 +404,6 @@ BEFORE INSERT ON "like"
 FOR EACH ROW
 EXECUTE FUNCTION trg_check_unique_like();
 
---------------------------------
-
--- Create the trigger function to delete related notifications
-CREATE OR REPLACE FUNCTION trg_delete_related_notification()
-RETURNS TRIGGER AS $$
-BEGIN
-    DELETE FROM notification WHERE id = OLD.id_notification;
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER after_user_notification_delete
-AFTER DELETE ON user_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_comment_notification_delete
-AFTER DELETE ON comment_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_group_notification_delete
-AFTER DELETE ON group_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_post_notification_delete
-AFTER DELETE ON post_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_like_notification_delete
-AFTER DELETE ON like_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
-CREATE TRIGGER after_message_notification_delete
-AFTER DELETE ON message_notification
-FOR EACH ROW
-EXECUTE FUNCTION trg_delete_related_notification();
-
 -----------------------------------------------
 
 -- Truncate tables
@@ -562,14 +414,7 @@ TRUNCATE group_membership CASCADE;
 TRUNCATE "group" CASCADE;
 TRUNCATE friendship CASCADE;
 TRUNCATE friendship_request CASCADE;
-TRUNCATE report CASCADE;
 TRUNCATE notification CASCADE;
-TRUNCATE user_notification CASCADE;
-TRUNCATE comment_notification CASCADE;
-TRUNCATE group_notification CASCADE;
-TRUNCATE post_notification CASCADE;
-TRUNCATE like_notification CASCADE;
-TRUNCATE message_notification CASCADE;
 TRUNCATE message CASCADE;
 TRUNCATE admin CASCADE;
 TRUNCATE "user" CASCADE;
@@ -580,7 +425,6 @@ ALTER SEQUENCE group_id_seq RESTART WITH 1;
 ALTER SEQUENCE post_id_seq RESTART WITH 1;
 ALTER SEQUENCE comment_id_seq RESTART WITH 1;
 ALTER SEQUENCE like_id_seq RESTART WITH 1;
-ALTER SEQUENCE report_id_seq RESTART WITH 1;
 ALTER SEQUENCE notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE message_id_seq RESTART WITH 1;
 
@@ -589,6 +433,7 @@ INSERT INTO "user" (username, email, name, password, visibility, account_status,
 VALUES 
 ('john_doe', 'john.doe@up.pt', 'John Doe', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
 ('jane_smith', 'jane.smith@up.pt', 'Jane Smith', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'private', 'active', 'users/images/default.png'),
+('anonymous', 'anonymous@up.pt', 'Anonymous', '$2a$12$MhT/6twPk.2Hb63b.VXDZe1ceusL6iUyAWQ9Nq4978NWlLNz3zOf2', 'public', 'active', 'users/images/default.png'),
 ('alice_jones', 'alice.jones@up.pt', 'Alice Jones', 'hashed_password3', 'public', 'offline', 'users/images/default.png'),
 ('bob_brown', 'bob.brown@up.pt', 'Bob Brown', 'hashed_password4', 'public', 'active', 'users/images/default.png'),
 ('carol_white', 'carol.white@up.pt', 'Carol White', 'hashed_password5', 'private', 'active', 'users/images/default.png'),
@@ -721,20 +566,6 @@ VALUES
 (11,10),
 (12,10);
 
--- Insert reports
-INSERT INTO report (description, status, id_user, id_reported_post)
-VALUES 
-('Inappropriate content', 'pending', 3, 1),
-('Spam', 'reviewed', 4, 2),
-('Hate speech', 'resolved', 5, 3),
-('Harassment', 'pending', 6, 4),
-('Misinformation', 'pending', 7, 5),
-('Inappropriate image', 'reviewed', 8, 6),
-('Phishing attempt', 'resolved', 9, 7),
-('Copyright infringement', 'pending', 10, 8),
-('Fake news', 'reviewed', 1, 9),
-('Offensive language', 'resolved', 2, 10);
-
 -- Insert admin
 INSERT INTO admin (id)
 VALUES 
@@ -755,39 +586,6 @@ VALUES
 ('Congrats on your new job!', 9, 10, 'public'),
 ('See you soon!', 10, 1, 'public'),
 ('Se houver penalti contra o benfica amanhã pago um jantar a todos os membros do grupo', 14, 11, 'public');
-
-
-INSERT INTO notification (id_user, id_related_post, id_related_comment, id_related_group, seen)
-VALUES 
-(1, 1, NULL, 1, FALSE),
-(2, 2, 1, NULL, FALSE),
-(3, NULL, NULL, NULL, TRUE),
-(4, 2, NULL, 2, FALSE),
-(5, NULL, 2, NULL, FALSE),
-(6, 5, NULL, 5, FALSE),
-(7, 6, NULL, 6, FALSE),
-(8, 7, NULL, 7, FALSE),
-(9, 8, NULL, 8, FALSE),
-(10, 9, NULL, 9, FALSE),
-(11, 10, NULL, 10, FALSE),
-(14, 11, NULL, 11, FALSE);
-
--- Insert specific user notifications
-INSERT INTO user_notification (id_notification, type)
-VALUES 
-(1, 'received_friend_request'),
-(3, 'match');
-
--- Insert specific comment notifications
-INSERT INTO comment_notification (id_notification, type)
-VALUES 
-(5, 'commented_on_post');
-
-
--- Insert specific group notifications
-INSERT INTO group_notification (id_notification, type)
-VALUES 
-(6, 'invited_to_group');
 
 
 INSERT INTO friendship (id_user1, id_user2, created_at)
