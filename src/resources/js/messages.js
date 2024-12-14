@@ -82,21 +82,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const listItem = event.target.closest(".conversation-item");
             if (listItem) {
                 const contactId = listItem.getAttribute("data-contact-id");
+                const contactName = listItem.querySelector("p").textContent.trim(); // Capturar o nome do contato
                 currentContactId = contactId;
-
+    
+                // Atualizar o nome do contato no painel
+                const contactNamePanel = document.getElementById("contact-name-panel");
+                contactNamePanel.textContent = `Chat with ${contactName}`;
+    
                 messageInputPanel.classList.remove("hidden");
                 messageList.innerHTML = "";
-
+    
                 const placeholder = document.getElementById("placeholder");
                 if (placeholder) placeholder.classList.add("hidden");
-
+    
                 const newMessageList = document.getElementById("message-list");
                 newMessageList.classList.remove("hidden");
-
+    
                 // Resetar paginação ao selecionar nova conversa
                 currentPage = 1;
                 lastPage = 1;
-
+    
                 try {
                     await loadLastPageOfConversation(contactId);
                 } catch (error) {
@@ -106,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    
 
     // Evento de scroll: se chegar ao topo, carregamos a página anterior (mais antiga)
     messageList.addEventListener('scroll', async () => {

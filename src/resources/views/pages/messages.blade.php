@@ -30,8 +30,8 @@
 
         <!-- Painel de mensagens -->
         <div class="w-full lg:w-2/3 bg-white shadow-md rounded-lg flex flex-col">
-            <div class="bg-teal-600 text-white px-4 py-3 font-semibold rounded-t-lg">
-                Messages
+            <div id="contact-name-panel" class="bg-teal-600 text-white px-4 py-3 font-semibold rounded-t-lg">
+                Select a conversation
             </div>
             <div id="message-panel" class="flex-1 p-4 overflow-y-auto">
                 <div id="placeholder" class="flex items-center justify-center h-full text-gray-500 italic">
