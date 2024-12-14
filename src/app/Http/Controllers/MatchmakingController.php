@@ -10,19 +10,36 @@ class MatchmakingController extends Controller
     /**
      * Exibe o próximo perfil para o matchmaking.
      */
-    public function index()
-    {
-        $currentUser = auth()->user();
+    public function index(Request $request)
+{
+    $currentUser = auth()->user();
+    $seenProfiles = session('seen_profiles', []);
 
-        // Obtém o próximo perfil (excluindo o usuário autenticado)
-        // Aqui você pode adicionar filtros (gênero, localização, interesses, etc.)
-        $profile = User::where('id', '!=', $currentUser->id)
-            ->inRandomOrder()
-            ->first();
+    // Seleciona perfis que o usuário ainda não viu
+    $profile = User::where('id', '!=', $currentUser->id)
+        ->whereNotIn('id', $seenProfiles)
+        ->inRandomOrder()
+        ->first();
 
-        // Retorna a view com o próximo perfil
-        return view('pages.matchmaking', compact('profile'));
+    // Salva o ID do perfil visto na sessão
+    if ($profile) {
+        $seenProfiles[] = $profile->id;
+        session(['seen_profiles' => $seenProfiles]);
+    } else {
+        session()->forget('seen_profiles'); // Reseta se não houver mais perfis
     }
+
+    // Retorna apenas o conteúdo parcial se for AJAX
+    if ($request->ajax()) {
+        return view('partials.profile-cards-matchmaking', compact('profile'))->render();
+    }
+
+    // Retorna a página principal se for uma requisição padrão
+    return view('pages.matchmaking', compact('profile'));
+}
+
+
+
 
     /**
      * Processa a interação do usuário (like/dislike).
@@ -33,14 +50,14 @@ class MatchmakingController extends Controller
 
         // Captura o ID do perfil e a ação (like/dislike)
         $profileId = $request->input('profile_id');
-        $action = $request->input('action'); // "like" ou "dislike"
+        $action = $request->input('action');
 
-        // Aqui você pode salvar a interação no banco (como uma tabela de likes ou matches)
-        // Exemplo:
-        // Match::create([
+        // Exemplo de salvar interação no banco de dados
+        // Match::updateOrCreate([
         //     'user_id' => $currentUser->id,
         //     'matched_user_id' => $profileId,
-        //     'action' => $action,
+        // ], [
+        //     'action' => $action
         // ]);
 
         // Redireciona para o próximo perfil
