@@ -173,6 +173,11 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middlewa
 
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
+    Route::post('/matchmaking/interact', [App\Http\Controllers\MatchmakingController::class, 'interact'])->name('matchmaking.interact');
+});
+
 Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
 
 
