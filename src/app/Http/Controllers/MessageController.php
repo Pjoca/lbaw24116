@@ -88,7 +88,7 @@ public function getMessages(Request $request, $contactId)
             $query->where('id_sender', $contactId)
                   ->where('id_receiver', $userId);
         })
-        ->orderBy('created_at', 'desc'); // Mensagens mais recentes primeiro
+        ->orderBy('created_at', 'asc'); // Mensagens mais recentes primeiro
 
     // Paginação das mensagens
     $messages = $query->paginate($perPage, ['*'], 'page', $page);
@@ -101,7 +101,7 @@ public function getMessages(Request $request, $contactId)
             'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
             'created_at' => $message->created_at->format('Y-m-d H:i:s'),
         ];
-    })->reverse()->values();
+    });
 
     return response()->json([
         'data' => $formattedMessages,

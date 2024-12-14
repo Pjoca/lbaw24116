@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentContactId = null;
     let currentPage = 1;
     let lastPage = 1;
-    let loading = false; // Para evitar requisições múltiplas em simultâneo
+    let loading = false; // Para evitar requisições múltiplas simultâneas
 
     function scrollToBottom() {
         messageList.scrollTop = messageList.scrollHeight;
@@ -49,6 +49,34 @@ document.addEventListener("DOMContentLoaded", () => {
         return listItem;
     }
 
+    async function loadLastPageOfConversation(contactId) {
+        // Primeiro, obtenha info da primeira página apenas para saber o last_page
+        let response = await fetch(`/messages/${contactId}?page=1`);
+        if (!response.ok) throw new Error("Failed to load messages");
+        let result = await response.json();
+        lastPage = result.last_page;
+
+        // Agora, carregue a última página (mais recente)
+        response = await fetch(`/messages/${contactId}?page=${lastPage}`);
+        if (!response.ok) throw new Error("Failed to load messages");
+        result = await response.json();
+
+        const { data, current_page } = result;
+        currentPage = current_page;
+
+        if (data.length === 0) {
+            messageList.innerHTML = `<li class="text-gray-500 italic">No messages to display.</li>`;
+        } else {
+            data.forEach((message) => {
+                const listItem = createMessageListItem(message);
+                messageList.appendChild(listItem);
+            });
+
+            // Como estamos na última página (mais recente), rolamos para o fundo:
+            scrollToBottom();
+        }
+    }
+
     if (conversationList) {
         conversationList.addEventListener("click", async (event) => {
             const listItem = event.target.closest(".conversation-item");
@@ -65,31 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const newMessageList = document.getElementById("message-list");
                 newMessageList.classList.remove("hidden");
 
-                // Reseta paginação ao selecionar nova conversa
+                // Resetar paginação ao selecionar nova conversa
                 currentPage = 1;
                 lastPage = 1;
 
                 try {
-                    const response = await fetch(`/messages/${contactId}?page=1`);
-                    if (!response.ok) {
-                        throw new Error("Failed to load messages");
-                    }
-
-                    const result = await response.json();
-                    const { data, current_page, last_page } = result;
-                    currentPage = current_page;
-                    lastPage = last_page;
-
-                    if (data.length === 0) {
-                        newMessageList.innerHTML = `<li class="text-gray-500 italic">No messages to display.</li>`;
-                    } else {
-                        data.forEach((message) => {
-                            const listItem = createMessageListItem(message);
-                            newMessageList.appendChild(listItem);
-                        });
-
-                        scrollToBottom();
-                    }
+                    await loadLastPageOfConversation(contactId);
                 } catch (error) {
                     console.error(error);
                     messagePanel.innerHTML = `<h4 class="text-red-500">Failed to load messages.</h4>`;
@@ -98,33 +107,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Adiciona evento de scroll no painel de mensagens
+    // Evento de scroll: se chegar ao topo, carregamos a página anterior (mais antiga)
     messageList.addEventListener('scroll', async () => {
-        // Quando o scroll chega ao topo, verifica se temos mais páginas
-        if (messageList.scrollTop === 0 && currentPage < lastPage && !loading && currentContactId) {
+        // Quando o scroll chega ao topo, se currentPage > 1 temos páginas anteriores a carregar
+        if (messageList.scrollTop === 0 && currentPage > 1 && !loading && currentContactId) {
             loading = true;
             const oldScrollHeight = messageList.scrollHeight;
 
-            const nextPage = currentPage + 1;
+            const previousPage = currentPage - 1;
             try {
-                const response = await fetch(`/messages/${currentContactId}?page=${nextPage}`);
+                const response = await fetch(`/messages/${currentContactId}?page=${previousPage}`);
                 if (!response.ok) {
                     throw new Error("Failed to load previous messages");
                 }
 
                 const result = await response.json();
-                const { data, current_page, last_page } = result;
-
+                const { data, current_page } = result;
+                data.reverse();
                 data.forEach((message) => {
                     const listItem = createMessageListItem(message);
                     messageList.insertBefore(listItem, messageList.firstChild);
                 });
 
                 currentPage = current_page;
-                lastPage = last_page;
 
-                // Ajusta a posição do scroll para que o utilizador fique
-                // no mesmo ponto da conversa, ao invés de saltar
+                // Ajusta a posição do scroll para o utilizador não perder a posição
                 const newScrollHeight = messageList.scrollHeight;
                 messageList.scrollTop = newScrollHeight - oldScrollHeight;
             } catch (error) {
@@ -135,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Envio de mensagens (permanece praticamente o mesmo)
+    // Envio de mensagens
     if (messageForm) {
         messageForm.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -224,7 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (result.success) {
                         const contact = result.contact;
     
-                        
                         const noConversationsPlaceholder = document.querySelector("#conversation-list .no-conversations");
                         if (noConversationsPlaceholder) {
                             noConversationsPlaceholder.remove();
@@ -244,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         const conversationList = document.getElementById("conversation-list");
                         conversationList.prepend(newContact); 
     
-                        
                         newConversationModal.classList.add("hidden");
     
                         newContact.click();
@@ -255,6 +260,5 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
-    }    
+    }
 });
-
