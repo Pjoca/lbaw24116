@@ -7,6 +7,8 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\DB;
+
 class MessageController extends Controller
 {
     public function index()
@@ -30,11 +32,22 @@ class MessageController extends Controller
         });
     
     $existingContactIds = $contacts->pluck('id');
-    $friends = User::where('id', '!=', $userId)
-                   ->whereNotIn('id', $existingContactIds)
-                   ->get();
+    $friendIds = DB::table('friendship')
+        ->where('id_user1', $userId)
+        ->pluck('id_user2')
+        ->merge(
+            DB::table('friendship')
+                ->where('id_user2', $userId)
+                ->pluck('id_user1')
+        )
+        ->unique(); // Garantir sem duplicados
 
-    return view('pages.messages', compact('contacts', 'friends'));
+        $friends = User::where('id', '!=', $userId)
+            ->whereNotIn('id', $existingContactIds)
+            ->whereIn('id', $friendIds)
+           ->get();
+
+           return view('pages.messages', compact('contacts', 'friends'));
 }
 
 
