@@ -96,16 +96,13 @@ class UserController extends Controller
         'groupInvites' => $groupInvites, // Pass group invites
     ]);
 }
-
-
-
-
     /**
      * Search users.
      */
     public function search(Request $request)
 {
     $query = $request->input('query'); // Capture query input
+    $type = $request->input('type');
     $limit = $request->input('limit', null);
 
     // If no query is provided, return an empty collection

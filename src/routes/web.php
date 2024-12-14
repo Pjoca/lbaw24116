@@ -14,6 +14,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\GroupMembershipController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
@@ -84,7 +85,9 @@ Route::controller(PostController::class)->group(function () {
 });
 
 // Search
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
+Route::get('/search/groups', [GroupController::class, 'search'])->name('groups.search');
 
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {
@@ -188,7 +191,8 @@ Route::post('/messages/start-conversation', [MessageController::class, 'startCon
 Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
 Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
 
-Route::post('/posts/{postId}/comments', [PostController::class, 'storeComment'])->name('comments.store');
+// Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::post('/comments/{postId}', [CommentController::class, 'store'])->name('comments.store');
 Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
@@ -206,8 +210,14 @@ Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middlewa
 
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
+    Route::post('/matchmaking/interact', [App\Http\Controllers\MatchmakingController::class, 'interact'])->name('matchmaking.interact');
+});
 
-Route::get('/matchmaking', [MatchmakingController::class, 'index'])->name('matchmaking.index');
+Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
+
+
 
 
 
