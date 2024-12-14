@@ -59,7 +59,7 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/profile/{id}', 'show')->name('profile.show');
     Route::get('/profile/{id}/edit', 'edit')->middleware('auth')->name('profile.edit');
     Route::put('/profile/{id}', 'update')->middleware('auth')->name('profile.update');
-    Route::delete('/users/{id}', 'delete')->name('profile.delete');
+    Route::delete('/profile/{id}', 'delete')->name('profile.delete');
 });
 
 // Timeline Default Route

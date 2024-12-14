@@ -239,11 +239,12 @@ class UserController extends Controller
     {
         DB::beginTransaction();
 
-        $this->authorize('update', User::class);
 
         try {
             // Find the user to be deleted
             $user = User::findOrFail($id);
+
+            $this->authorize('update', $user);
 
             // Get the anonymous user (assume it's user with ID 1)
             $anonymousUser = User::where('username', 'anonymous')->first();
