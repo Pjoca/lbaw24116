@@ -22,6 +22,8 @@ class SearchController extends Controller
     {
         $query = $request->input('query');
         $type = $request->input('type');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
     
         // Default empty collections
         $users = collect();
@@ -35,9 +37,24 @@ class SearchController extends Controller
             } elseif ($type === 'groups') {
                 $groups = Group::where('name', 'LIKE', '%' . $query . '%')->get();
             } elseif ($type === 'posts') {
-                $posts = Post::where('content', 'LIKE', '%' . $query . '%')->get();
+                // If a date is provided
+                $posts = Post::query()
+                    ->where('content', 'LIKE', '%' . $query . '%')
+                    ->when($startDate, fn($q) => $q->where('created_at', '>=', $startDate . ' 00:00:00'))
+                    ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59'))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
             } elseif ($type === 'comments') {
                 $comments = Comment::where('content', 'LIKE', '%' . $query . '%')->get();
+            }
+        } else {
+            // Apply default date filtering for posts if no query is provided
+            if ($type === 'posts') {
+                $posts = Post::query()
+                    ->when($startDate, fn($q) => $q->where('created_at', '>=', $startDate . ' 00:00:00'))
+                    ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59'))
+                    ->orderBy('created_at', 'desc')
+                    ->get();
             }
         }
     

@@ -22,7 +22,7 @@
             <!-- Date Range Fields -->
             <input 
                 type="date" 
-                id="start_date" 
+                id="search-date1" 
                 name="start_date" 
                 value="{{ old('start_date', $startDate ?? '') }}" 
                 class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-teal-400 focus:outline-none" 
@@ -30,7 +30,7 @@
 
             <input 
                 type="date" 
-                id="end_date" 
+                id="search-date2" 
                 name="end_date" 
                 value="{{ old('end_date', $endDate ?? '') }}" 
                 class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-teal-400 focus:outline-none" 
