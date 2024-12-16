@@ -5,6 +5,7 @@ SET search_path TO lbaw24116;
 
 -- Drop tables that depend on the types
 DROP TABLE IF EXISTS "user" CASCADE;
+DROP TABLE IF EXISTS password_reset_tokens CASCADE;
 DROP TABLE IF EXISTS friendship CASCADE;
 DROP TABLE IF EXISTS friendship_request CASCADE;
 DROP TABLE IF EXISTS "group" CASCADE;
@@ -44,6 +45,12 @@ CREATE TABLE "user" (
     visibility visibility_type CHECK (visibility IN ('public', 'private')) NOT NULL,
     account_status account_status_type NOT NULL,
     last_login DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE password_reset_tokens (
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE friendship (

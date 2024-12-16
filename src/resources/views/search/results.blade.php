@@ -2,87 +2,141 @@
 
 @section('content')
 
-    <div class="relative">
-        <form id="search-form" action="{{ route('search') }}" method="GET" class="flex gap-2">
-            <select name="type" class="border border-gray-300 rounded-lg px-4 py-2 text-sm">
-                <option value="users">Users</option>
-                <option value="groups">Groups</option>
-                <option value="posts">Posts</option>
-                <option value="comments">Comments</option>
-            </select>
-                <input 
-                    type="text" 
-                    id="search-query"
-                    name="query" 
-                    placeholder="Search" 
-                    class="w-full bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-teal-400 focus:outline-none placeholder-gray-500" 
-                    autocomplete="off" 
-                    required>
-                <button type="submit" class="px-4 py-2 bg-teal-500 text-white rounded-lg">Search</button>
-        </form>
-        <div id="search-results" class="absolute top-full left-0 z-10 mt-2 w-full max-h-52 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg hidden">
-            <!-- Dynamically loaded content -->
-        </div>
-    </div>
-         
-    <!-- Results Section -->
+<!-- Search Container -->
+<div class="max-w-4xl mx-auto mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+    <form id="search-form" action="{{ route('search') }}" method="GET" class="flex flex-wrap items-center gap-4 justify-center">
+        <!-- Dropdown -->
+        <select 
+            id="search-type" 
+            name="type" 
+            class="w-28 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
+            <option value="users">Users</option>
+            <option value="groups">Groups</option>
+            <option value="posts">Posts</option>
+            <option value="comments">Comments</option>
+        </select>
 
-    @if(empty($query))
-        <p class="text-gray-500">
-            
-        </p>
-    @else
-        <h2 class="text-xl font-bold mb-4">Search Results for "{{ $query }}"</h2>
+        <!-- Search Bar -->
+        <input 
+            type="text" 
+            id="search-query" 
+            name="query" 
+            placeholder="Search" 
+            class="w-64 border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-teal-400 focus:outline-none placeholder-gray-500" 
+            autocomplete="off" required>
+
+        <!-- Date Inputs -->
+        <div id="date-filters" class="hidden">
+        <input 
+            type="date" 
+            id="search-date1" 
+            name="start_date" 
+            value="{{ old('start_date', $startDate ?? '') }}" 
+            class="w-36 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
+
+        <input 
+            type="date" 
+            id="search-date2" 
+            name="end_date" 
+            value="{{ old('end_date', $endDate ?? '') }}" 
+            class="w-36 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
+
+        <!-- Search Button -->
+        <button 
+            type="submit" 
+            class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 focus:ring-2 focus:ring-teal-400 focus:outline-none">
+            Search
+        </button>
+    </form>
+</div>
+
+
+<!-- Empty State Message -->
+@if(empty($query))
+    <p class="mt-8 text-gray-500 text-center italic">
+        No search query entered. Please use the search bar above.
+    </p>
+@else
+    <!-- Results Section -->
+    <div class="max-w-3xl mx-auto mt-8 space-y-6">
+        <h2 class="text-xl font-bold block text-teal-600">
+        
+
+            Search Results for "{{ $query }}"
+        </h2>
 
         @if(!$users->isEmpty())
-            <ul class="divide-y divide-gray-200 w-full max-w-2xl">
+            <!-- User Results -->
+            <h3 class="text-lg font-semibold block text-teal-600">
+                User Results
+            </h3>
+            <ul class="divide-y divide-gray-200">
                 @foreach($users as $user)
                     <li class="py-4 flex items-center justify-between">
-                        <span class="font-medium">{{ $user->name }}</span>
-                        <a href="{{ route('profile.show', $user->id) }}" class="text-teal-600 hover:underline">
+                        <span class="block text-teal-600">{{ $user->name }}</span>
+                        <a href="{{ route('profile.show', $user->id) }}" class="block text-teal-600 hover:text-teal-800 font-medium transition">
                             View Profile
                         </a>
                     </li>
                 @endforeach
             </ul>
-            
-        
-        @elseif(!$groups->isEmpty())
-            <ul class="divide-y divide-gray-200 w-full max-w-2xl">
+        @endif
+
+        @if(!$groups->isEmpty())
+            <!-- Group Results -->
+            <h3 class="text-lg font-semibold block text-teal-600">
+                Group Results
+            </h3>
+            <ul class="divide-y divide-gray-200">
                 @foreach($groups as $group)
                     <li class="py-4 flex items-center justify-between">
-                        <span class="font-medium">{{ $group->name }}</span>
-                        <a href="{{ route('groups.show', $group->id) }}" class="text-teal-600 hover:underline">
+                        <span class="block text-teal-600">{{ $group->name }}</span>
+                        <a href="{{ route('groups.show', $group->id) }}" class="block text-teal-600 hover:text-teal-800 font-medium transition">
                             View Group
                         </a>
                     </li>
                 @endforeach
-            </ul>   
-            
-        @elseif(!$posts->isEmpty())
-            <div id="posts-container" class="max-w-3xl mx-auto space-y-8">
-                @each('partials.post', $posts, 'post')
-            </div> 
-
-        @elseif(!$comments->isEmpty())
-        <div id="comments-container" class="max-w-3xl mx-auto space-y-8">
-            @foreach($comments as $comment)
-                <div class="border rounded-lg p-4 shadow">
-                    <div class="mb-2">
-                        <h3 class="font-bold text-teal-600">Comment</h3>
-                        <p class="text-gray-700">{{ $comment->content }}</p>
-                    </div>
-                    <div class="bg-gray-100 p-2 rounded">
-                        <h4 class="font-semibold text-teal-600">Associated Post:</h4>
-                        @include('partials.post', ['post' => $comment->post])
-                        
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-        @else
-            <p class="text-gray-500">Nothing found matching your search.</p>
+            </ul>
         @endif
-    @endif
+
+        @if(!$posts->isEmpty())
+            <!-- Post Results -->
+            <h3 class="text-lg font-semibold block text-teal-600">
+                Post Results
+            </h3>
+            <div class="space-y-6">
+                @each('partials.post', $posts, 'post')
+            </div>
+        @endif
+
+        @if(!$comments->isEmpty())
+            <!-- Comment Results -->
+            <h3 class="text-lg font-semibold block text-teal-600">
+                Comment Results
+            </h3>
+            <div class="space-y-6">
+                @foreach($comments as $comment)
+                    <div class="border border-gray-200 rounded-lg p-4 shadow">
+                        <div class="mb-2">
+                            <h3 class="font-bold text-teal-600">Comment</h3>
+                            <p class="text-gray-700">{{ $comment->content }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded">
+                            <h4 class="font-semibold text-teal-600">Associated Post:</h4>
+                            @include('partials.post', ['post' => $comment->post])
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if($users->isEmpty() && $groups->isEmpty() && $posts->isEmpty() && $comments->isEmpty())
+            <!-- No Results -->
+            <p class="text-gray-500 text-center mt-6">
+                Nothing found matching your search.
+            </p>
+        @endif
+    </div>
+@endif
+
 @endsection

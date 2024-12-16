@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NotificationController;
+use App\Mail\MyTestEmail;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -20,6 +21,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
 
 use App\Http\Controllers\MatchmakingController;
+
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 use Illuminate\Http\Request;
 
@@ -140,6 +143,14 @@ Route::controller(NotificationController::class)->middleware('auth')->group(func
 });
 
 
+Route::controller(ForgotPasswordController::class)->group( function () {
+    Route::get('password/reset', 'showLinkRequestForm')->name('password.request');
+    Route::post('password/email',  'sendResetLinkEmail')->name('password.email');
+    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset');
+    Route::post('password/reset', 'reset')->name('password.update');
+});
+
+
 
 Route::post('/broadcasting/auth', function (Request $request) {
     if (!Auth::check()) {
@@ -216,12 +227,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
-
-
-
-
-
-
 
 
 
