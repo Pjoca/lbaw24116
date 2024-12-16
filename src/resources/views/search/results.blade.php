@@ -6,7 +6,10 @@
 <div class="max-w-4xl mx-auto mt-8 p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
     <form id="search-form" action="{{ route('search') }}" method="GET" class="flex flex-wrap items-center gap-4 justify-center">
         <!-- Dropdown -->
-        <select name="type" class="w-28 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
+        <select 
+            id="search-type" 
+            name="type" 
+            class="w-28 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
             <option value="users">Users</option>
             <option value="groups">Groups</option>
             <option value="posts">Posts</option>
@@ -23,6 +26,7 @@
             autocomplete="off" required>
 
         <!-- Date Inputs -->
+        <div id="date-filters" class="hidden">
         <input 
             type="date" 
             id="search-date1" 
@@ -134,3 +138,26 @@
 @endif
 
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchType = document.getElementById('search-type');
+    const dateFilters = document.getElementById('date-filters');
+
+    // Function to toggle visibility of date inputs
+    function toggleDateInputs() {
+        const selectedType = searchType.value;
+        if (selectedType === 'groups' || selectedType === 'posts') {
+            dateFilters.classList.remove('hidden');
+        } else {
+            dateFilters.classList.add('hidden');
+        }
+    }
+
+    // Initialize visibility on page load
+    toggleDateInputs();
+
+    // Add event listener to the dropdown
+    searchType.addEventListener('change', toggleDateInputs);
+});
+</script>
