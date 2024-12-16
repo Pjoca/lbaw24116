@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\NotificationController;
-use App\Mail\MyTestEmail;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -19,8 +18,6 @@ use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
-
-use App\Http\Controllers\MatchmakingController;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
@@ -171,15 +168,15 @@ Route::post('/broadcasting/auth', function (Request $request) {
     }
 
     $pusher = new Pusher\Pusher(
-        env('PUSHER_APP_KEY'),
-        env('PUSHER_APP_SECRET'),
-        env('PUSHER_APP_ID'),
+        config('broadcasting.connections.pusher.key'),
+        config('broadcasting.connections.pusher.secret'),
+        config('broadcasting.connections.pusher.app_id'),
         [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
+            'cluster' => config('broadcasting.connections.pusher.options.cluster'),
             'useTLS' => false,
-            'host' => env('APP_URL'),
-            'port' => 6001,
-            'scheme' => 'http',
+            'host' => config('broadcasting.connections.pusher.options.host'),
+            'port' => config('broadcasting.connections.pusher.options.port'),
+            'scheme' => config('broadcasting.connections.pusher.options.scheme'),
         ]
     );
 
