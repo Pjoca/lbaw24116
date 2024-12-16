@@ -59,20 +59,22 @@
 @else
     <!-- Results Section -->
     <div class="max-w-3xl mx-auto mt-8 space-y-6">
-        <h2 class="text-xl font-bold text-gray-700 border-b border-gray-200 pb-2">
+        <h2 class="text-xl font-bold block text-teal-600">
+        
+
             Search Results for "{{ $query }}"
         </h2>
 
         @if(!$users->isEmpty())
             <!-- User Results -->
-            <h3 class="text-lg font-semibold text-gray-700 border-b border-gray-200 pb-2">
+            <h3 class="text-lg font-semibold block text-teal-600">
                 User Results
             </h3>
             <ul class="divide-y divide-gray-200">
                 @foreach($users as $user)
                     <li class="py-4 flex items-center justify-between">
-                        <span class="font-medium">{{ $user->name }}</span>
-                        <a href="{{ route('profile.show', $user->id) }}" class="text-teal-600 hover:underline">
+                        <span class="block text-teal-600">{{ $user->name }}</span>
+                        <a href="{{ route('profile.show', $user->id) }}" class="block text-teal-600 hover:text-teal-800 font-medium transition">
                             View Profile
                         </a>
                     </li>
@@ -82,14 +84,14 @@
 
         @if(!$groups->isEmpty())
             <!-- Group Results -->
-            <h3 class="text-lg font-semibold text-gray-700 border-b border-gray-200 pb-2">
+            <h3 class="text-lg font-semibold block text-teal-600">
                 Group Results
             </h3>
             <ul class="divide-y divide-gray-200">
                 @foreach($groups as $group)
                     <li class="py-4 flex items-center justify-between">
-                        <span class="font-medium">{{ $group->name }}</span>
-                        <a href="{{ route('groups.show', $group->id) }}" class="text-teal-600 hover:underline">
+                        <span class="block text-teal-600">{{ $group->name }}</span>
+                        <a href="{{ route('groups.show', $group->id) }}" class="block text-teal-600 hover:text-teal-800 font-medium transition">
                             View Group
                         </a>
                     </li>
@@ -99,7 +101,7 @@
 
         @if(!$posts->isEmpty())
             <!-- Post Results -->
-            <h3 class="text-lg font-semibold text-gray-700 border-b border-gray-200 pb-2">
+            <h3 class="text-lg font-semibold block text-teal-600">
                 Post Results
             </h3>
             <div class="space-y-6">
@@ -109,7 +111,7 @@
 
         @if(!$comments->isEmpty())
             <!-- Comment Results -->
-            <h3 class="text-lg font-semibold text-gray-700 border-b border-gray-200 pb-2">
+            <h3 class="text-lg font-semibold block text-teal-600">
                 Comment Results
             </h3>
             <div class="space-y-6">
@@ -138,26 +140,3 @@
 @endif
 
 @endsection
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const searchType = document.getElementById('search-type');
-    const dateFilters = document.getElementById('date-filters');
-
-    // Function to toggle visibility of date inputs
-    function toggleDateInputs() {
-        const selectedType = searchType.value;
-        if (selectedType === 'groups' || selectedType === 'posts') {
-            dateFilters.classList.remove('hidden');
-        } else {
-            dateFilters.classList.add('hidden');
-        }
-    }
-
-    // Initialize visibility on page load
-    toggleDateInputs();
-
-    // Add event listener to the dropdown
-    searchType.addEventListener('change', toggleDateInputs);
-});
-</script>

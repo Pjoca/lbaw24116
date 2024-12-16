@@ -33,6 +33,8 @@ class SearchController extends Controller
     
         if (!empty($query)) { // If a date is provided
 
+            $query = strtolower($query);
+
             if ($type === 'users') {
                 $users = User::where('name', 'LIKE', '%' . $query . '%')->get();
             } elseif ($type === 'groups') {
@@ -76,7 +78,7 @@ class SearchController extends Controller
 
     public function searchUsers(Request $request)
     {
-        $query = $request->input('query'); // Capture query input
+        $query = strtolower($request->input('query', ''));
         $type = $request->input('type');
         $limit = $request->input('limit', null);
     

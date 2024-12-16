@@ -644,3 +644,50 @@ function deleteNotification(notificationId) {
 
 
 window.deleteNotification = deleteNotification;
+
+
+// Search
+
+// Date inputs
+
+document.addEventListener('DOMContentLoaded', function () {
+    const searchType = document.getElementById('search-type');
+    const dateFilters = document.getElementById('date-filters');
+
+    // Function to toggle visibility of date inputs
+    function toggleDateInputs() {
+        const selectedType = searchType.value;
+        if (selectedType === 'groups' || selectedType === 'posts') {
+            dateFilters.classList.remove('hidden');
+        } else {
+            dateFilters.classList.add('hidden');
+        }
+    }
+
+    // Initialize visibility on page load
+    toggleDateInputs();
+
+    // Add event listener to the dropdown
+    searchType.addEventListener('change', toggleDateInputs);
+});
+
+// Filter User List Functionality
+/* function filterUsers() {
+    const searchValue = document.getElementById('search-searchUsers-input')?.value.toLowerCase();
+    const rows = document.querySelectorAll('#user-list-tbody tr');
+
+    rows.forEach(row => {
+        const name = row.children[1]?.textContent.toLowerCase();
+        const email = row.children[2]?.textContent.toLowerCase();
+        const isVisible = name.includes(searchValue) || email.includes(searchValue);
+        row.style.display = isVisible ? '' : 'none';
+    });
+}
+
+// Attach event listener for user search input
+function handleUserSearchInput() {
+    const userSearchInput = document.getElementById('search-searchUsers-input');
+    if (userSearchInput) {
+        userSearchInput.addEventListener('keyup', filterUsers);
+    }
+} */
