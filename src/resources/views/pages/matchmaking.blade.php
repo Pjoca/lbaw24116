@@ -1,74 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex items-center justify-center min-h-screen bg-gray-100 relative">
-    @if($profile)
-        <!-- Card de perfil -->
-        <div id="profile-card" class="bg-white shadow-lg rounded-lg p-6 w-full max-w-md sm:max-w-lg lg:max-w-xl relative transform transition-all duration-500">
-            <!-- Imagem do cabeçalho -->
-            <div class="relative h-72 w-full overflow-hidden rounded-t-lg">
-                <img src="{{ $profile->profile_picture }}" alt="Header Image" class="w-full h-full object-cover">
-                <!-- Nome do perfil -->
-                <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                    <h2 class="text-2xl font-bold">{{ $profile->name }}</h2>
-                    <p class="text-sm">{{ $profile->age }} anos - {{ $profile->location }}</p>
+<div class="container mx-auto py-8">
+    <!-- Exibindo usuários com grupos em comum -->
+    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Utilizador em grupos em comum contigo</h2>
+    <div class="same-group-users grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($sameGroupUsers as $user)
+            <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-center space-x-4">
+                    <!-- Imagem do usuário -->
+                    <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                        <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                    </div>
                 </div>
             </div>
-            <!-- Detalhes do perfil -->
-            <div class="p-4">
-                <p class="text-gray-600 text-center">"Descrição do usuário ou detalhes adicionais."</p>
-            </div>
-            <!-- Botões de interação -->
-            <div class="flex justify-around mt-4">
-                <form action="{{ route('matchmaking.interact') }}" method="POST" id="dislike-form">
-                    @csrf
-                    <input type="hidden" name="profile_id" value="{{ $profile->id }}">
-                    <input type="hidden" name="action" value="dislike">
-                    <button type="submit" class="bg-red-500 text-white px-6 py-3 rounded-full shadow-lg text-lg hover:bg-red-600 transform hover:scale-105 transition">
-                        ❌ Dislike
-                    </button>
-                </form>
-                <form action="{{ route('matchmaking.interact') }}" method="POST" id="like-form">
-                    @csrf
-                    <input type="hidden" name="profile_id" value="{{ $profile->id }}">
-                    <input type="hidden" name="action" value="like">
-                    <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-full shadow-lg text-lg hover:bg-green-600 transform hover:scale-105 transition">
-                        ❤️ Like
-                    </button>
-                </form>
-            </div>
-        </div>
+        @endforeach
+    </div>
 
-        <!-- Efeito de match -->
-        <div id="match-overlay" class="hidden absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center z-50">
-            <div class="text-center">
-                <h1 class="text-white text-6xl font-bold mb-4">🎉 Match! 🎉</h1>
-                <p class="text-white text-lg">Vocês deram like um no outro!</p>
+    <!-- Exibindo outros usuários -->
+    <h2 class="text-2xl font-semibold mt-12 mb-4 text-gray-800">Outros Utilizadores</h2>
+    <div class="other-users grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($otherUsers as $user)
+            <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-center space-x-4">
+                    <!-- Imagem do usuário -->
+                    <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                        <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    @else
-        <p class="text-gray-500">Nenhum perfil disponível no momento.</p>
-    @endif
+        @endforeach
+    </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const likeForm = document.getElementById('like-form');
-        const matchOverlay = document.getElementById('match-overlay');
-        const profileCard = document.getElementById('profile-card');
-
-        likeForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Previne o envio imediato do formulário
-            // Mostra o efeito de match
-            matchOverlay.classList.remove('hidden');
-            matchOverlay.classList.add('flex');
-            profileCard.classList.add('opacity-0');
-
-            // Redireciona após alguns segundos
-            setTimeout(() => {
-                likeForm.submit(); // Envia o formulário após a animação
-            }, 2000);
-        });
-    });
-</script>
 @endsection

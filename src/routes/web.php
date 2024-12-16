@@ -228,5 +228,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
 
+Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
+
+
+
+
 
 
