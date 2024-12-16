@@ -57,7 +57,7 @@
 
     <!-- Imagem do Post (se houver) -->
     @if ($post->image_url)
-        <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover mb-4">
+        <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover mb-4" onclick="showPostViewModal({{ $post->id }})">
     @endif
 
     <!-- Conteúdo do Post -->

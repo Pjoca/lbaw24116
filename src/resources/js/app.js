@@ -691,3 +691,79 @@ function handleUserSearchInput() {
         userSearchInput.addEventListener('keyup', filterUsers);
     }
 } */
+
+
+const postViewModalHandler = {
+    async show(id) {
+        const postViewModal = document.getElementById('post-view-modal'); // Modal para visualização do post
+        const postViewContent = document.getElementById('post-view-content'); // Container do conteúdo do modal
+
+        try {
+            // Fazer a requisição para buscar os dados do post
+            const response = await fetch(`/posts/${id}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Erro ao carregar os dados do post:', errorText);
+                postViewContent.innerHTML = `
+                    <p class="text-red-500 text-center">Erro ao carregar os dados do post.</p>
+                `;
+                return;
+            }
+
+            const postData = await response.json();
+
+            // Preencher o modal com os dados do post
+            postViewContent.innerHTML = `
+                <div>
+                    <!-- Imagem do Post -->
+                    ${postData.image_url
+                        ? `<img src="/storage/${postData.image_url}" alt="Post Image" class="rounded-lg w-full mb-4" />`
+                        : ''}
+
+                    <!-- Texto do Post -->
+                    <p class="text-lg text-gray-800 mb-4">${postData.content}</p>
+
+                    <!-- Informações do Autor -->
+                    <div class="flex items-center">
+                        <img src="/storage/${postData.user_image}" alt="${postData.user_name}" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">${postData.user_name}</p>
+                            <p class="text-sm text-gray-500">${postData.created_at}</p>
+                        </div>
+                    </div>
+
+                    <!-- Informações Adicionais -->
+                    <div class="mt-4 flex items-center">
+                        <span class="text-gray-600">${postData.likes_count} likes</span>
+                    </div>
+                </div>
+            `;
+
+            // Mostrar o modal
+            if (postViewModal) postViewModal.classList.remove('hidden');
+        } catch (error) {
+            console.error('Erro ao carregar os dados do post:', error);
+            postViewContent.innerHTML = `
+                <p class="text-red-500 text-center">Erro ao carregar os dados do post.</p>
+            `;
+        }
+    },
+
+    hide() {
+        const postViewModal = document.getElementById('post-view-modal');
+        if (postViewModal) postViewModal.classList.add('hidden');
+    },
+};
+
+// Anexar as funções ao objeto global para acesso no HTML
+window.showPostViewModal = postViewModalHandler.show;
+window.hidePostViewModal = postViewModalHandler.hide;
+
+// Adicionar evento para fechar o modal
+document.getElementById('close-post-view-modal').addEventListener('click', () => {
+    postViewModalHandler.hide();
+});
+
