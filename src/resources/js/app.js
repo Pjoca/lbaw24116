@@ -695,75 +695,66 @@ function handleUserSearchInput() {
 
 const postViewModalHandler = {
     async show(id) {
-        const postViewModal = document.getElementById('post-view-modal'); // Modal para visualização do post
-        const postViewContent = document.getElementById('post-view-content'); // Container do conteúdo do modal
+        const postViewModal = document.getElementById('post-view-modal');
+        const modalPostImage = document.getElementById('modal-post-image');
+        const modalUserImage = document.getElementById('modal-user-image');
+        const modalUserName = document.getElementById('modal-user-name');
+        const modalCreatedAt = document.getElementById('modal-created-at');
+        const modalPostContent = document.getElementById('modal-post-content');
+        const modalLikesCount = document.getElementById('modal-likes-count');
+        const modalComments = document.getElementById('modal-comments');
 
         try {
-            // Fazer a requisição para buscar os dados do post
             const response = await fetch(`/posts/${id}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Erro ao carregar os dados do post:', errorText);
-                postViewContent.innerHTML = `
-                    <p class="text-red-500 text-center">Erro ao carregar os dados do post.</p>
-                `;
-                return;
-            }
+            if (!response.ok) throw new Error('Erro ao buscar os dados do post');
 
             const postData = await response.json();
 
-            // Preencher o modal com os dados do post
-            postViewContent.innerHTML = `
-                <div>
-                    <!-- Imagem do Post -->
-                    ${postData.image_url
-                        ? `<img src="/storage/${postData.image_url}" alt="Post Image" class="rounded-lg w-full mb-4" />`
-                        : ''}
+            // Preencher o modal
+            modalPostImage.src = `/storage/${postData.image_url}`;
+            modalUserImage.src = `/storage/${postData.user_image}`;
+            modalUserName.textContent = postData.user_name;
+            modalCreatedAt.textContent = postData.created_at;
+            modalPostContent.textContent = postData.content;
+            modalLikesCount.textContent = `${postData.likes_count} Likes`;
 
-                    <!-- Texto do Post -->
-                    <p class="text-lg text-gray-800 mb-4">${postData.content}</p>
-
-                    <!-- Informações do Autor -->
-                    <div class="flex items-center">
-                        <img src="/storage/${postData.user_image}" alt="${postData.user_name}" class="w-12 h-12 rounded-full mr-4">
-                        <div>
-                            <p class="text-sm font-semibold text-gray-800">${postData.user_name}</p>
-                            <p class="text-sm text-gray-500">${postData.created_at}</p>
+            // Carregar os comentários
+            modalComments.innerHTML = ''; // Limpa comentários anteriores
+            const commentsResponse = await fetch(`/posts/${id}/comments`);
+            if (commentsResponse.ok) {
+                const commentsData = await commentsResponse.json();
+                commentsData.comments.forEach(comment => {
+                    modalComments.innerHTML += `
+                        <div class="flex items-center">
+                            <img src="/storage/${comment.user_image_url}" alt="User" class="w-8 h-8 rounded-full mr-3">
+                            <p><strong>${comment.user_name}</strong>: ${comment.content}</p>
                         </div>
-                    </div>
+                    `;
+                });
+            }
 
-                    <!-- Informações Adicionais -->
-                    <div class="mt-4 flex items-center">
-                        <span class="text-gray-600">${postData.likes_count} likes</span>
-                    </div>
-                </div>
-            `;
-
-            // Mostrar o modal
-            if (postViewModal) postViewModal.classList.remove('hidden');
+            postViewModal.classList.remove('hidden');
         } catch (error) {
-            console.error('Erro ao carregar os dados do post:', error);
-            postViewContent.innerHTML = `
-                <p class="text-red-500 text-center">Erro ao carregar os dados do post.</p>
-            `;
+            console.error(error);
+            alert('Erro ao carregar o post.');
         }
     },
 
     hide() {
-        const postViewModal = document.getElementById('post-view-modal');
-        if (postViewModal) postViewModal.classList.add('hidden');
+        document.getElementById('post-view-modal').classList.add('hidden');
     },
 };
 
-// Anexar as funções ao objeto global para acesso no HTML
-window.showPostViewModal = postViewModalHandler.show;
-window.hidePostViewModal = postViewModalHandler.hide;
-
-// Adicionar evento para fechar o modal
+// Botão para fechar o modal
 document.getElementById('close-post-view-modal').addEventListener('click', () => {
     postViewModalHandler.hide();
 });
+
+window.showPostViewModal = postViewModalHandler.show;
+window.hidePostViewModal = postViewModalHandler.hide;
+
+
 

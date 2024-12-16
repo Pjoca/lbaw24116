@@ -164,7 +164,11 @@ public function show($id)
     return response()->json([
         'id' => $post->id,
         'content' => $post->content,
-        'visibility' => $post->visibility,
+        'image_url' => $post->image_url,
+        'user_name' => $post->user->name,
+        'user_image' => $post->user->image_url ?? 'users/images/default.png',
+        'created_at' => $post->created_at->format('d M, Y H:i'),
+        'likes_count' => $post->likes->count(),
     ]);
 }
 
