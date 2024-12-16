@@ -7,6 +7,8 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\DB;
+
 class MessageController extends Controller
 {
     public function index()
@@ -30,11 +32,22 @@ class MessageController extends Controller
         });
     
     $existingContactIds = $contacts->pluck('id');
-    $friends = User::where('id', '!=', $userId)
-                   ->whereNotIn('id', $existingContactIds)
-                   ->get();
+    $friendIds = DB::table('friendship')
+        ->where('id_user1', $userId)
+        ->pluck('id_user2')
+        ->merge(
+            DB::table('friendship')
+                ->where('id_user2', $userId)
+                ->pluck('id_user1')
+        )
+        ->unique(); // Garantir sem duplicados
 
-    return view('pages.messages', compact('contacts', 'friends'));
+        $friends = User::where('id', '!=', $userId)
+            ->whereNotIn('id', $existingContactIds)
+            ->whereIn('id', $friendIds)
+           ->get();
+
+           return view('pages.messages', compact('contacts', 'friends'));
 }
 
 
@@ -75,7 +88,7 @@ public function getMessages(Request $request, $contactId)
             $query->where('id_sender', $contactId)
                   ->where('id_receiver', $userId);
         })
-        ->orderBy('created_at', 'desc'); // Mensagens mais recentes primeiro
+        ->orderBy('created_at', 'asc'); // Mensagens mais recentes primeiro
 
     // Paginação das mensagens
     $messages = $query->paginate($perPage, ['*'], 'page', $page);
@@ -88,7 +101,7 @@ public function getMessages(Request $request, $contactId)
             'sender_name' => $message->id_sender == $userId ? 'You' : User::find($message->id_sender)->name,
             'created_at' => $message->created_at->format('Y-m-d H:i:s'),
         ];
-    })->reverse()->values();
+    });
 
     return response()->json([
         'data' => $formattedMessages,

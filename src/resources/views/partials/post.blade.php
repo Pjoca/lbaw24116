@@ -57,7 +57,7 @@
 
     <!-- Imagem do Post (se houver) -->
     @if ($post->image_url)
-        <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover mb-4">
+        <img src="{{ asset('storage/' . $post->image_url) }}" alt="Post Image" class="w-full h-auto rounded-lg object-cover mb-4" onclick="showPostViewModal({{ $post->id }})">
     @endif
 
     <!-- Conteúdo do Post -->
@@ -93,7 +93,11 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <img src="{{ asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')) }}" class="w-8 h-8 rounded-full mr-3">
-                        <span class="font-semibold text-gray-800">{{ $comment->user->name }}</span>
+                        <a href="{{ route('profile.show', ['id' => $comment->user->id]) }}" 
+                            class="font-semibold text-gray-800 hover:text-blue-500 transition">
+                            {{ $comment->user->name }}
+                        </a>
+
                     </div>
 
                     @if(Auth::check() && Auth::id() === $comment->id_user)

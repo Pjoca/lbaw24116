@@ -117,4 +117,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class, 'id_user')->orderBy('created_at', 'desc');
     }
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_membership', 'id_user', 'id_group')
+                    ->withTimestamps(); 
+    }
+
+
+
 }

@@ -39,6 +39,7 @@
     </div>
 
     @include('modals.edit-post-modal')
+    @include('modals.post-modal')
     <!-- Include Infinite Scroll Script -->
     @vite('resources/js/infinite-scroll.js')
 @endsection

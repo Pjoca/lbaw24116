@@ -4,46 +4,36 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\GroupMembership;
 
 class MatchmakingController extends Controller
 {
-    /**
-     * Exibe o próximo perfil para o matchmaking.
-     */
     public function index()
     {
-        $currentUser = auth()->user();
+        // Obter o usuário autenticado
+        $user = auth()->user();
 
-        // Obtém o próximo perfil (excluindo o usuário autenticado)
-        // Aqui você pode adicionar filtros (gênero, localização, interesses, etc.)
-        $profile = User::where('id', '!=', $currentUser->id)
-            ->inRandomOrder()
-            ->first();
+        // Obter os grupos do usuário
+        $userGroups = $user->groups()->pluck('id')->toArray();
 
-        // Retorna a view com o próximo perfil
-        return view('pages.matchmaking', compact('profile'));
-    }
+        // Obter usuários em grupos em comum
+        $sameGroupUsers = User::whereHas('groups', function ($query) use ($userGroups) {
+            // Verifica se o usuário está em algum dos grupos do usuário autenticado
+            $query->whereIn('id', $userGroups);
+        })
+        ->where('id', '!=', $user->id)  // Exclui o próprio usuário
+        ->get();
 
-    /**
-     * Processa a interação do usuário (like/dislike).
-     */
-    public function interact(Request $request)
-    {
-        $currentUser = auth()->user();
+        // Obter usuários que não estão em grupos em comum
+        $otherUsers = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
+            // Verifica se o usuário não está em nenhum dos grupos do usuário autenticado
+            $query->whereIn('id', $userGroups);
+        })
+        ->where('id', '!=', $user->id)  // Exclui o próprio usuário
+        ->get();
 
-        // Captura o ID do perfil e a ação (like/dislike)
-        $profileId = $request->input('profile_id');
-        $action = $request->input('action'); // "like" ou "dislike"
-
-        // Aqui você pode salvar a interação no banco (como uma tabela de likes ou matches)
-        // Exemplo:
-        // Match::create([
-        //     'user_id' => $currentUser->id,
-        //     'matched_user_id' => $profileId,
-        //     'action' => $action,
-        // ]);
-
-        // Redireciona para o próximo perfil
-        return redirect()->route('matchmaking.index');
+        // Passar os dados para a view
+        return view('pages.matchmaking', compact('sameGroupUsers', 'otherUsers'));
     }
 }
+

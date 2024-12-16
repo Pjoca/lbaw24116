@@ -132,7 +132,7 @@ CREATE TABLE notification (
 CREATE TABLE message (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
-    created_at DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     id_sender INT REFERENCES "user"(id),
     id_receiver INT REFERENCES "user"(id),
     visibility visibility_type NOT NULL DEFAULT 'public'

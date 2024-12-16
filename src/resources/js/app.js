@@ -691,3 +691,70 @@ function handleUserSearchInput() {
         userSearchInput.addEventListener('keyup', filterUsers);
     }
 } */
+
+
+const postViewModalHandler = {
+    async show(id) {
+        const postViewModal = document.getElementById('post-view-modal');
+        const modalPostImage = document.getElementById('modal-post-image');
+        const modalUserImage = document.getElementById('modal-user-image');
+        const modalUserName = document.getElementById('modal-user-name');
+        const modalCreatedAt = document.getElementById('modal-created-at');
+        const modalPostContent = document.getElementById('modal-post-content');
+        const modalLikesCount = document.getElementById('modal-likes-count');
+        const modalComments = document.getElementById('modal-comments');
+
+        try {
+            const response = await fetch(`/posts/${id}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+
+            if (!response.ok) throw new Error('Erro ao buscar os dados do post');
+
+            const postData = await response.json();
+
+            // Preencher o modal
+            modalPostImage.src = `/storage/${postData.image_url}`;
+            modalUserImage.src = `/storage/${postData.user_image}`;
+            modalUserName.textContent = postData.user_name;
+            modalCreatedAt.textContent = postData.created_at;
+            modalPostContent.textContent = postData.content;
+            modalLikesCount.textContent = `${postData.likes_count} Likes`;
+
+            // Carregar os comentários
+            modalComments.innerHTML = ''; // Limpa comentários anteriores
+            const commentsResponse = await fetch(`/posts/${id}/comments`);
+            if (commentsResponse.ok) {
+                const commentsData = await commentsResponse.json();
+                commentsData.comments.forEach(comment => {
+                    modalComments.innerHTML += `
+                        <div class="flex items-center">
+                            <img src="/storage/${comment.user_image_url}" alt="User" class="w-8 h-8 rounded-full mr-3">
+                            <p><strong>${comment.user_name}</strong>: ${comment.content}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            postViewModal.classList.remove('hidden');
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao carregar o post.');
+        }
+    },
+
+    hide() {
+        document.getElementById('post-view-modal').classList.add('hidden');
+    },
+};
+
+// Botão para fechar o modal
+document.getElementById('close-post-view-modal').addEventListener('click', () => {
+    postViewModalHandler.hide();
+});
+
+window.showPostViewModal = postViewModalHandler.show;
+window.hidePostViewModal = postViewModalHandler.hide;
+
+
+
