@@ -42,10 +42,8 @@ class ForgotPasswordController extends Controller
             return back()->withErrors(['email' => 'We could not find a user with that email address.']);
         }
 
-        // Create a password reset token manually
         $token = Password::createToken($user);
 
-        // Send the custom email using the CustomResetPassword notification
         $user->notify(new CustomResetPassword($token));
 
         return back()->with('status', 'We have emailed your password reset link!');
@@ -74,21 +72,18 @@ class ForgotPasswordController extends Controller
      */
     public function reset(Request $request)
     {
-        // Validate the request
         $request->validate([
             'token' => 'required',
             'email' => 'required|email|exists:user,email',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Reset the password using the broker
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->password = Hash::make($password);
                 $user->save();
 
-                // Automatically log in the user after successful password reset
                 Auth::login($user);
             }
         );
