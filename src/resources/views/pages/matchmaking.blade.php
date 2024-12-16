@@ -11,7 +11,10 @@
                     <!-- Imagem do usuário -->
                     <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                        <!-- Nome do usuário agora é um link para o perfil -->
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <a href="{{ route('profile.show', $user->id) }}" class="hover:text-blue-500">{{ $user->name }}</a>
+                        </h3>
                         <p class="text-sm text-gray-600">{{ $user->email }}</p>
                     </div>
                 </div>
@@ -28,7 +31,10 @@
                     <!-- Imagem do usuário -->
                     <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
+                        <!-- Nome do usuário agora é um link para o perfil -->
+                        <h3 class="text-lg font-semibold text-gray-900">
+                            <a href="{{ route('profile.show', $user->id) }}" class="hover:text-blue-500">{{ $user->name }}</a>
+                        </h3>
                         <p class="text-sm text-gray-600">{{ $user->email }}</p>
                     </div>
                 </div>
