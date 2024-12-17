@@ -20,7 +20,7 @@ window.onload = function() {
         sessionStorage.removeItem("reloading");
         sessionStorage.removeItem("command");
     }
-}
+};
 
 function reloadP(command) {
     sessionStorage.setItem("reloading", "true");
@@ -30,7 +30,6 @@ function reloadP(command) {
 
 window.reloadP = reloadP;
 
-
 function goWithCommand(location, command) {
     sessionStorage.setItem("reloading", "true");
     sessionStorage.setItem("command", command);
@@ -39,34 +38,28 @@ function goWithCommand(location, command) {
 
 window.goWithCommand = goWithCommand;
 
-
 function openModal(modalId) {
     console.log(`Opening modal: ${modalId}`);
     const modal = document.getElementById(modalId);
     if (modal) {
         if (modalId === 'create-post-modal') {
             const groupIdMeta = document.querySelector('meta[name="group-id"]');
-
             if (groupIdMeta) {
                 const visibilityField = document.getElementById('visibility');
                 const groupField = document.getElementById('id_group');
-
                 if (visibilityField && groupField) {
                     visibilityField.value = 'group';
                     visibilityField.setAttribute('disabled', true);
-                    
                     groupField.value = groupIdMeta.getAttribute('content');
                     groupField.setAttribute('disabled', true);
                 }
             } else {
                 const visibilityField = document.getElementById('visibility');
                 const groupField = document.getElementById('id_group');
-
                 if (visibilityField) {
                     visibilityField.removeAttribute('disabled');
                     visibilityField.value = 'public';
                 }
-
                 if (groupField) {
                     groupField.removeAttribute('disabled');
                     groupField.value = '';
@@ -81,17 +74,13 @@ function openModal(modalId) {
     }
 }
 
-
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     modal.classList.add('hidden');
 }
 
-
 window.openModal = openModal;
 window.closeModal = closeModal;
-
-
 
 function toggleProfileDropdown() {
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -104,12 +93,11 @@ document.addEventListener('click', (event) => {
     const profileDropdown = document.getElementById('profile-dropdown');
     const profileDropdownToggle = document.getElementById('profile-dropdown-toggle');
 
-    if (!profileDropdownToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
+    if (profileDropdown && profileDropdownToggle && !profileDropdownToggle.contains(event.target) && !profileDropdown.contains(event.target)) {
         profileDropdown.classList.add('hidden');
     }
 });
 
-// Modal Handling for User
 const modalHandler = {
     show(id, name, email, username) {
         const editUserForm = document.getElementById('edit-user-form');
@@ -132,7 +120,9 @@ const modalHandler = {
     }
 };
 
-// Modal Handling for Posts
+window.showEditUserModal = modalHandler.show;
+window.hideEditUserModal = modalHandler.hide;
+
 const postModalHandler = {
     async show(id) {
         const editPostForm = document.getElementById('edit-post-form');
@@ -141,7 +131,6 @@ const postModalHandler = {
         const editPostModal = document.getElementById('edit-post-modal');
 
         try {
-            // Fetch the latest data for the post
             const response = await fetch(`/posts/${id}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
@@ -155,12 +144,10 @@ const postModalHandler = {
 
             const postData = await response.json();
 
-            // Populate the modal fields with the latest data
             if (editPostForm) editPostForm.action = `/posts/${id}`;
             if (editPostContent) editPostContent.value = postData.content || '';
             if (editPostVisibility) editPostVisibility.value = postData.visibility || 'public';
 
-            // Show the modal
             if (editPostModal) editPostModal.classList.remove('hidden');
         } catch (error) {
             console.error('Error loading post data:', error);
@@ -173,12 +160,8 @@ const postModalHandler = {
     },
 };
 
-// Attach modal functions to the global window object for global access
-window.showEditUserModal = modalHandler.show;
-window.hideEditUserModal = modalHandler.hide;
 window.showEditPostModal = postModalHandler.show;
 window.hideEditPostModal = postModalHandler.hide;
-
 
 const profileModalHandler = {
     show(user) {
@@ -190,13 +173,11 @@ const profileModalHandler = {
 
         if (!modal) return;
 
-        // Populate the modal fields with the provided user data
         if (editNameField) editNameField.value = user.name || '';
         if (editEmailField) editEmailField.value = user.email || '';
         if (editUsernameField) editUsernameField.value = user.username || '';
         if (editVisibilityField) editVisibilityField.value = user.visibility || 'public';
 
-        // Show the modal
         modal.classList.remove('hidden');
     },
 
@@ -206,11 +187,9 @@ const profileModalHandler = {
     },
 };
 
-// Attach modal functions to the global window object for global access
 window.showEditProfileModal = profileModalHandler.show;
 window.hideEditProfileModal = profileModalHandler.hide;
 
-// Image Preview Functionality
 function handleImagePreview() {
     const imageInput = document.getElementById('image');
     if (!imageInput) return;
@@ -234,7 +213,6 @@ function handleImagePreview() {
     });
 }
 
-// Dropdown Handling
 function handleDropdowns(event) {
     const allDropdowns = document.querySelectorAll('[id^="dropdownMenu-"]');
     const dropdownButton = event.target.closest('[id^="dropdownMenuButton-"]');
@@ -252,7 +230,6 @@ function handleDropdowns(event) {
     }
 }
 
-// Handle Post Update Submission
 function handleEditPostSubmission() {
     const editPostForm = document.getElementById('edit-post-form');
 
@@ -287,14 +264,8 @@ function handleEditPostSubmission() {
             }
 
             const data = await response.json();
-
-            // Update the post content dynamically on the page
             updatePostContent(postId, data);
-
-            // Close the modal
             postModalHandler.hide();
-
-            // Display success message
             window.showFeedbackMessage('green', 'Post updated successfully!');
         } catch (error) {
             console.error('Error updating post:', error);
@@ -303,29 +274,15 @@ function handleEditPostSubmission() {
     });
 }
 
-// Update Post Content Dynamically
 function updatePostContent(postId, data) {
     const postDiv = document.querySelector(`[data-id="${postId}"]`);
-    if (!postDiv) {
-        console.warn(`Post with ID ${postId} not found on the page.`);
-        return;
-    }
+    if (!postDiv) return;
 
-    // Update content
     const contentParagraph = postDiv.querySelector('p.text-lg');
-    if (contentParagraph) {
-        contentParagraph.textContent = data.content;
-    } else {
-        console.warn('Content paragraph not found for post.');
-    }
-
-    // Update visibility if applicable
+    if (contentParagraph) contentParagraph.textContent = data.content;
     const visibilityField = postDiv.querySelector('.post-visibility');
-    if (visibilityField) {
-        visibilityField.textContent = data.visibility;
-    }
+    if (visibilityField) visibilityField.textContent = data.visibility;
 }
-
 
 const messageHandler = {
     show(type, message) {
@@ -366,8 +323,6 @@ function initializeMessageHandler() {
 
 window.showFeedbackMessage = (type, message) => messageHandler.show(type, message);
 
-
-// Initialize Event Listeners
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
     handleImagePreview();
@@ -375,12 +330,7 @@ function addEventListeners() {
     initializeMessageHandler();
 }
 
-
-
-
-// Call the initialization function
 addEventListeners();
-
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -402,7 +352,6 @@ async function addFriend(userId) {
         if (!response.ok) throw new Error('Failed to add friend');
         const data = await response.json();
 
-        // Update the button dynamically
         const button = document.querySelector(`[data-user-id="${userId}"]`);
         if (button) {
             button.textContent = 'Cancel Friend Request';
@@ -430,7 +379,6 @@ async function removeFriend(userId) {
         if (!response.ok) throw new Error('Failed to remove friend');
         const data = await response.json();
 
-        // Update the button dynamically
         const button = document.querySelector(`[data-user-id="${userId}"]`);
         if (button) {
             button.textContent = 'Add Friend';
@@ -459,7 +407,6 @@ async function cancelFriendRequest(userId) {
         
         const data = await response.json();
 
-        // Update the button dynamically if it exists elsewhere
         const button = document.querySelector(`[data-user-id="${userId}"]`);
         if (button) {
             button.textContent = 'Add Friend';
@@ -467,13 +414,11 @@ async function cancelFriendRequest(userId) {
             button.setAttribute('onclick', `addFriend(${userId})`);
         }
 
-        // Remove the friend request from the sent requests list (if it exists)
         const sentRequestItem = document.querySelector(`#sent-request-${userId}`);
         if (sentRequestItem) {
             sentRequestItem.remove();
         }
 
-        // Show success feedback
         window.showFeedbackMessage('green', 'Friend request canceled successfully!');
     } catch (error) {
         console.error(error);
@@ -481,11 +426,9 @@ async function cancelFriendRequest(userId) {
     }
 }
 
-
 window.cancelFriendRequest = cancelFriendRequest;
 window.addFriend = addFriend;
 window.removeFriend = removeFriend;
-
 
 async function acceptFriendRequest(requestId) {
     try {
@@ -498,7 +441,7 @@ async function acceptFriendRequest(requestId) {
         });
 
         if (!response.ok) throw new Error('Failed to accept friend request');
-        window,reloadP("showFeedbackMessage('green', 'Friend request accepted!');");
+        window.reloadP("showFeedbackMessage('green', 'Friend request accepted!');");
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while accepting the friend request.');
@@ -523,12 +466,8 @@ async function rejectFriendRequest(requestId) {
     }
 }
 
-
-
 window.acceptFriendRequest = acceptFriendRequest;
 window.rejectFriendRequest = rejectFriendRequest;
-
-
 
 async function acceptGroupInvite(inviteId) {
     try {
@@ -546,14 +485,11 @@ async function acceptGroupInvite(inviteId) {
         }
 
         const data = await response.json();
-
-        // Remove the invite dynamically
         const inviteElement = document.querySelector(`#group-invites-list li[data-invite-id="${inviteId}"]`);
         if (inviteElement) {
             inviteElement.remove();
         }
 
-        // Check if the list is empty after removing the item
         const remainingInvites = document.querySelectorAll('#group-invites-list li');
         if (remainingInvites.length === 0) {
             document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
@@ -566,7 +502,6 @@ async function acceptGroupInvite(inviteId) {
     }
 }
 
-// Function to reject a group invite
 async function rejectGroupInvite(inviteId) {
     try {
         const response = await fetch(`/groups/invite/${inviteId}/reject`, {
@@ -583,14 +518,11 @@ async function rejectGroupInvite(inviteId) {
         }
 
         const data = await response.json();
-
-        // Remove the invite dynamically
         const inviteElement = document.querySelector(`#group-invites-list li[data-invite-id="${inviteId}"]`);
         if (inviteElement) {
             inviteElement.remove();
         }
 
-        // Check if the list is empty after removing the item
         const remainingInvites = document.querySelectorAll('#group-invites-list li');
         if (remainingInvites.length === 0) {
             document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
@@ -605,7 +537,6 @@ async function rejectGroupInvite(inviteId) {
 
 window.acceptGroupInvite = acceptGroupInvite;
 window.rejectGroupInvite = rejectGroupInvite;
-
 
 function deleteNotification(notificationId) {
     const notificationElement = document.getElementById(`notification-${notificationId}`);
@@ -626,29 +557,20 @@ function deleteNotification(notificationId) {
         return response.json();
     })
     .then(data => {
-        // Remove the notification element from the DOM
         notificationElement.remove();
-
-        // Decrement the notification counter
         const notificationCountElement = document.getElementById('notification-count');
         if (notificationCountElement) {
             let currentCount = parseInt(notificationCountElement.textContent) || 0;
-            currentCount = Math.max(currentCount - 1, 0); // Ensure it never goes below zero
+            currentCount = Math.max(currentCount - 1, 0);
             notificationCountElement.textContent = currentCount;
-
-            // Hide the count if it reaches zero
             if (currentCount === 0) {
                 notificationCountElement.classList.add('hidden');
             }
         }
-
-        // Check if there are no more notifications in the list
         const notificationList = document.getElementById('notification-list');
         if (notificationList.children.length === 0) {
             notificationList.innerHTML = '<li class="text-center p-4 text-gray-500">No new notifications</li>';
         }
-
-        console.log('Notification deleted successfully:', data);
     })
     .catch(error => {
         console.error('Error deleting notification:', error);
@@ -658,66 +580,58 @@ function deleteNotification(notificationId) {
 window.deleteNotification = deleteNotification;
 
 // Search
-
-// Keeps date inputs
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
-
-    // Set the dropdown value
     const typeSelect = document.getElementById('search-type');
-    if (urlParams.has('type')) {
+    if (typeSelect && urlParams.has('type')) {
         typeSelect.value = urlParams.get('type');
     }
 
-    // Set the search query value
     const searchQuery = document.getElementById('search-bar');
-    if (urlParams.has('query')) {
+    if (searchQuery && urlParams.has('query')) {
         searchQuery.value = urlParams.get('query');
     }
 
-    // Set the start date value
     const startDateInput = document.getElementById('start-date');
-    if (urlParams.has('start_date')) {
+    if (startDateInput && urlParams.has('start_date')) {
         startDateInput.value = urlParams.get('start_date');
     }
 
-    // Set the end date value
     const endDateInput = document.getElementById('end-date');
-    if (urlParams.has('end_date')) {
+    if (endDateInput && urlParams.has('end_date')) {
         endDateInput.value = urlParams.get('end_date');
     }
 });
 
-// Date inputs
 document.addEventListener('DOMContentLoaded', function () {
     const searchType = document.getElementById('search-type');
     const dateFilters = document.getElementById('date-filters');
     const searchButton = document.getElementById('search-button');
 
-    // Function to toggle visibility of date inputs
     function toggleDateInputs() {
+        if (!searchType) return;
         const selectedType = searchType.value;
         if (selectedType === 'groups' || selectedType === 'posts') {
-            dateFilters.classList.remove('hidden');
+            if (dateFilters) dateFilters.classList.remove('hidden');
         } else {
-            dateFilters.classList.add('hidden');
+            if (dateFilters) dateFilters.classList.add('hidden');
         }
-        searchButton.classList.remove('hidden');
+        if (searchButton) searchButton.classList.remove('hidden');
     }
 
-    // Initialize visibility on page load
-    toggleDateInputs();
-
-    // Add event listener to the dropdown
-    searchType.addEventListener('change', toggleDateInputs);
+    if (searchType) {
+        toggleDateInputs();
+        searchType.addEventListener('change', toggleDateInputs);
+    }
 });
 
 
-// Preview search
-
+// Modal de Visualização do Post
 const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
+        postViewModal.setAttribute('data-post-id', id);
+
         const modalPostImage = document.getElementById('modal-post-image');
         const modalUserImage = document.getElementById('modal-user-image');
         const modalUserName = document.getElementById('modal-user-name');
@@ -725,6 +639,8 @@ const postViewModalHandler = {
         const modalPostContent = document.getElementById('modal-post-content');
         const modalLikesCount = document.getElementById('modal-likes-count');
         const modalComments = document.getElementById('modal-comments');
+        const modalLikeButton = document.getElementById('modal-like-button');
+        const modalLikeText = document.getElementById('modal-like-text');
 
         try {
             const response = await fetch(`/posts/${id}`, {
@@ -735,30 +651,81 @@ const postViewModalHandler = {
 
             const postData = await response.json();
 
-            // Preencher o modal
-            modalPostImage.src = `/storage/${postData.image_url}`;
+            modalPostImage.src = postData.image_url ? `/storage/${postData.image_url}` : '';
             modalUserImage.src = `/storage/${postData.user_image}`;
             modalUserName.textContent = postData.user_name;
             modalCreatedAt.textContent = postData.created_at;
             modalPostContent.textContent = postData.content;
-            modalLikesCount.textContent = `${postData.likes_count} Likes`;
+            modalLikesCount.textContent = `${postData.likes_count} Like${postData.likes_count !== 1 ? 's' : ''}`;
 
-            // Carregar os comentários
-            modalComments.innerHTML = ''; // Limpa comentários anteriores
+            // Atualiza estado do like no botão
+            if (postData.liked_by_current_user) {
+                modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
+                modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
+                modalLikeText.textContent = 'Remove like';
+            } else {
+                modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
+                modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
+                modalLikeText.textContent = 'Like';
+            }
+
+            // Carregar comentários do modal
+            modalComments.innerHTML = '';
             const commentsResponse = await fetch(`/posts/${id}/comments`);
             if (commentsResponse.ok) {
                 const commentsData = await commentsResponse.json();
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
-                        <div class="flex items-center">
-                            <img src="/storage/${comment.user_image_url}" alt="User" class="w-8 h-8 rounded-full mr-3">
-                            <p><strong>${comment.user_name}</strong>: ${comment.content}</p>
+                        <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
+                                    <span class="font-semibold text-gray-800">${comment.user_name}</span>
+                                </div>
+                                ${comment.editable ? `
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-trash-alt"></i> Excluir
+                                    </button>
+                                </div>
+                                ` : ''}
+                            </div>
+                            <p class="mt-2 text-gray-700" id="modal-commentContent-${comment.id}">${comment.content}</p>
+                            <form id="modal-editForm-${comment.id}" class="hidden mt-2" onsubmit="saveModalInlineEdit(event, ${comment.id})">
+                                @csrf
+                                @method('PUT')
+                                <textarea name="content" class="w-full p-2 border rounded-lg" id="modal-editTextArea-${comment.id}"></textarea>
+                                <div class="flex justify-end mt-2">
+                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
+                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+                                </div>
+                            </form>
                         </div>
                     `;
                 });
             }
 
             postViewModal.classList.remove('hidden');
+            postViewModal.classList.add('flex');
+
+            // Adicionar evento ao botão de like no modal
+            modalLikeButton.onclick = async () => {
+                const data = await toggleLike(id);
+                if (data.liked) {
+                    modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
+                    modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
+                    modalLikeText.textContent = 'Remove like';
+                } else {
+                    modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
+                    modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
+                    modalLikeText.textContent = 'Like';
+                }
+                modalLikesCount.textContent = `${data.likesCount} Like${data.likesCount !== 1 ? 's' : ''}`;
+            };            
+
         } catch (error) {
             console.error(error);
             alert('Erro ao carregar o post.');
@@ -766,7 +733,8 @@ const postViewModalHandler = {
     },
 
     hide() {
-        document.getElementById('post-view-modal').classList.add('hidden');
+        const postViewModal = document.getElementById('post-view-modal');
+        postViewModal.classList.add('hidden');
     },
 };
 
@@ -800,7 +768,7 @@ function handlePostSubmission(event) {
         closeModal('create-post-modal');
         form.reset();
         const previewContainer = document.getElementById('preview-container');
-        previewContainer.classList.add('hidden');
+        if (previewContainer) previewContainer.classList.add('hidden');
     })
     .catch(error => {
         console.error('Error creating post:', error);
@@ -810,16 +778,17 @@ function handlePostSubmission(event) {
 
 window.handlePostSubmission = handlePostSubmission;
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('search-bar');
-        const searchType = document.getElementById('search-type');
-        const resultsContainer = document.getElementById('search-results');
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search-bar');
+    const searchType = document.getElementById('search-type');
+    const resultsContainer = document.getElementById('search-results');
 
+    if (searchInput && resultsContainer && searchType) {
         searchInput.addEventListener('input', function () {
             const query = searchInput.value;
             const type = searchType.value;
 
-            if (query.length < 2) { // Avoid firing for small inputs
+            if (query.length < 2) {
                 resultsContainer.innerHTML = '';
                 resultsContainer.classList.add('hidden');
                 return;
@@ -832,7 +801,7 @@ window.handlePostSubmission = handlePostSubmission;
                     if (data.length > 0) {
                         resultsContainer.classList.remove('hidden');
                         data.forEach(item => {
-                            let content = item.name || item.content; // Adjust for name or content fields
+                            let content = item.name || item.content;
                             const resultItem = document.createElement('div');
                             resultItem.classList.add('px-4', 'py-2', 'hover:bg-gray-100', 'cursor-pointer');
                             resultItem.textContent = content;
@@ -845,11 +814,10 @@ window.handlePostSubmission = handlePostSubmission;
                 .catch(error => console.error('Error fetching results:', error));
         });
 
-        // Hide results on click outside
         document.addEventListener('click', function (event) {
             if (!resultsContainer.contains(event.target) && event.target !== searchInput) {
                 resultsContainer.classList.add('hidden');
             }
         });
-    });
-
+    }
+});

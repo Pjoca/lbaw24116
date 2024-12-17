@@ -1,4 +1,4 @@
-<div id="post-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center">
+<div id="post-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center" data-post-id="">
     <div class="bg-white w-full max-w-5xl h-[90vh] rounded-lg shadow-lg flex relative">
         <!-- Botão para Fechar -->
         <button 
@@ -28,26 +28,29 @@
 
             <!-- Likes -->
             <div class="flex items-center mb-4">
-                <i class="fas fa-heart text-red-500 mr-2"></i>
-                <span id="modal-likes-count" class="text-gray-600"></span>
+                <button id="modal-like-button" class="flex items-center like-button mr-4">
+                    <i class="far fa-heart text-2xl mr-2 text-gray-500"></i>
+                    <span id="modal-like-text">Like</span>
+                </button>
+                <span id="modal-likes-count" class="text-gray-600">0 Likes</span>
             </div>
 
             <!-- Comentários -->
             <div class="flex-1 overflow-y-auto">
                 <h3 class="text-lg font-semibold mb-2">Comentários</h3>
                 <div id="modal-comments" class="space-y-2">
-                    <!-- Comentários serão carregados aqui -->
+                    <!-- Comentários serão carregados aqui via JS -->
                 </div>
             </div>
 
             <!-- Formulário de Comentário -->
             @auth
-                <form id="modal-comment-form" class="mt-4 flex">
+                <form id="modal-comment-form" class="mt-4">
                     @csrf
-                    <input type="text" id="modal-comment-input" placeholder="Adicione um comentário..."
-                        class="flex-1 border-gray-300 rounded-l-md p-2 focus:ring-teal-500 focus:border-teal-500">
+                    <input type="text" name="content" id="modal-comment-input" placeholder="Adicione um comentário..."
+                        class="flex-1 border-gray-300 rounded-l-md p-2 focus:ring-teal-500 focus:border-teal-500 w-full">
                     <button type="submit" 
-                        class="bg-teal-500 text-white px-4 rounded-r-md hover:bg-teal-600 transition">
+                        class="bg-teal-500 text-white px-4 rounded-md hover:bg-teal-600 transition mt-2">
                         Enviar
                     </button>
                 </form>
