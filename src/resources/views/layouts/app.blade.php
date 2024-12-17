@@ -28,24 +28,7 @@
                 <nav>
                     <ul class="flex gap-4 mt-4 md:mt-0">
                         <li>
-                            <div class="relative">
-                                <form id="search-form" action="{{ route('users.search') }}" method="GET" class="flex gap-2">
-                                    <input 
-                                        type="text" 
-                                        id="search-query"
-                                        name="query" 
-                                        placeholder="Quick Search" 
-                                        class="w-full bg-white text-gray-800 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-teal-400 focus:outline-none placeholder-gray-500" 
-                                        autocomplete="off" 
-                                        required>
-                                </form>
-                                <div id="search-results" class="absolute top-full left-0 z-10 mt-2 w-full max-h-52 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg hidden">
-                                    <!-- Dynamically loaded content -->
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <a href="{{ route('users.search') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
+                            <a href="{{ route('search') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
                                 Search
                             </a>
                         </li>

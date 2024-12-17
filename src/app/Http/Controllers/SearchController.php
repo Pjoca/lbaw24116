@@ -19,6 +19,7 @@ class SearchController extends Controller
         // Retrieve the search inputs
         $query = $request->input('query');
         $type = $request->input('type');
+        //$limit = $request->input('limit', null);
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -120,7 +121,7 @@ class SearchController extends Controller
                 ]);
             }
         }
-
+        
         // Return the search results view
         return view('search.results', compact('query', 'type', 'startDate', 'endDate', 'users', 'groups', 'posts', 'comments'));
     }
@@ -201,4 +202,46 @@ class SearchController extends Controller
 
         return view('search.results', compact('comments', 'query'));
     }
+
+    public function searchPreview(Request $request)
+{
+    $query = $request->input('query');
+    $type = $request->input('type');
+
+    if (empty($query)) {
+        return response()->json([]);
+    }
+
+    $results = [];
+
+    switch ($type) {
+        case 'users':
+            $results = User::where('name', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'name']);
+            break;
+
+        case 'groups':
+            $results = Group::where('name', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'name']);
+            break;
+
+        case 'posts':
+            $results = Post::where('content', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'content']);
+            break;
+
+        case 'comments':
+            $results = Comment::where('content', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'content']);
+            break;
+    }
+
+    return response()->json($results);
 }
+
+}
+

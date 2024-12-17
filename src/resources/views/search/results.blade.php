@@ -49,6 +49,11 @@
             Search
         </button>
     </form>
+
+    <div id="search-results" class="absolute top-full left-0 z-10 mt-2 w-full max-h-52 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg hidden">
+        <!-- Dynamically loaded content -->
+    </div>
+
 </div>
 
 <!-- Empty State Message -->

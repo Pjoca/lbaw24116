@@ -210,63 +210,6 @@ const profileModalHandler = {
 window.showEditProfileModal = profileModalHandler.show;
 window.hideEditProfileModal = profileModalHandler.hide;
 
-// Search Functionality
-function handleSearchInput() {
-    const searchQueryInput = document.getElementById('search-query');
-    const searchResultsDiv = document.getElementById('search-results');
-
-    if (!searchQueryInput || !searchResultsDiv) return;
-
-    searchQueryInput.addEventListener('input', function () {
-        const query = this.value;
-
-        if (query.length > 0) {
-            fetch(`/search/users?query=${encodeURIComponent(query)}&limit=3`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Network error');
-                    return response.text();
-                })
-                .then(data => {
-                    searchResultsDiv.innerHTML = data;
-                    searchResultsDiv.classList.remove('hidden');
-                })
-                .catch(err => console.error('Error:', err));
-        } else {
-            searchResultsDiv.classList.add('hidden');
-            searchResultsDiv.innerHTML = '';
-        }
-    });
-
-    document.addEventListener('click', function (event) {
-        if (!searchQueryInput.contains(event.target) && !searchResultsDiv.contains(event.target)) {
-            searchResultsDiv.classList.add('hidden');
-        }
-    });
-}
-
-// Filter User List Functionality
-function filterUserList() {
-    const searchValue = document.getElementById('user-search-input')?.value.toLowerCase();
-    const rows = document.querySelectorAll('#user-list-tbody tr');
-
-    rows.forEach(row => {
-        const name = row.children[1]?.textContent.toLowerCase();
-        const email = row.children[2]?.textContent.toLowerCase();
-        const isVisible = name.includes(searchValue) || email.includes(searchValue);
-        row.style.display = isVisible ? '' : 'none';
-    });
-}
-
-// Attach event listener for user search input
-function handleUserSearchInput() {
-    const userSearchInput = document.getElementById('user-search-input');
-    if (userSearchInput) {
-        userSearchInput.addEventListener('keyup', filterUserList);
-    }
-}
-
 // Image Preview Functionality
 function handleImagePreview() {
     const imageInput = document.getElementById('image');
@@ -428,8 +371,6 @@ window.showFeedbackMessage = (type, message) => messageHandler.show(type, messag
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
     handleImagePreview();
-    handleSearchInput();
-    handleUserSearchInput();
     handleEditPostSubmission();
     initializeMessageHandler();
 }
@@ -714,9 +655,7 @@ function deleteNotification(notificationId) {
     });
 }
 
-
 window.deleteNotification = deleteNotification;
-
 
 // Search
 
@@ -774,27 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// Filter User List Functionality
-/* function filterUsers() {
-    const searchValue = document.getElementById('search-searchUsers-input')?.value.toLowerCase();
-    const rows = document.querySelectorAll('#user-list-tbody tr');
-
-    rows.forEach(row => {
-        const name = row.children[1]?.textContent.toLowerCase();
-        const email = row.children[2]?.textContent.toLowerCase();
-        const isVisible = name.includes(searchValue) || email.includes(searchValue);
-        row.style.display = isVisible ? '' : 'none';
-    });
-}
-
-// Attach event listener for user search input
-function handleUserSearchInput() {
-    const userSearchInput = document.getElementById('search-searchUsers-input');
-    if (userSearchInput) {
-        userSearchInput.addEventListener('keyup', filterUsers);
-    }
-} */
-
+// Preview search
 
 const postViewModalHandler = {
     async show(id) {
@@ -890,3 +809,47 @@ function handlePostSubmission(event) {
 }
 
 window.handlePostSubmission = handlePostSubmission;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-bar');
+        const searchType = document.getElementById('search-type');
+        const resultsContainer = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value;
+            const type = searchType.value;
+
+            if (query.length < 2) { // Avoid firing for small inputs
+                resultsContainer.innerHTML = '';
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            fetch(`{{ route('search.preview') }}?query=${query}&type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+                    if (data.length > 0) {
+                        resultsContainer.classList.remove('hidden');
+                        data.forEach(item => {
+                            let content = item.name || item.content; // Adjust for name or content fields
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('px-4', 'py-2', 'hover:bg-gray-100', 'cursor-pointer');
+                            resultItem.textContent = content;
+                            resultsContainer.appendChild(resultItem);
+                        });
+                    } else {
+                        resultsContainer.classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error fetching results:', error));
+        });
+
+        // Hide results on click outside
+        document.addEventListener('click', function (event) {
+            if (!resultsContainer.contains(event.target) && event.target !== searchInput) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    });
+
