@@ -11,6 +11,41 @@ use App\Models\Comment;
 
 class SearchController extends Controller
 {
+
+    public function searchPreview(Request $request)
+    {
+        $query = $request->get('query');
+        $type = $request->get('type');
+    
+        if (!$query) {
+            return response()->json(['message' => 'No query parameter provided'], 400);
+        }
+    
+        $results = [];
+        switch ($type) {
+            case 'users':
+                $results = User::select('id', 'name')->where('name', 'like', "%{$query}%")->limit(3)->get();
+                break;
+    
+            case 'groups':
+                $results = Group::select('id', 'name')->where('name', 'like', "%{$query}%")->limit(3)->get();
+                break;
+    
+            case 'posts':
+                $results = Post::select('id', 'content')->where('title', 'like', "%{$query}%")->limit(3)->get();
+                break;
+    
+            case 'comments':
+                $results = Comment::select('id', 'content')->where('content', 'like', "%{$query}%")->limit(3)->get();
+                break;
+    
+            default:
+                return response()->json(['message' => 'Invalid search type'], 400);
+        }
+    
+        return response()->json(['results' => $results]);
+    }    
+    
     /**
      * General search for users, groups, posts, and comments.
      */
@@ -202,46 +237,6 @@ class SearchController extends Controller
 
         return view('search.results', compact('comments', 'query'));
     }
-
-    public function searchPreview(Request $request)
-{
-    $query = $request->input('query');
-    $type = $request->input('type');
-
-    if (empty($query)) {
-        return response()->json([]);
-    }
-
-    $results = [];
-
-    switch ($type) {
-        case 'users':
-            $results = User::where('name', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'name']);
-            break;
-
-        case 'groups':
-            $results = Group::where('name', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'name']);
-            break;
-
-        case 'posts':
-            $results = Post::where('content', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'content']);
-            break;
-
-        case 'comments':
-            $results = Comment::where('content', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'content']);
-            break;
-    }
-
-    return response()->json($results);
-}
 
 }
 

@@ -715,6 +715,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Preview search
 
+document.addEventListener('DOMContentLoaded', function () {
+    const searchBar = document.getElementById('search-bar');
+    const searchType = document.getElementById('search-type');
+    const resultsContainer = document.getElementById('search-results');
+
+    searchBar.addEventListener('input', function () {
+        const query = searchBar.value.trim();
+        const type = searchType.value;
+
+        if (query.length > 0) {
+            fetch(`/search/preview?query=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data && data.results) {
+                    resultsContainer.innerHTML = ''; 
+                    data.results.forEach(result => {
+                        const resultItem = document.createElement('div');
+                        resultItem.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-gray-100');
+
+                        // types
+                        if (type === 'users' || type === 'groups') {
+                            resultItem.textContent = result.name;
+                        } else if (type === 'posts' || type === 'comments') {
+                            resultItem.textContent = result.content || 'No content available'; 
+                        }
+
+                        resultsContainer.appendChild(resultItem);
+                    });
+                    resultsContainer.classList.remove('hidden'); 
+                } else {
+                    resultsContainer.innerHTML = '<p class="text-gray-500 px-4 py-2">No results found.</p>';
+                }
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+        } else {
+            resultsContainer.innerHTML = ''; 
+            resultsContainer.classList.add('hidden'); 
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('#search-bar') && !e.target.closest('#search-results')) {
+            resultsContainer.classList.add('hidden');
+        }
+    });
+});
+
+
 const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
@@ -809,47 +860,3 @@ function handlePostSubmission(event) {
 }
 
 window.handlePostSubmission = handlePostSubmission;
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('search-bar');
-        const searchType = document.getElementById('search-type');
-        const resultsContainer = document.getElementById('search-results');
-
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value;
-            const type = searchType.value;
-
-            if (query.length < 2) { // Avoid firing for small inputs
-                resultsContainer.innerHTML = '';
-                resultsContainer.classList.add('hidden');
-                return;
-            }
-
-            fetch(`{{ route('search.preview') }}?query=${query}&type=${type}`)
-                .then(response => response.json())
-                .then(data => {
-                    resultsContainer.innerHTML = '';
-                    if (data.length > 0) {
-                        resultsContainer.classList.remove('hidden');
-                        data.forEach(item => {
-                            let content = item.name || item.content; // Adjust for name or content fields
-                            const resultItem = document.createElement('div');
-                            resultItem.classList.add('px-4', 'py-2', 'hover:bg-gray-100', 'cursor-pointer');
-                            resultItem.textContent = content;
-                            resultsContainer.appendChild(resultItem);
-                        });
-                    } else {
-                        resultsContainer.classList.add('hidden');
-                    }
-                })
-                .catch(error => console.error('Error fetching results:', error));
-        });
-
-        // Hide results on click outside
-        document.addEventListener('click', function (event) {
-            if (!resultsContainer.contains(event.target) && event.target !== searchInput) {
-                resultsContainer.classList.add('hidden');
-            }
-        });
-    });
-
