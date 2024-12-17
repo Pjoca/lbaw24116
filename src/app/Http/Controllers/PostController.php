@@ -73,6 +73,8 @@ class PostController extends Controller
     {
         $this->authorize('create', Post::class);
 
+        Log::info('Creating a new post:', ['request' => $request->all()]);
+
         // Validate the incoming request
         $validated = $request->validate([
             'content' => 'required|string',
@@ -111,7 +113,12 @@ class PostController extends Controller
 
         Log::info('New post created:', ['post' => $post]);
 
+        if ($request->id_group) {
+            return redirect()->route('groups.show', ['id' => $request->id_group])
+                ->with('success', 'Você criou um novo post no grupo com sucesso');
+        }else{
         return redirect()->route('timeline.public')->with('success', 'Você criou um novo post com sucesso');
+        }
     }
 
 

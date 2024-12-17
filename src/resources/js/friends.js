@@ -1,22 +1,3 @@
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        console.error(`Modal with ID ${modalId} not found.`);
-    }
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('hidden');
-    } else {
-        console.error(`Modal with ID ${modalId} not found.`);
-    }
-}
-
 async function loadInitialReceivedFriendRequests(userId) {
     const modal = document.getElementById('friend-requests-modal');
     const receivedRequestsList = document.getElementById('friend-requests-list');

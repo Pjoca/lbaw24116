@@ -35,7 +35,13 @@ use Illuminate\Http\Request;
 */
 
 // Home
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect('/timeline/personalized');
+    } else {
+        return redirect('/timeline/public');
+    }
+});
 
 // Independent Home Route
 Route::get('/home', function () {
