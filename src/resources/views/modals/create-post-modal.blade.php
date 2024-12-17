@@ -1,0 +1,59 @@
+<div id="create-post-modal" 
+     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white w-full max-w-lg rounded-lg shadow-2xl p-6 relative">
+
+        <!-- Close Button -->
+        <button 
+            onclick="closeModal('create-post-modal')" 
+            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition text-2xl font-bold">
+            &times;
+        </button>
+
+        <!-- Modal Title -->
+        <h2 class="text-2xl font-bold text-center mb-6">Create New Post</h2>
+
+        <!-- Create Post Form -->
+        <form id="create-post-form" method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data">
+
+            @csrf
+
+            <!-- Post Content -->
+            <div class="mb-4">
+                <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
+                <textarea id="content" name="content" rows="4" required
+                          class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+            </div>
+
+            <!-- Visibility -->
+            <div class="mb-4" id="visibility-container">
+                <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
+                <select id="visibility" name="visibility" required
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+
+            <input type="hidden" id="id_group" name="id_group" value="">
+
+            <!-- Image Upload -->
+            <div class="mb-4">
+                <label for="image" class="block text-sm font-medium text-gray-700">Image (Optional)</label>
+                <input type="file" id="image" name="image" accept="image/*"
+                       class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <!-- Preview -->
+            <div id="preview-container" class="mb-4 hidden">
+                <label class="block text-sm font-medium text-gray-700">Preview:</label>
+                <img id="preview-image" src="#" alt="Image Preview" class="w-full h-auto rounded-md shadow-md mt-2">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                    class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded">
+                Create Post
+            </button>
+        </form>
+    </div>
+</div>

@@ -49,8 +49,12 @@
             Search
         </button>
     </form>
-</div>
 
+    <div id="search-results" class="absolute top-full left-0 z-10 mt-2 w-full max-h-52 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg hidden">
+        <!-- Dynamically loaded content -->
+    </div>
+
+</div>
 
 <!-- Empty State Message -->
 @if(empty($query))
@@ -84,7 +88,42 @@
 
     <!-- Pagination for Users -->
     <div class="mt-4">
-        {{ $users->appends(request()->query())->links() }}
+    @if ($users->hasPages())
+    <nav class="flex justify-between items-center mt-4">
+        {{-- First Page and Previous Page --}}
+        <div>
+            @if (!$users->onFirstPage())
+                <a href="{{ $users->url(1) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">First</a>
+                <a href="{{ $users->previousPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Previous</a>
+            @endif
+        </div>
+
+        {{-- Page Links (Center) --}}
+        <div class="flex space-x-2">
+            @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                @if ($page == $users->currentPage())
+                    <span class="px-3 py-2 border rounded bg-teal-500 text-white">{{ $page }}</span>
+                @elseif(abs($page - $users->currentPage()) <= 2) {{-- Show 2 pages around current --}}
+                    <a href="{{ $url }}" 
+                       class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">{{ $page }}</a>
+                @endif
+            @endforeach
+        </div>
+
+        {{-- Next Page and Last Page --}}
+        <div>
+            @if ($users->hasMorePages())
+                <a href="{{ $users->nextPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Next</a>
+                <a href="{{ $users->url($users->lastPage()) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Last</a>
+            @endif
+        </div>
+    </nav>
+@endif
+
     </div>
         @endif
 
@@ -104,9 +143,44 @@
                 @endforeach
             </ul>
 
-            <!-- Pagination for Groups -->
+        <!-- Pagination for Groups -->
         <div class="mt-4">
-            {{ $groups->appends(request()->query())->links() }}
+        @if ($groups->hasPages())
+    <nav class="flex justify-between items-center mt-4">
+        {{-- First Page and Previous Page --}}
+        <div>
+            @if (!$groups->onFirstPage())
+                <a href="{{ $groups->url(1) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">First</a>
+                <a href="{{ $groups->previousPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Previous</a>
+            @endif
+        </div>
+
+        {{-- Page Links (Center) --}}
+        <div class="flex space-x-2">
+            @foreach ($groups->getUrlRange(1, $groups->lastPage()) as $page => $url)
+                @if ($page == $groups->currentPage())
+                    <span class="px-3 py-2 border rounded bg-teal-500 text-white">{{ $page }}</span>
+                @elseif(abs($page - $groups->currentPage()) <= 2) {{-- Show 2 pages around current --}}
+                    <a href="{{ $url }}" 
+                       class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">{{ $page }}</a>
+                @endif
+            @endforeach
+        </div>
+
+        {{-- Next Page and Last Page --}}
+        <div>
+            @if ($groups->hasMorePages())
+                <a href="{{ $groups->nextPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Next</a>
+                <a href="{{ $groups->url($groups->lastPage()) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Last</a>
+            @endif
+        </div>
+    </nav>
+@endif
+
         </div>
 
         @endif
@@ -122,7 +196,42 @@
 
         <!-- Pagination for Posts -->
         <div class="mt-4">
-            {{ $posts->appends(request()->query())->links() }}
+        @if ($posts->hasPages())
+    <nav class="flex justify-between items-center mt-4">
+        {{-- First Page and Previous Page --}}
+        <div>
+            @if (!$posts->onFirstPage())
+                <a href="{{ $posts->url(1) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">First</a>
+                <a href="{{ $posts->previousPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Previous</a>
+            @endif
+        </div>
+
+        {{-- Page Links (Center) --}}
+        <div class="flex space-x-2">
+            @foreach ($posts->getUrlRange(1, $posts->lastPage()) as $page => $url)
+                @if ($page == $posts->currentPage())
+                    <span class="px-3 py-2 border rounded bg-teal-500 text-white">{{ $page }}</span>
+                @elseif(abs($page - $posts->currentPage()) <= 2) {{-- Show 2 pages around current --}}
+                    <a href="{{ $url }}" 
+                       class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">{{ $page }}</a>
+                @endif
+            @endforeach
+        </div>
+
+        {{-- Next Page and Last Page --}}
+        <div>
+            @if ($posts->hasMorePages())
+                <a href="{{ $posts->nextPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Next</a>
+                <a href="{{ $posts->url($posts->lastPage()) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Last</a>
+            @endif
+        </div>
+    </nav>
+@endif
+
         </div>
 
         @endif
@@ -147,9 +256,44 @@
                 @endforeach
             </div>
 
-        <!-- Pagination Links for Comments -->
+        <!-- Pagination for Comments -->
         <div class="mt-4">
-            {{ $comments->appends(request()->query())->links() }}
+        @if ($comments->hasPages())
+    <nav class="flex justify-between items-center mt-4">
+        {{-- First Page and Previous Page --}}
+        <div>
+            @if (!$comments->onFirstPage())
+                <a href="{{ $comments->url(1) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">First</a>
+                <a href="{{ $comments->previousPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Previous</a>
+            @endif
+        </div>
+
+        {{-- Page Links (Center) --}}
+        <div class="flex space-x-2">
+            @foreach ($comments->getUrlRange(1, $comments->lastPage()) as $page => $url)
+                @if ($page == $comments->currentPage())
+                    <span class="px-3 py-2 border rounded bg-teal-500 text-white">{{ $page }}</span>
+                @elseif(abs($page - $comments->currentPage()) <= 2) {{-- Show 2 pages around current --}}
+                    <a href="{{ $url }}" 
+                       class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">{{ $page }}</a>
+                @endif
+            @endforeach
+        </div>
+
+        {{-- Next Page and Last Page --}}
+        <div>
+            @if ($comments->hasMorePages())
+                <a href="{{ $comments->nextPageUrl() }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Next</a>
+                <a href="{{ $comments->url($comments->lastPage()) }}" 
+                   class="px-3 py-2 border rounded bg-gray-100 text-gray-600 hover:bg-gray-200">Last</a>
+            @endif
+        </div>
+    </nav>
+@endif
+
         </div>
         @endif
 

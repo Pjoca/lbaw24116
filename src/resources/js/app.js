@@ -40,6 +40,58 @@ function goWithCommand(location, command) {
 window.goWithCommand = goWithCommand;
 
 
+function openModal(modalId) {
+    console.log(`Opening modal: ${modalId}`);
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        if (modalId === 'create-post-modal') {
+            const groupIdMeta = document.querySelector('meta[name="group-id"]');
+
+            if (groupIdMeta) {
+                const visibilityField = document.getElementById('visibility');
+                const groupField = document.getElementById('id_group');
+
+                if (visibilityField && groupField) {
+                    visibilityField.value = 'group';
+                    visibilityField.setAttribute('disabled', true);
+                    
+                    groupField.value = groupIdMeta.getAttribute('content');
+                    groupField.setAttribute('disabled', true);
+                }
+            } else {
+                const visibilityField = document.getElementById('visibility');
+                const groupField = document.getElementById('id_group');
+
+                if (visibilityField) {
+                    visibilityField.removeAttribute('disabled');
+                    visibilityField.value = 'public';
+                }
+
+                if (groupField) {
+                    groupField.removeAttribute('disabled');
+                    groupField.value = '';
+                }
+            }
+        }
+            
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        console.error(`Modal with ID ${modalId} not found.`);
+    }
+}
+
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('hidden');
+}
+
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+
 
 function toggleProfileDropdown() {
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -157,63 +209,6 @@ const profileModalHandler = {
 // Attach modal functions to the global window object for global access
 window.showEditProfileModal = profileModalHandler.show;
 window.hideEditProfileModal = profileModalHandler.hide;
-
-// Search Functionality
-function handleSearchInput() {
-    const searchQueryInput = document.getElementById('search-query');
-    const searchResultsDiv = document.getElementById('search-results');
-
-    if (!searchQueryInput || !searchResultsDiv) return;
-
-    searchQueryInput.addEventListener('input', function () {
-        const query = this.value;
-
-        if (query.length > 0) {
-            fetch(`/search/users?query=${encodeURIComponent(query)}&limit=3`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Network error');
-                    return response.text();
-                })
-                .then(data => {
-                    searchResultsDiv.innerHTML = data;
-                    searchResultsDiv.classList.remove('hidden');
-                })
-                .catch(err => console.error('Error:', err));
-        } else {
-            searchResultsDiv.classList.add('hidden');
-            searchResultsDiv.innerHTML = '';
-        }
-    });
-
-    document.addEventListener('click', function (event) {
-        if (!searchQueryInput.contains(event.target) && !searchResultsDiv.contains(event.target)) {
-            searchResultsDiv.classList.add('hidden');
-        }
-    });
-}
-
-// Filter User List Functionality
-function filterUserList() {
-    const searchValue = document.getElementById('user-search-input')?.value.toLowerCase();
-    const rows = document.querySelectorAll('#user-list-tbody tr');
-
-    rows.forEach(row => {
-        const name = row.children[1]?.textContent.toLowerCase();
-        const email = row.children[2]?.textContent.toLowerCase();
-        const isVisible = name.includes(searchValue) || email.includes(searchValue);
-        row.style.display = isVisible ? '' : 'none';
-    });
-}
-
-// Attach event listener for user search input
-function handleUserSearchInput() {
-    const userSearchInput = document.getElementById('user-search-input');
-    if (userSearchInput) {
-        userSearchInput.addEventListener('keyup', filterUserList);
-    }
-}
 
 // Image Preview Functionality
 function handleImagePreview() {
@@ -376,8 +371,6 @@ window.showFeedbackMessage = (type, message) => messageHandler.show(type, messag
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
     handleImagePreview();
-    handleSearchInput();
-    handleUserSearchInput();
     handleEditPostSubmission();
     initializeMessageHandler();
 }
@@ -662,9 +655,7 @@ function deleteNotification(notificationId) {
     });
 }
 
-
 window.deleteNotification = deleteNotification;
-
 
 // Search
 
@@ -722,27 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// Filter User List Functionality
-/* function filterUsers() {
-    const searchValue = document.getElementById('search-searchUsers-input')?.value.toLowerCase();
-    const rows = document.querySelectorAll('#user-list-tbody tr');
-
-    rows.forEach(row => {
-        const name = row.children[1]?.textContent.toLowerCase();
-        const email = row.children[2]?.textContent.toLowerCase();
-        const isVisible = name.includes(searchValue) || email.includes(searchValue);
-        row.style.display = isVisible ? '' : 'none';
-    });
-}
-
-// Attach event listener for user search input
-function handleUserSearchInput() {
-    const userSearchInput = document.getElementById('search-searchUsers-input');
-    if (userSearchInput) {
-        userSearchInput.addEventListener('keyup', filterUsers);
-    }
-} */
-
+// Preview search
 
 const postViewModalHandler = {
     async show(id) {
@@ -808,4 +779,77 @@ window.showPostViewModal = postViewModalHandler.show;
 window.hidePostViewModal = postViewModalHandler.hide;
 
 
+function handlePostSubmission(event) {
+    event.preventDefault();
+    const form = document.getElementById('create-post-form');
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to create post');
+        return response.json();
+    })
+    .then(data => {
+        alert('Post created successfully');
+        closeModal('create-post-modal');
+        form.reset();
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.classList.add('hidden');
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+        alert('Failed to create post. Please try again.');
+    });
+}
+
+window.handlePostSubmission = handlePostSubmission;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-bar');
+        const searchType = document.getElementById('search-type');
+        const resultsContainer = document.getElementById('search-results');
+
+        searchInput.addEventListener('input', function () {
+            const query = searchInput.value;
+            const type = searchType.value;
+
+            if (query.length < 2) { // Avoid firing for small inputs
+                resultsContainer.innerHTML = '';
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            fetch(`{{ route('search.preview') }}?query=${query}&type=${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+                    if (data.length > 0) {
+                        resultsContainer.classList.remove('hidden');
+                        data.forEach(item => {
+                            let content = item.name || item.content; // Adjust for name or content fields
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('px-4', 'py-2', 'hover:bg-gray-100', 'cursor-pointer');
+                            resultItem.textContent = content;
+                            resultsContainer.appendChild(resultItem);
+                        });
+                    } else {
+                        resultsContainer.classList.add('hidden');
+                    }
+                })
+                .catch(error => console.error('Error fetching results:', error));
+        });
+
+        // Hide results on click outside
+        document.addEventListener('click', function (event) {
+            if (!resultsContainer.contains(event.target) && event.target !== searchInput) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    });
 

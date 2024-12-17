@@ -36,7 +36,13 @@ use Illuminate\Http\Request;
 */
 
 // Home
-Route::redirect('/', '/login');
+Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect('/timeline/personalized');
+    } else {
+        return redirect('/timeline/public');
+    }
+});
 
 // Independent Home Route
 Route::get('/home', function () {
@@ -87,7 +93,7 @@ Route::controller(PostController::class)->group(function () {
 
 // Search
 Route::get('/search', [SearchController::class, 'search'])->name('search');
-Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
+Route::get('/search-preview', [SearchController::class, 'searchPreview'])->name('search.preview');
 
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {

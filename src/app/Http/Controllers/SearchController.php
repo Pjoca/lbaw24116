@@ -19,6 +19,7 @@ class SearchController extends Controller
         // Retrieve the search inputs
         $query = $request->input('query');
         $type = $request->input('type');
+        //$limit = $request->input('limit', null);
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
@@ -44,7 +45,11 @@ class SearchController extends Controller
                 })
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public users
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
-                ->paginate(8);
+                ->paginate(8)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type
+                ]);
 
             }
             // Search for groups if 'groups' type is selected
@@ -63,7 +68,13 @@ class SearchController extends Controller
                 ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public groups
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
-                ->paginate(8);
+                ->paginate(8)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]);
             }
             // Search for posts if 'posts' type is selected
             elseif ($type === 'posts') {
@@ -81,7 +92,13 @@ class SearchController extends Controller
                 ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public posts
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), plainto_tsquery(?)) DESC", [$query])
-                ->paginate(3);
+                ->paginate(3)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]);
             }
             // Search for comments if 'comments' type is selected
             elseif ($type === 'comments') {
@@ -97,10 +114,14 @@ class SearchController extends Controller
                 })
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public comments
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), websearch_to_tsquery(?)) DESC", [$query])
-                ->paginate(3);
+                ->paginate(3)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type
+                ]);
             }
         }
-
+        
         // Return the search results view
         return view('search.results', compact('query', 'type', 'startDate', 'endDate', 'users', 'groups', 'posts', 'comments'));
     }
@@ -181,4 +202,46 @@ class SearchController extends Controller
 
         return view('search.results', compact('comments', 'query'));
     }
+
+    public function searchPreview(Request $request)
+{
+    $query = $request->input('query');
+    $type = $request->input('type');
+
+    if (empty($query)) {
+        return response()->json([]);
+    }
+
+    $results = [];
+
+    switch ($type) {
+        case 'users':
+            $results = User::where('name', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'name']);
+            break;
+
+        case 'groups':
+            $results = Group::where('name', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'name']);
+            break;
+
+        case 'posts':
+            $results = Post::where('content', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'content']);
+            break;
+
+        case 'comments':
+            $results = Comment::where('content', 'ILIKE', '%' . $query . '%')
+                ->take(3)
+                ->get(['id', 'content']);
+            break;
+    }
+
+    return response()->json($results);
 }
+
+}
+
