@@ -18,6 +18,7 @@ use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MatchmakingController;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
@@ -228,6 +229,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
 
 Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
+
+Route::get('/matchmaking/load-more', [MatchmakingController::class, 'loadMoreUsers'])->name('matchmaking.loadMore');
 
 
 

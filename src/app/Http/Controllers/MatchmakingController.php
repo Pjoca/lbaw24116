@@ -9,31 +9,62 @@ use App\Models\GroupMembership;
 class MatchmakingController extends Controller
 {
     public function index()
-    {
-        // Obter o usuário autenticado
-        $user = auth()->user();
+{
+    $user = auth()->user();
+    $userGroups = $user->groups()->pluck('id')->toArray();
 
-        // Obter os grupos do usuário
+    // Paginar os usuários
+    $sameGroupUsers = User::whereHas('groups', function ($query) use ($userGroups) {
+        $query->whereIn('id', $userGroups);
+    })->where('id', '!=', $user->id)->paginate(9);
+
+    $otherUsers = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
+        $query->whereIn('id', $userGroups);
+    })->where('id', '!=', $user->id)->paginate(9);
+
+    return view('pages.matchmaking', compact('sameGroupUsers', 'otherUsers'));
+}
+
+public function loadMoreUsers(Request $request)
+{
+    try {
+        $user = auth()->user();
         $userGroups = $user->groups()->pluck('id')->toArray();
 
-        // Obter usuários em grupos em comum
-        $sameGroupUsers = User::whereHas('groups', function ($query) use ($userGroups) {
-            // Verifica se o usuário está em algum dos grupos do usuário autenticado
-            $query->whereIn('id', $userGroups);
-        })
-        ->where('id', '!=', $user->id)  // Exclui o próprio usuário
-        ->get();
+        // Verifica se o tipo é 'sameGroup' ou 'otherUsers'
+        if ($request->type === 'sameGroup') {
+            $users = User::whereHas('groups', function ($query) use ($userGroups) {
+                $query->whereIn('id', $userGroups);
+            })->where('id', '!=', $user->id)->paginate(9, ['*'], 'page', $request->page);
+        } else if ($request->type === 'otherUsers') {
+            // Verifica se o filtro "não amigos" foi ativado
+            $query = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
+                $query->whereIn('id', $userGroups);
+            })->where('id', '!=', $user->id);
 
-        // Obter usuários que não estão em grupos em comum
-        $otherUsers = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
-            // Verifica se o usuário não está em nenhum dos grupos do usuário autenticado
-            $query->whereIn('id', $userGroups);
-        })
-        ->where('id', '!=', $user->id)  // Exclui o próprio usuário
-        ->get();
+            // Se o filtro "não amigos" estiver ativo, filtra os usuários que não são amigos
+            if ($request->filter === 'not-friends') {
+                $query->whereDoesntHave('friends', function($query) use ($user) {
+                    $query->where('friend_id', $user->id);
+                });
+            }
 
-        // Passar os dados para a view
-        return view('pages.matchmaking', compact('sameGroupUsers', 'otherUsers'));
+            $users = $query->paginate(9, ['*'], 'page', $request->page);
+        } else {
+            // Tipo inválido
+            return response()->json(['error' => 'Tipo inválido'], 400);
+        }
+
+        // Retorna os dados em JSON
+        return response()->json(['users' => $users]);
+    } catch (\Exception $e) {
+        // Log do erro e retorno em caso de falha
+        \Log::error('Erro ao carregar mais usuários: ' . $e->getMessage());
+        return response()->json(['error' => 'Erro ao carregar mais usuários'], 500);
     }
+}
+
+
+
 }
 
