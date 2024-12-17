@@ -6,39 +6,49 @@
     <h2 class="text-2xl font-semibold mb-4 text-gray-800">Utilizadores em grupos em comum contigo</h2>
     <div id="same-group-users" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($sameGroupUsers as $user)
-            <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+            <!-- Card do usuário agora está dentro de um link -->
+            <a href="{{ route('profile.show', $user->id) }}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
                 <div class="flex items-center space-x-4">
                     <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">
-                            <a href="{{ route('profile.show', $user->id) }}" class="hover:text-blue-500">{{ $user->name }}</a>
+                            {{ $user->name }}
                         </h3>
                         <p class="text-sm text-gray-600">{{ $user->email }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
         @endforeach
     </div>
     <button id="load-more-same" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
+    <!-- Mensagem quando não houver mais usuários (grupos em comum) -->
+    <div id="no-more-same" class="hidden bg-yellow-200 text-yellow-800 text-sm p-2 rounded mt-2 text-center">
+        <strong>Não há mais utilizadores com grupos em comum</strong>
+    </div>
 
     <!-- Outros usuários -->
     <h2 class="text-2xl font-semibold mt-12 mb-4 text-gray-800">Outros Utilizadores</h2>
     <div id="other-users" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($otherUsers as $user)
-            <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+            <!-- Card do usuário agora está dentro de um link -->
+            <a href="{{ route('profile.show', $user->id) }}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
                 <div class="flex items-center space-x-4">
                     <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">
-                            <a href="{{ route('profile.show', $user->id) }}" class="hover:text-blue-500">{{ $user->name }}</a>
+                            {{ $user->name }}
                         </h3>
                         <p class="text-sm text-gray-600">{{ $user->email }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
         @endforeach
     </div>
     <button id="load-more-other" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
+    <!-- Mensagem quando não houver mais usuários (outros usuários) -->
+    <div id="no-more-other" class="hidden bg-yellow-200 text-yellow-800 text-sm p-2 rounded mt-2 text-center">
+        <strong>Não há mais utilizadores</strong>
+    </div>
 </div>
 
 <!-- Script para carregar mais usuários -->
@@ -62,24 +72,27 @@ function loadMore(type) {
             if (data.users && data.users.data.length > 0) {
                 data.users.data.forEach(user => {
                     let userCard = `
-                        <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                        <a href="/profile/${user.id}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
                             <div class="flex items-center space-x-4">
                                 <img src="/storage/${user.image_url ?? 'users/images/default.png'}" class="w-16 h-16 rounded-full object-cover">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">
-                                        <a href="/profile/${user.id}" class="hover:text-blue-500">${user.name}</a>
-                                    </h3>
+                                    <h3 class="text-lg font-semibold text-gray-900">${user.name}</h3>
                                     <p class="text-sm text-gray-600">${user.email}</p>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     `;
                     document.querySelector(container).innerHTML += userCard;
                 });
                 if (type === 'sameGroup') samePage++;
                 else otherPage++;
             } else {
-                alert('Não há mais usuários para carregar.');
+                // Exibe a mensagem de "Não há mais usuários"
+                if (type === 'sameGroup') {
+                    document.getElementById('no-more-same').classList.remove('hidden');
+                } else {
+                    document.getElementById('no-more-other').classList.remove('hidden');
+                }
             }
         })
         .catch(error => {
