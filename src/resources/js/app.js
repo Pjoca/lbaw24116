@@ -20,7 +20,7 @@ window.onload = function() {
         sessionStorage.removeItem("reloading");
         sessionStorage.removeItem("command");
     }
-}
+};
 
 function reloadP(command) {
     sessionStorage.setItem("reloading", "true");
@@ -44,11 +44,9 @@ function openModal(modalId) {
     if (modal) {
         if (modalId === 'create-post-modal') {
             const groupIdMeta = document.querySelector('meta[name="group-id"]');
-
             if (groupIdMeta) {
                 const visibilityField = document.getElementById('visibility');
                 const groupField = document.getElementById('id_group');
-
                 if (visibilityField && groupField) {
                     visibilityField.value = 'group';
                     visibilityField.setAttribute('disabled', true);
@@ -58,12 +56,10 @@ function openModal(modalId) {
             } else {
                 const visibilityField = document.getElementById('visibility');
                 const groupField = document.getElementById('id_group');
-
                 if (visibilityField) {
                     visibilityField.removeAttribute('disabled');
                     visibilityField.value = 'public';
                 }
-
                 if (groupField) {
                     groupField.removeAttribute('disabled');
                     groupField.value = '';
@@ -629,6 +625,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+
 // Modal de Visualização do Post
 const postViewModalHandler = {
     async show(id) {
@@ -672,14 +669,14 @@ const postViewModalHandler = {
                 modalLikeText.textContent = 'Like';
             }
 
-            // Carregar comentários
+            // Carregar comentários do modal
             modalComments.innerHTML = '';
             const commentsResponse = await fetch(`/posts/${id}/comments`);
             if (commentsResponse.ok) {
                 const commentsData = await commentsResponse.json();
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
-                        <div class="bg-gray-100 p-4 rounded-lg mb-2" id="comment-${comment.id}">
+                        <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
@@ -687,22 +684,22 @@ const postViewModalHandler = {
                                 </div>
                                 ${comment.editable ? `
                                 <div class="flex space-x-2">
-                                    <button type="button" onclick="openInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
+                                    <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
                                         <i class="fas fa-edit"></i> Editar
                                     </button>
-                                    <button onclick="deleteComment(${comment.id})" class="text-red-500 hover:text-red-700">
+                                    <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
                                         <i class="fas fa-trash-alt"></i> Excluir
                                     </button>
                                 </div>
                                 ` : ''}
                             </div>
-                            <p class="mt-2 text-gray-700" id="commentContent-${comment.id}">${comment.content}</p>
-                            <form id="editForm-${comment.id}" class="hidden mt-2" onsubmit="saveInlineEdit(event, ${comment.id})">
+                            <p class="mt-2 text-gray-700" id="modal-commentContent-${comment.id}">${comment.content}</p>
+                            <form id="modal-editForm-${comment.id}" class="hidden mt-2" onsubmit="saveModalInlineEdit(event, ${comment.id})">
                                 @csrf
                                 @method('PUT')
-                                <textarea name="content" class="w-full p-2 border rounded-lg" id="editTextArea-${comment.id}"></textarea>
+                                <textarea name="content" class="w-full p-2 border rounded-lg" id="modal-editTextArea-${comment.id}"></textarea>
                                 <div class="flex justify-end mt-2">
-                                    <button type="button" onclick="cancelInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
+                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
                                     <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
                                 </div>
                             </form>
@@ -771,7 +768,7 @@ function handlePostSubmission(event) {
         closeModal('create-post-modal');
         form.reset();
         const previewContainer = document.getElementById('preview-container');
-        previewContainer.classList.add('hidden');
+        if (previewContainer) previewContainer.classList.add('hidden');
     })
     .catch(error => {
         console.error('Error creating post:', error);

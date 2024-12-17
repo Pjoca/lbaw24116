@@ -45,12 +45,12 @@
 
             <!-- Formulário de Comentário -->
             @auth
-                <form id="modal-comment-form" class="mt-4 flex comment-form">
+                <form id="modal-comment-form" class="mt-4">
                     @csrf
-                    <input type="text" id="modal-comment-input" placeholder="Adicione um comentário..."
-                        class="flex-1 border-gray-300 rounded-l-md p-2 focus:ring-teal-500 focus:border-teal-500">
+                    <input type="text" name="content" id="modal-comment-input" placeholder="Adicione um comentário..."
+                        class="flex-1 border-gray-300 rounded-l-md p-2 focus:ring-teal-500 focus:border-teal-500 w-full">
                     <button type="submit" 
-                        class="bg-teal-500 text-white px-4 rounded-r-md hover:bg-teal-600 transition">
+                        class="bg-teal-500 text-white px-4 rounded-md hover:bg-teal-600 transition mt-2">
                         Enviar
                     </button>
                 </form>
