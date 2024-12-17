@@ -463,9 +463,10 @@ async function cancelFriendRequest(userId) {
         });
 
         if (!response.ok) throw new Error('Failed to cancel friend request');
+        
         const data = await response.json();
 
-        // Update the button dynamically
+        // Update the button dynamically if it exists elsewhere
         const button = document.querySelector(`[data-user-id="${userId}"]`);
         if (button) {
             button.textContent = 'Add Friend';
@@ -473,6 +474,13 @@ async function cancelFriendRequest(userId) {
             button.setAttribute('onclick', `addFriend(${userId})`);
         }
 
+        // Remove the friend request from the sent requests list (if it exists)
+        const sentRequestItem = document.querySelector(`#sent-request-${userId}`);
+        if (sentRequestItem) {
+            sentRequestItem.remove();
+        }
+
+        // Show success feedback
         window.showFeedbackMessage('green', 'Friend request canceled successfully!');
     } catch (error) {
         console.error(error);

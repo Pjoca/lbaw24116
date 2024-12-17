@@ -7,9 +7,11 @@
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center relative">
             <!-- Friend Requests Button (top-right corner) -->
             @if (Auth::id() === $user['id']) <!-- Only show for the profile owner -->
+                @vite('resources/js/friends.js')
+                @include('modals.friend-requests-modal')
                 <!-- Friend Requests Button (top-right corner of the profile info section) -->
                 <button id="friend-requests-toggle" 
-                        onclick="toggleRequestsSidebar()" 
+                        onclick="openModal('friend-requests-modal'); loadInitialReceivedFriendRequests({{ Auth::id() }}); loadInitialSentFriendRequests({{ Auth::id() }});"
                         class="absolute top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
                     View Friend Requests
                 </button>
