@@ -87,7 +87,6 @@ Route::controller(PostController::class)->group(function () {
 // Search
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/search/users', [UserController::class, 'search'])->name('users.search');
-Route::get('/search/groups', [GroupController::class, 'search'])->name('groups.search');
 
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {

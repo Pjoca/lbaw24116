@@ -44,7 +44,7 @@ class SearchController extends Controller
                 })
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public users
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
-                ->get();
+                ->paginate(8);
 
             }
             // Search for groups if 'groups' type is selected
@@ -63,7 +63,7 @@ class SearchController extends Controller
                 ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public groups
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
-                ->get();
+                ->paginate(8);
             }
             // Search for posts if 'posts' type is selected
             elseif ($type === 'posts') {
@@ -81,7 +81,7 @@ class SearchController extends Controller
                 ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public posts
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), plainto_tsquery(?)) DESC", [$query])
-                ->get();
+                ->paginate(3);
             }
             // Search for comments if 'comments' type is selected
             elseif ($type === 'comments') {
@@ -97,7 +97,7 @@ class SearchController extends Controller
                 })
                 ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public comments
                 ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), websearch_to_tsquery(?)) DESC", [$query])
-                ->get();
+                ->paginate(3);
             }
         }
 

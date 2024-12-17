@@ -81,6 +81,11 @@
                     </li>
                 @endforeach
             </ul>
+
+    <!-- Pagination for Users -->
+    <div class="mt-4">
+        {{ $users->appends(request()->query())->links() }}
+    </div>
         @endif
 
         @if(!$groups->isEmpty())
@@ -98,6 +103,12 @@
                     </li>
                 @endforeach
             </ul>
+
+            <!-- Pagination for Groups -->
+        <div class="mt-4">
+            {{ $groups->appends(request()->query())->links() }}
+        </div>
+
         @endif
 
         @if(!$posts->isEmpty())
@@ -108,6 +119,12 @@
             <div class="space-y-6">
                 @each('partials.post', $posts, 'post')
             </div>
+
+        <!-- Pagination for Posts -->
+        <div class="mt-4">
+            {{ $posts->appends(request()->query())->links() }}
+        </div>
+
         @endif
 
         @if(!$comments->isEmpty())
@@ -129,6 +146,11 @@
                     </div>
                 @endforeach
             </div>
+
+        <!-- Pagination Links for Comments -->
+        <div class="mt-4">
+            {{ $comments->appends(request()->query())->links() }}
+        </div>
         @endif
 
         @if($users->isEmpty() && $groups->isEmpty() && $posts->isEmpty() && $comments->isEmpty())
