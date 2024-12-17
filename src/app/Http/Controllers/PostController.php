@@ -157,9 +157,9 @@ public function show($id)
     $post = Post::findOrFail($id);
 
     // Authorization check if necessary
-    if (Auth::id() !== $post->id_user) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    // if (Auth::id() !== $post->id_user) {
+    //     return response()->json(['error' => 'Unauthorized'], 403);
+    // }
 
     return response()->json([
         'id' => $post->id,
