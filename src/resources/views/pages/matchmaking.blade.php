@@ -9,7 +9,7 @@
             <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center space-x-4">
                     <!-- Imagem do usuário -->
-                    <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
+                    <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
                         <!-- Nome do usuário agora é um link para o perfil -->
                         <h3 class="text-lg font-semibold text-gray-900">
@@ -29,7 +29,7 @@
             <div class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
                 <div class="flex items-center space-x-4">
                     <!-- Imagem do usuário -->
-                    <img src="{{ $user->image_url ?? 'https://via.placeholder.com/150' }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
+                    <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" alt="{{ $user->name }}" class="w-16 h-16 rounded-full object-cover">
                     <div>
                         <!-- Nome do usuário agora é um link para o perfil -->
                         <h3 class="text-lg font-semibold text-gray-900">

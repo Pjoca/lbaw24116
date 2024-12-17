@@ -66,7 +66,7 @@
         <ul id="friend-list" class="divide-y divide-gray-200">
             @foreach ($friends as $friend)
             <li class="p-4 hover:bg-gray-100 cursor-pointer friend-item flex items-center gap-4" data-friend-id="{{ $friend->id }}">
-                <img src="{{ asset('storage/' . $friend['image_url']) }}" alt="{{ $friend['name'] }}" class="w-12 h-12 rounded-full object-cover">
+                <img src="{{ asset('storage/' . ($friend['image_url'] ?? 'users/images/default.png')) }}" alt="{{ $friend['name'] }}" class="w-12 h-12 rounded-full object-cover">
                 <span class="ml-4">{{ $friend->name }}</span>
             </li>
             @endforeach

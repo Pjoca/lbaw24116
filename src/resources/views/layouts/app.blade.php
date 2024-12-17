@@ -109,7 +109,7 @@
 
                         <div class="relative">
                         <button id="profile-dropdown-toggle" onclick="toggleProfileDropdown()" class="flex items-center gap-2 text-sm font-bold hover:text-yellow-300 transition focus:outline-none ml-4">
-                            <img src="{{ asset('storage/' . Auth::user()->image_url ?? 'users/images/default.png') }}" alt="User Image" class="w-8 h-8 rounded-full border-2 border-white">
+                            <img src="{{ asset('storage/' . (Auth::user()->image_url ?? 'users/images/default.png')) }}" alt="User Image" class="w-8 h-8 rounded-full border-2 border-white">
                             <span>{{ Auth::user()->name }}</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" id="dropdown-arrow" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06 0L10 10.939l3.71-3.72a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd" />

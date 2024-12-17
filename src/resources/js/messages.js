@@ -25,21 +25,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function createMessageListItem(message) {
+    function createMessageListItem(message, image_url) {
+        const contactImage = image_url ? `/storage/${image_url}` : '/storage/users/images/default.png';
         const listItem = document.createElement("li");
-
         if (message.sender_name === "You") {
             listItem.className = "flex justify-end items-start gap-3";
             listItem.innerHTML = `
                 <div class="bg-teal-500 text-white px-4 py-2 rounded-lg max-w-md">
                     ${message.content}
                 </div>
-                <img src="/path/to/your-profile.jpg" alt="You" class="w-10 h-10 rounded-full">
+                <img src="${contactImage}" alt="You" class="w-10 h-10 rounded-full">
             `;
         } else {
             listItem.className = "flex items-start gap-3";
             listItem.innerHTML = `
-                <img src="/path/to/sender-profile.jpg" alt="${message.sender_name}" class="w-10 h-10 rounded-full">
+                <img src="${contactImage}" alt="${message.sender_name}" class="w-10 h-10 rounded-full">
                 <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg max-w-md">
                     ${message.content}
                 </div>
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
             messageList.innerHTML = `<li class="text-gray-500 italic">No messages to display.</li>`;
         } else {
             data.forEach((message) => {
-                const listItem = createMessageListItem(message);
+                const listItem = createMessageListItem(message, message.sender_image_url);
                 messageList.appendChild(listItem);
             });
 
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const { data, current_page } = result;
                 data.reverse();
                 data.forEach((message) => {
-                    const listItem = createMessageListItem(message);
+                    const listItem = createMessageListItem(message, message.sender_image_url);
                     messageList.insertBefore(listItem, messageList.firstChild);
                 });
 
@@ -171,7 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     const result = await response.json();
-                    const userProfileImage = document.querySelector(".container").getAttribute("data-user-profile");
+                    const contactImage = document.querySelector("#profile-dropdown-toggle img")?.getAttribute("src") 
+                    || '/storage/users/images/default.png';
 
                     if (result.success) {
                         removeNoMessagesPlaceholder();
@@ -182,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="bg-teal-500 text-white px-4 py-2 rounded-lg max-w-md">
                                 ${messageInput.value.trim()}
                             </div>
-                            <img src="${userProfileImage}" alt="You" class="w-10 h-10 rounded-full">
+                            <img src="${contactImage}" alt="You" class="w-10 h-10 rounded-full">
                         `;
                         messageList.appendChild(listItem);
                         messageInput.value = "";
@@ -244,10 +245,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
                         // Adicionar a nova conversa no topo da lista
                         const newContact = document.createElement("li");
+                        const contactImage = contact.image_url ? `/storage/${contact.image_url}` : '/storage/users/images/default.png';
                         newContact.className = "p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item";
                         newContact.setAttribute("data-contact-id", contact.id);
                         newContact.innerHTML = `
-                            <img src="${contact.image_url}" alt="${contact.name}" class="w-12 h-12 rounded-full object-cover">
+                            <img src="${contactImage}" alt="${contact.name}" class="w-12 h-12 rounded-full object-cover">
                             <div>
                                 <p class="font-semibold text-gray-800">${contact.name}</p>
                             </div>
