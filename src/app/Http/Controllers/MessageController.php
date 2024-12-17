@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+use Pusher\Pusher;
 
 class MessageController extends Controller
 {
@@ -129,6 +132,30 @@ public function sendMessage(Request $request)
         ]);
 
         $message->save();
+
+        $pusher = new Pusher(
+            config('broadcasting.connections.pusher.key'),
+              config('broadcasting.connections.pusher.secret'),
+              config('broadcasting.connections.pusher.app_id'),
+              [
+                  'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+                  'useTLS' => true
+              ]
+          );
+        
+          $pusher->trigger('private-notification.' . $request->input('receiver_id') . '.' . Auth::id(), 'new-message', [
+            'message' => [
+                'content' => $message->content,
+                'id_sender' => $message->id_sender,
+                'id_receiver' => $message->id_receiver,
+                'created_at' => $message->created_at->format('Y-m-d H:i:s'),
+                'sender_image_url' => Auth::user()->image_url,
+            ]
+        ]);
+
+        Log::info('Message sent: ' . $message->content);
+        Log::info('Auth ID: ' . Auth::id());
+        Log::info('Receiver ID: ' . $request->input('receiver_id'));
 
         return response()->json([
             'success' => true,

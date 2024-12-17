@@ -1,3 +1,5 @@
+import Pusher from 'pusher-js';
+
 document.addEventListener("DOMContentLoaded", () => {
     const conversationList = document.getElementById("conversation-list");
     const messageList = document.getElementById("message-list");
@@ -9,10 +11,61 @@ document.addEventListener("DOMContentLoaded", () => {
     const newConversationModal = document.getElementById("new-conversation-modal");
     const closeModalBtn = document.getElementById("close-modal-btn");
     const friendList = document.getElementById("friend-list");
+    const userId = document.querySelector('meta[name="user-id"]').content;
     let currentContactId = null;
     let currentPage = 1;
     let lastPage = 1;
     let loading = false; // Para evitar requisições múltiplas simultâneas
+    let pusherChannel = null;
+
+
+    const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+            cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+            encrypted: true,
+            authEndpoint: '/broadcasting/auth',
+            auth: {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            },
+            logToConsole: true 
+        });
+
+
+        function subscribeToChannel(contactId) {
+            if (pusherChannel) {
+                console.log(`Unsubscribing from channel: ${pusherChannel.name}`);
+                pusherChannel.unbind_all();
+                pusher.unsubscribe(pusherChannel.name);
+            }
+    
+            const channelName = `private-notification.${userId}.${contactId}`;
+            pusherChannel = pusher.subscribe(channelName);
+
+            pusherChannel.bind('pusher:subscription_succeeded', function() {
+                console.log(`Subscription successful to channel: ${channelName}`);
+            });
+
+            pusherChannel.bind('pusher:subscription_error', function(status) {
+                console.error(`Subscription error to channel: ${channelName}`, status);
+            });
+    
+            console.log(`Subscribed to channel: ${channelName}`);
+    
+            pusherChannel.bind('new-message', function(data) {
+                console.log(`New message from Pusher:`, data);
+                console.log(`Current contact ID: ${currentContactId}`);
+                if (data.message.id_sender == currentContactId) {
+                    console.log("Adding message to list");
+                    const listItem = createMessageListItem(data.message, data.message.sender_image_url);
+                    console.log(listItem);
+                    messageList.appendChild(listItem);
+                    scrollToBottom();
+                }
+            });
+
+            
+        }
 
     function scrollToBottom() {
         messageList.scrollTop = messageList.scrollHeight;
@@ -50,13 +103,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function loadLastPageOfConversation(contactId) {
-        // Primeiro, obtenha info da primeira página apenas para saber o last_page
         let response = await fetch(`/messages/${contactId}?page=1`);
         if (!response.ok) throw new Error("Failed to load messages");
         let result = await response.json();
         lastPage = result.last_page;
 
-        // Agora, carregue a última página (mais recente)
         response = await fetch(`/messages/${contactId}?page=${lastPage}`);
         if (!response.ok) throw new Error("Failed to load messages");
         result = await response.json();
@@ -72,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 messageList.appendChild(listItem);
             });
 
-            // Como estamos na última página (mais recente), rolamos para o fundo:
             scrollToBottom();
         }
     }
@@ -84,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const contactId = listItem.getAttribute("data-contact-id");
                 const contactName = listItem.querySelector("p").textContent.trim(); // Capturar o nome do contato
                 currentContactId = contactId;
+                subscribeToChannel(contactId);
     
                 // Atualizar o nome do contato no painel
                 const contactNamePanel = document.getElementById("contact-name-panel");
