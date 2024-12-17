@@ -24,6 +24,8 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 
 use Illuminate\Http\Request;
 
+use Pusher\Pusher;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -159,37 +161,47 @@ Route::controller(ForgotPasswordController::class)->group( function () {
 
 
 Route::post('/broadcasting/auth', function (Request $request) {
+    // Check if the user is authenticated
     if (!Auth::check()) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
     $userId = Auth::id();
-    $channelName = $request->request->get('channel_name');
+    $channelName = $request->input('channel_name');
 
-    if (!preg_match('/^private-notification\.(\d+)$/', $channelName, $matches)) {
+    // Regex for private-notification.<userId> or private-messages.<userId>.<contactId>
+    if (!preg_match('/^private-(notification|messages)\.(\d+)(?:\.(\d+))?$/', $channelName, $matches)) {
+        Log::info('Invalid channel name: ' . $channelName);
         return response()->json(['message' => 'Invalid channel name'], 403);
     }
 
-    $channelUserId = (int) $matches[1];
+    $channelType = $matches[1]; // "notification" or "messages"
+    $channelUserId = (int) $matches[2]; // User ID for whom the channel is created
+    Log::info('Channel user ID: ' . $channelUserId);
+    $contactId = isset($matches[3]) ? (int) $matches[3] : null; // Contact ID (only for messages channel)
+    Log::info('Contact ID: ' . $contactId);
 
-    if ($userId !== $channelUserId) {
+    // Check if the authenticated user is authorized to access this channel
+    if ($userId !== $channelUserId && $userId !== $contactId) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
-    $pusher = new Pusher\Pusher(
+    // Configure the Pusher instance
+    $pusher = new Pusher(
         config('broadcasting.connections.pusher.key'),
         config('broadcasting.connections.pusher.secret'),
         config('broadcasting.connections.pusher.app_id'),
         [
             'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-            'useTLS' => false,
-            'host' => config('broadcasting.connections.pusher.options.host'),
-            'port' => config('broadcasting.connections.pusher.options.port'),
-            'scheme' => config('broadcasting.connections.pusher.options.scheme'),
+            'useTLS' => config('broadcasting.connections.pusher.options.useTLS', true),
+            'host' => config('broadcasting.connections.pusher.options.host', '127.0.0.1'),
+            'port' => config('broadcasting.connections.pusher.options.port', 6001),
+            'scheme' => config('broadcasting.connections.pusher.options.scheme', 'http'),
         ]
     );
 
-    return $pusher->socket_auth($channelName, $request->request->get('socket_id'));
+    // Authenticate the Pusher socket for the channel
+    return $pusher->socket_auth($channelName, $request->input('socket_id'));
 });
 
 
