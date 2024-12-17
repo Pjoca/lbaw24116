@@ -376,32 +376,28 @@ public function getJoinRequests(Request $request, $groupId)
 }
 
 
-public function getInvites(Request $request, $groupId)
+
+public function getGroupInvites(Request $request)
 {
-    $group = Group::findOrFail($groupId);
+    $userId = Auth::id();
 
-    $user = Auth::user();
-    // Ensure the user is the group owner
-    if ($group->id_owner !== $user->id) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
-
-    // Query pending invites
-    $query = GroupMembershipRequest::where('id_group', $groupId)
+    // Query pending group invites for the authenticated user
+    $query = GroupMembershipRequest::where('id_user', $userId)
         ->where('request_status', 'pending')
         ->where('is_invite', true) // Only invites, not join requests
-        ->with('user')
+        ->with('group')
         ->orderBy('requested_at', 'desc'); // Assuming requested_at tracks the invite time
 
+    // Paginate the invites (5 per page)
     $invites = $query->simplePaginate(5);
 
+    // Render the invites as HTML to be dynamically loaded into a view
+    $html = view('partials.user-invites-renderer', compact('invites'))->render();
+
     return response()->json([
-        'html' => view('partials.invites-renderer', compact('invites', 'group'))->render(),
+        'html' => $html,
         'hasMorePages' => $invites->hasMorePages(),
         'nextPageUrl' => $invites->nextPageUrl()
     ]);
 }
-
-
-
 }

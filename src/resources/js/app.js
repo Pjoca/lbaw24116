@@ -560,9 +560,15 @@ async function acceptGroupInvite(inviteId) {
             inviteElement.remove();
         }
 
+        // Check if the list is empty after removing the item
+        const remainingInvites = document.querySelectorAll('#group-invites-list li');
+        if (remainingInvites.length === 0) {
+            document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
+        }
+
         window.showFeedbackMessage('green', data.success || 'Invite accepted successfully!');
     } catch (error) {
-        console.error(error);
+        console.error('Error accepting invite:', error);
         window.showFeedbackMessage('red', error.message || 'An error occurred while accepting the invite.');
     }
 }
@@ -591,9 +597,15 @@ async function rejectGroupInvite(inviteId) {
             inviteElement.remove();
         }
 
+        // Check if the list is empty after removing the item
+        const remainingInvites = document.querySelectorAll('#group-invites-list li');
+        if (remainingInvites.length === 0) {
+            document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
+        }
+
         window.showFeedbackMessage('green', data.success || 'Invite rejected successfully!');
     } catch (error) {
-        console.error(error);
+        console.error('Error rejecting invite:', error);
         window.showFeedbackMessage('red', error.message || 'An error occurred while rejecting the invite.');
     }
 }

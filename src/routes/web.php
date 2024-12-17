@@ -125,6 +125,7 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
     Route::delete('/groups/{groupId}/members/{memberId}', 'removeMember')->name('groups.removeMember');
     Route::get('/groups/{groupId}/join-requests',  'getJoinRequests')->name('groups.getJoinRequests');
     Route::get('/groups/{groupId}/invites', 'getInvites')->name('groups.getInvites');
+    Route::get('/groups/invites/{userId}',  'getGroupInvites')->name('groups.invites');
 });
 
 Route::controller(GroupController::class)->middleware('auth')->group(function () {

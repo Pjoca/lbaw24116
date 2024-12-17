@@ -5,19 +5,6 @@
 
         <!-- User Profile Section -->
         <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mb-8 text-center relative">
-            <!-- Friend Requests Button (top-right corner) -->
-            @if (Auth::id() === $user['id']) <!-- Only show for the profile owner -->
-                @vite('resources/js/friends.js')
-                @include('modals.friend-requests-modal')
-                <!-- Friend Requests Button (top-right corner of the profile info section) -->
-                <button id="friend-requests-toggle" 
-                        onclick="openModal('friend-requests-modal'); loadInitialReceivedFriendRequests({{ Auth::id() }}); loadInitialSentFriendRequests({{ Auth::id() }});"
-                        class="absolute top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
-                    View Friend Requests
-                </button>
-
-                @include('partials.friend-requests-sidebar')
-            @endif
 
             <!-- User Profile Image -->
             <div class="mb-4">
@@ -76,8 +63,9 @@
                 @endif
             </div>
 
-            <!-- Edit Profile Button (Visible only to the profile owner) -->
+            <!-- Edit Profile and Delete Profile Buttons (only visible to the profile owner) -->
             @if (Auth::id() === $user['id'])
+                @vite('resources/js/friends.js')
                 <div class="mt-4 flex gap-4 justify-center">
                     <button onclick="showEditProfileModal({{ json_encode($user) }})" 
                             class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
@@ -85,7 +73,8 @@
                     </button>
 
                     <!-- Delete Profile Button -->
-                    <form action="{{ route('profile.delete', ['id' => $user['id']]) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete your profile? This action cannot be undone.');">
+                    <form action="{{ route('profile.delete', ['id' => $user['id']]) }}" method="POST" 
+                          onsubmit="return confirm('Are you sure you want to delete your profile? This action cannot be undone.');">
                         @csrf
                         @method('DELETE')
                         <button type="submit" 
@@ -93,6 +82,18 @@
                             Delete Profile
                         </button>
                     </form>
+                </div>
+
+                <div class="mt-4 flex gap-4 justify-center">
+                    <button onclick="openModal('friend-requests-modal'); loadInitialReceivedFriendRequests({{ Auth::id() }}); loadInitialSentFriendRequests({{ Auth::id() }});" 
+                            class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                        View Friend Requests
+                    </button>
+
+                    <button onclick="openModal('group-invites-modal'); loadInitialGroupInvites({{ Auth::id() }});" 
+                            class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                        View Group Invites
+                    </button>
                 </div>
             @endif
         </div>
@@ -102,7 +103,7 @@
             <h3 class="text-xl font-bold mb-4">Posts by {{ $user['name'] }}</h3>
             @if ($posts->isEmpty())
                 <p>No posts available.</p>
-                @if (Auth::id() === $user['id']) <!-- Only show for the profile owner -->
+                @if (Auth::id() === $user['id'])
                     <div class="mt-4">
                         <a href="{{ route('posts.create') }}" 
                            class="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition">
@@ -121,6 +122,8 @@
     </div>
 
     <!-- Modals -->
-    @include('modals.edit-post-modal')
     @include('modals.edit-profile-modal')
+    @include('modals.friend-requests-modal')
+    @include('modals.user-group-invites-modal')
+
 @endsection

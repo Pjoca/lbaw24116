@@ -179,3 +179,89 @@ window.loadMoreReceivedFriendRequests = loadMoreReceivedFriendRequests;
 window.loadInitialSentFriendRequests = loadInitialSentFriendRequests;
 window.loadMoreSentFriendRequests = loadMoreSentFriendRequests;
 
+
+async function loadInitialGroupInvites(userId) {
+    const modal = document.getElementById('group-invites-modal');
+    const invitesList = document.getElementById('group-invites-list');
+    const loadMoreButtonContainer = modal.querySelector('.load-more-invites-container');
+    let loadMoreButton = document.getElementById('load-more-group-invites');
+
+    try {
+        console.log(`Fetching group invites for user ${userId}`);
+
+        const response = await fetch(`/groups/invites/${userId}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch group invites.');
+
+        const data = await response.json();
+
+        // Clear existing list before loading
+        invitesList.innerHTML = ''; 
+
+        if (!data.html || data.html.trim() === '') {
+            console.log('No group invites found');
+            invitesList.innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
+        } else {
+            console.log('Group invites loaded successfully');
+            invitesList.insertAdjacentHTML('beforeend', data.html); // Insert HTML from response
+        }
+
+        if (data.hasMorePages) {
+            if (!loadMoreButton) {
+                loadMoreButton = document.createElement('button');
+                loadMoreButton.id = 'load-more-group-invites';
+                loadMoreButton.textContent = 'Load More';
+                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
+                loadMoreButton.onclick = () => loadMoreGroupInvites();
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            } else {
+                loadMoreButton.classList.remove('hidden');
+            }
+            modal.setAttribute('data-next-group-invites-url', data.nextPageUrl);
+        } else if (loadMoreButton) {
+            loadMoreButton.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading group invites:', error.message);
+    }
+}
+
+async function loadMoreGroupInvites() {
+    const modal = document.getElementById('group-invites-modal');
+    const nextPageUrl = modal.getAttribute('data-next-group-invites-url');
+    const invitesList = document.getElementById('group-invites-list');
+
+    if (!nextPageUrl) return;
+
+    try {
+        console.log(`Loading more group invites from ${nextPageUrl}`);
+
+        const response = await fetch(nextPageUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) throw new Error('Failed to load more group invites.');
+
+        const data = await response.json();
+
+        if (data.html && data.html.trim() !== '') {
+            invitesList.insertAdjacentHTML('beforeend', data.html);
+        }
+
+        if (data.hasMorePages) {
+            modal.setAttribute('data-next-group-invites-url', data.nextPageUrl);
+        } else {
+            const loadMoreButton = document.getElementById('load-more-group-invites');
+            if (loadMoreButton) {
+                loadMoreButton.remove();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading more group invites:', error.message);
+    }
+}
+
+window.loadInitialGroupInvites = loadInitialGroupInvites;
+window.loadMoreGroupInvites = loadMoreGroupInvites;
