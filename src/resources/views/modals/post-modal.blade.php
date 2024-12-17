@@ -9,7 +9,7 @@
 
         <!-- Imagem do Post -->
         <div class="flex-1 bg-gray-100 rounded-l-lg overflow-hidden">
-            <img id="modal-post-image" src="" alt="Post Image" class="w-full h-full object-cover">
+            <img id="modal-post-image" src="" alt="Post Image" class="w-full h-full object-contain">
         </div>
 
         <!-- Conteúdo do Post -->
