@@ -248,19 +248,29 @@ class PostController extends Controller
     }
 
     public function storeComment(Request $request, $postId)
-    {
-        $validated = $request->validate([
-            'content' => 'required|string|max:1000',
-        ]);
+{
+    $validated = $request->validate([
+        'content' => 'required|string|max:1000',
+    ]);
 
-        $comment = new Comment();
-        $comment->content = $validated['content'];
-        $comment->id_user = Auth::id();
-        $comment->id_post = $postId;
-        $comment->save();
+    $comment = new Comment();
+    $comment->content = $validated['content'];
+    $comment->id_user = Auth::id();
+    $comment->id_post = $postId;
+    $comment->save();
 
-        return redirect()->back();
-    }
+    return response()->json([
+        'success' => true,
+        'comment' => [
+            'id' => $comment->id,
+            'content' => $comment->content,
+            'user_name' => $comment->user->name,
+            'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
+            'editable' => (Auth::id() === $comment->id_user)
+        ],
+    ]);
+}
+
 
     public function toggleLike(Request $request, Post $post)
     {

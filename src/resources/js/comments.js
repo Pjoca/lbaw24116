@@ -6,7 +6,7 @@ function toggleLike(postId) {
     const likeButton = document.getElementById(`like-button-${postId}`);
     const likeCount = document.getElementById(`like-count-${postId}`);
 
-    fetch(`/posts/${postId}/like-toggle`, {
+    return fetch(`/posts/${postId}/like-toggle`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -15,15 +15,23 @@ function toggleLike(postId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.liked) {
-            likeButton.innerHTML = '<i class="fas fa-heart text-2xl mr-2 text-red-500"></i> Remove like';
-        } else {
-            likeButton.innerHTML = '<i class="far fa-heart text-2xl mr-2 text-gray-500"></i> Like';
+        // Atualiza se existir no post da timeline
+        if (likeButton && likeCount) {
+            if (data.liked) {
+                likeButton.innerHTML = '<i class="fas fa-heart text-2xl mr-2 text-red-500"></i> Remove like';
+            } else {
+                likeButton.innerHTML = '<i class="far fa-heart text-2xl mr-2 text-gray-500"></i> Like';
+            }
+            likeCount.textContent = `${data.likesCount} ${data.likesCount === 1 ? 'like' : 'likes'}`;
         }
-        likeCount.textContent = `${data.likesCount} ${data.likesCount === 1 ? 'like' : 'likes'}`;
+        return data; // retorna para usar no modal
     })
-    .catch(error => console.error('Erro ao processar like:', error));
+    .catch(error => {
+        console.error('Erro ao processar like:', error);
+        throw error;
+    });
 }
+
 
 // Editar comentário inline
 function openInlineEdit(commentId, content) {
@@ -117,7 +125,7 @@ document.querySelectorAll('form.comment-form').forEach(commentForm => {
 
             const data = await response.json();
             if (data.success) {
-                const commentSection = document.getElementById(`comments-section-${postId}`);
+                const commentSection = document.getElementById(`comments-section-${postId}`) || document.getElementById('modal-comments');
                 const newComment = document.createElement("div");
                 newComment.classList.add("bg-gray-100", "p-4", "rounded-lg", "mb-2");
                 newComment.id = `comment-${data.comment.id}`;

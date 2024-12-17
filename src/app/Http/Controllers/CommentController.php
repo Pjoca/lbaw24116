@@ -25,39 +25,38 @@ class CommentController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $comment = Comment::findOrFail($id);
-        
-        // Verifica se o usuário logado é o autor do comentário
-        if ($comment->id_user !== auth()->id()) {
-            return response()->json(['success' => false, 'error' => 'Sem permissão'], 403);
-        }
+{
+    $comment = Comment::findOrFail($id);
 
-        $comment->content = $request->input('content');
-        $comment->save();
-
-        return response()->json(['success' => true, 'content' => $comment->content]);
+    if ($comment->id_user !== auth()->id()) {
+        return response()->json(['success' => false, 'error' => 'Sem permissão'], 403);
     }
 
-    public function destroy($id)
-    {
-        $comment = Comment::find($id);
+    $comment->content = $request->input('content');
+    $comment->save();
 
-        if (!$comment) {
-            return response()->json(['success' => false, 'message' => 'Comentário não encontrado'], 404);
-        }
+    return response()->json(['success' => true, 'content' => $comment->content]);
+}
 
-        // Verifica se o usuário logado é o autor do comentário
-        if ($comment->id_user !== auth()->id()) {
-            return response()->json(['success' => false, 'message' => 'Sem permissão'], 403);
-        }
+public function destroy($id)
+{
+    $comment = Comment::find($id);
 
-        if ($comment->delete()) {
-            return response()->json(['success' => true, 'message' => 'Comentário excluído com sucesso']);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Falha ao excluir o comentário']);
-        }
+    if (!$comment) {
+        return response()->json(['success' => false, 'message' => 'Comentário não encontrado'], 404);
     }
+
+    if ($comment->id_user !== auth()->id()) {
+        return response()->json(['success' => false, 'message' => 'Sem permissão'], 403);
+    }
+
+    if ($comment->delete()) {
+        return response()->json(['success' => true, 'message' => 'Comentário excluído com sucesso']);
+    } else {
+        return response()->json(['success' => false, 'message' => 'Falha ao excluir o comentário']);
+    }
+}
+
 
     public function store(Request $request, $postId)
 {

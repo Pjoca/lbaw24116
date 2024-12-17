@@ -727,7 +727,7 @@ const postViewModalHandler = {
                     modalLikeText.textContent = 'Like';
                 }
                 modalLikesCount.textContent = `${data.likesCount} Like${data.likesCount !== 1 ? 's' : ''}`;
-            };
+            };            
 
         } catch (error) {
             console.error(error);
