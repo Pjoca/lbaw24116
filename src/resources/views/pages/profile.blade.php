@@ -125,5 +125,6 @@
     @include('modals.edit-profile-modal')
     @include('modals.friend-requests-modal')
     @include('modals.user-group-invites-modal')
+    @include('modals.post-modal')
 
 @endsection
