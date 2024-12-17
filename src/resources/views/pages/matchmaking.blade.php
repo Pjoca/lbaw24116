@@ -8,23 +8,30 @@
         @foreach($sameGroupUsers as $user)
             <!-- Card do usuário agora está dentro de um link -->
             <a href="{{ route('profile.show', $user->id) }}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
-                <div class="flex items-center space-x-4">
-                    <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            {{ $user->name }}
-                        </h3>
-                        <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                <div class="relative">
+                    <!-- Indicação de amigo -->
+                    @if($currentUser->isFriend($user))
+                        <span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                            Amigo
+                        </span>
+                    @endif
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                {{ $user->name }}
+                            </h3>
+                            <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                        </div>
                     </div>
                 </div>
             </a>
         @endforeach
     </div>
-    <button id="load-more-same" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
-    <!-- Mensagem quando não houver mais usuários (grupos em comum) -->
     <div id="no-more-same" class="hidden bg-yellow-200 text-yellow-800 text-sm p-2 rounded mt-2 text-center">
         <strong>Não há mais utilizadores com grupos em comum</strong>
     </div>
+    <button id="load-more-same" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
 
     <!-- Outros usuários -->
     <h2 class="text-2xl font-semibold mt-12 mb-4 text-gray-800">Outros Utilizadores</h2>
@@ -32,23 +39,30 @@
         @foreach($otherUsers as $user)
             <!-- Card do usuário agora está dentro de um link -->
             <a href="{{ route('profile.show', $user->id) }}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
-                <div class="flex items-center space-x-4">
-                    <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">
-                            {{ $user->name }}
-                        </h3>
-                        <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                <div class="relative">
+                    <!-- Indicação de amigo -->
+                    @if($currentUser->isFriend($user))
+                        <span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">
+                            Amigo
+                        </span>
+                    @endif
+                    <div class="flex items-center space-x-4">
+                        <img src="{{ asset('storage/' . ($user->image_url ?? 'users/images/default.png')) }}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                {{ $user->name }}
+                            </h3>
+                            <p class="text-sm text-gray-600">{{ $user->email }}</p>
+                        </div>
                     </div>
                 </div>
             </a>
         @endforeach
     </div>
-    <button id="load-more-other" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
-    <!-- Mensagem quando não houver mais usuários (outros usuários) -->
     <div id="no-more-other" class="hidden bg-yellow-200 text-yellow-800 text-sm p-2 rounded mt-2 text-center">
         <strong>Não há mais utilizadores</strong>
     </div>
+    <button id="load-more-other" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Carregar Mais</button>
 </div>
 
 <!-- Script para carregar mais usuários -->
@@ -71,19 +85,29 @@ function loadMore(type) {
         .then(data => {
             if (data.users && data.users.data.length > 0) {
                 data.users.data.forEach(user => {
+                    // Verifica se o usuário é amigo e adiciona o badge "Amigo"
+                    let friendBadge = user.is_friend 
+                        ? `<span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">Amigo</span>`
+                        : ''; // Se não for amigo, não exibe o badge
+
                     let userCard = `
                         <a href="/profile/${user.id}" class="user-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 block">
-                            <div class="flex items-center space-x-4">
-                                <img src="/storage/${user.image_url ?? 'users/images/default.png'}" class="w-16 h-16 rounded-full object-cover">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900">${user.name}</h3>
-                                    <p class="text-sm text-gray-600">${user.email}</p>
+                            <div class="relative">
+                                ${friendBadge} <!-- Aqui adicionamos o badge de amigo, se aplicável -->
+                                <div class="flex items-center space-x-4">
+                                    <img src="/storage/${user.image_url ?? 'users/images/default.png'}" class="w-16 h-16 rounded-full object-cover">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">${user.name}</h3>
+                                        <p class="text-sm text-gray-600">${user.email}</p>
+                                    </div>
                                 </div>
                             </div>
                         </a>
                     `;
                     document.querySelector(container).innerHTML += userCard;
                 });
+
+                // Atualizar página
                 if (type === 'sameGroup') samePage++;
                 else otherPage++;
             } else {

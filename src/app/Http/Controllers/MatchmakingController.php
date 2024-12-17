@@ -22,7 +22,11 @@ class MatchmakingController extends Controller
         $query->whereIn('id', $userGroups);
     })->where('id', '!=', $user->id)->paginate(9);
 
-    return view('pages.matchmaking', compact('sameGroupUsers', 'otherUsers'));
+    return view('pages.matchmaking', [
+        'sameGroupUsers' => $sameGroupUsers,
+        'otherUsers' => $otherUsers,
+        'currentUser' => $user, // Passa o usuário autenticado para verificação de amizade
+    ]);
 }
 
 public function loadMoreUsers(Request $request)
@@ -37,12 +41,11 @@ public function loadMoreUsers(Request $request)
                 $query->whereIn('id', $userGroups);
             })->where('id', '!=', $user->id)->paginate(9, ['*'], 'page', $request->page);
         } else if ($request->type === 'otherUsers') {
-            // Verifica se o filtro "não amigos" foi ativado
             $query = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
                 $query->whereIn('id', $userGroups);
             })->where('id', '!=', $user->id);
 
-            // Se o filtro "não amigos" estiver ativo, filtra os usuários que não são amigos
+            // Se o filtro "não amigos" estiver ativo
             if ($request->filter === 'not-friends') {
                 $query->whereDoesntHave('friends', function($query) use ($user) {
                     $query->where('friend_id', $user->id);
@@ -51,18 +54,23 @@ public function loadMoreUsers(Request $request)
 
             $users = $query->paginate(9, ['*'], 'page', $request->page);
         } else {
-            // Tipo inválido
             return response()->json(['error' => 'Tipo inválido'], 400);
         }
+
+        // Adiciona o status de amizade a cada usuário
+        $users->getCollection()->transform(function ($userItem) use ($user) {
+            $userItem->is_friend = $user->isFriend($userItem); // Adiciona o status de amizade
+            return $userItem;
+        });
 
         // Retorna os dados em JSON
         return response()->json(['users' => $users]);
     } catch (\Exception $e) {
-        // Log do erro e retorno em caso de falha
         \Log::error('Erro ao carregar mais usuários: ' . $e->getMessage());
         return response()->json(['error' => 'Erro ao carregar mais usuários'], 500);
     }
 }
+
 
 
 
