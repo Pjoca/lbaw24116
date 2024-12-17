@@ -105,6 +105,8 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::delete('/friends/cancel/{id}', 'cancel');
         Route::post('/friends/accept/{id}', 'accept');
         Route::delete('/friends/reject/{id}', 'reject');
+        Route::get('/friends/requests/received/{userId}',  'getReceivedRequests')->name('friends.requests.received');
+        Route::get('/friends/requests/sent/{userId}',  'getSentRequests')->name('friends.requests.sent');
     });
 
 
@@ -123,6 +125,7 @@ Route::controller(GroupMembershipController::class)->middleware('auth')->group(f
     Route::delete('/groups/{groupId}/members/{memberId}', 'removeMember')->name('groups.removeMember');
     Route::get('/groups/{groupId}/join-requests',  'getJoinRequests')->name('groups.getJoinRequests');
     Route::get('/groups/{groupId}/invites', 'getInvites')->name('groups.getInvites');
+    Route::get('/groups/invites/{userId}',  'getGroupInvites')->name('groups.invites');
 });
 
 Route::controller(GroupController::class)->middleware('auth')->group(function () {

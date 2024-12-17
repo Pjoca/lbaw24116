@@ -463,9 +463,10 @@ async function cancelFriendRequest(userId) {
         });
 
         if (!response.ok) throw new Error('Failed to cancel friend request');
+        
         const data = await response.json();
 
-        // Update the button dynamically
+        // Update the button dynamically if it exists elsewhere
         const button = document.querySelector(`[data-user-id="${userId}"]`);
         if (button) {
             button.textContent = 'Add Friend';
@@ -473,6 +474,13 @@ async function cancelFriendRequest(userId) {
             button.setAttribute('onclick', `addFriend(${userId})`);
         }
 
+        // Remove the friend request from the sent requests list (if it exists)
+        const sentRequestItem = document.querySelector(`#sent-request-${userId}`);
+        if (sentRequestItem) {
+            sentRequestItem.remove();
+        }
+
+        // Show success feedback
         window.showFeedbackMessage('green', 'Friend request canceled successfully!');
     } catch (error) {
         console.error(error);
@@ -552,9 +560,15 @@ async function acceptGroupInvite(inviteId) {
             inviteElement.remove();
         }
 
+        // Check if the list is empty after removing the item
+        const remainingInvites = document.querySelectorAll('#group-invites-list li');
+        if (remainingInvites.length === 0) {
+            document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
+        }
+
         window.showFeedbackMessage('green', data.success || 'Invite accepted successfully!');
     } catch (error) {
-        console.error(error);
+        console.error('Error accepting invite:', error);
         window.showFeedbackMessage('red', error.message || 'An error occurred while accepting the invite.');
     }
 }
@@ -583,9 +597,15 @@ async function rejectGroupInvite(inviteId) {
             inviteElement.remove();
         }
 
+        // Check if the list is empty after removing the item
+        const remainingInvites = document.querySelectorAll('#group-invites-list li');
+        if (remainingInvites.length === 0) {
+            document.getElementById('group-invites-list').innerHTML = `<p class="text-gray-500 text-center">No group invites at the moment.</p>`;
+        }
+
         window.showFeedbackMessage('green', data.success || 'Invite rejected successfully!');
     } catch (error) {
-        console.error(error);
+        console.error('Error rejecting invite:', error);
         window.showFeedbackMessage('red', error.message || 'An error occurred while rejecting the invite.');
     }
 }

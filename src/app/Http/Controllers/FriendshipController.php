@@ -84,19 +84,23 @@ class FriendshipController extends Controller
         }
     }
 
-public function cancel($id)
-{
-    $user = Auth::user();
-    $friend = User::findOrFail($id);
+    public function cancel($id)
+    {
+        $userId = Auth::id();
+        $friend = User::findOrFail($id);
 
-    if (!$user->hasRequestedFriendship($friend)) {
-        return response()->json(['error' => 'Action not allowed'], 400);
+        $friendRequest = FriendshipRequest::where('id_sender', $userId)
+                                          ->where('id_receiver', $friend->id)
+                                          ->first();
+        if (!$friendRequest) {
+            return response()->json(['error' => 'No friend request found for this user'], 404);
+        }
+        
+        $friendRequest->delete();
+    
+        return response()->json(['success' => 'Friend request canceled'], 200);
     }
-
-    $user->requestedFriends()->detach($friend->id);
-
-    return response()->json(['success' => 'Friend request canceled'], 200);
-}
+    
 
 public function accept($senderId, NotificationController $notificationController)
     {
@@ -147,7 +151,6 @@ public function accept($senderId, NotificationController $notificationController
 public function reject($senderId, NotificationController $notificationController)
 {
     try {
-        // Find the friendship request by sender and receiver
         $request = FriendshipRequest::where('id_sender', $senderId)
             ->where('id_receiver', Auth::id())
             ->first();
@@ -156,7 +159,6 @@ public function reject($senderId, NotificationController $notificationController
             return response()->json(['error' => 'Friend request not found'], 404);
         }
 
-        // Delete the friend request
         $request->delete();
 
         $sender = User::findOrFail($senderId);
@@ -173,6 +175,28 @@ public function reject($senderId, NotificationController $notificationController
         return response()->json(['error' => 'An error occurred while rejecting the friend request.'], 500);
     }
 }
+
+public function getReceivedRequests(Request $request, $userId)
+{
+    $requests = FriendshipRequest::where('id_receiver', $userId)->paginate(5);
+    return response()->json([
+        'html' => view('partials.friend-request-renderer', ['requests' => $requests, 'type'=> 'received'])->render(),
+        'hasMorePages' => $requests->hasMorePages(),
+        'nextPageUrl' => $requests->nextPageUrl(),
+    ]);
+}
+
+public function getSentRequests(Request $request, $userId)
+{
+    $requests = FriendshipRequest::where('id_sender', $userId)->paginate(5);
+    return response()->json([
+        'html' => view('partials.friend-request-renderer', ['requests' => $requests, 'type' => 'sent'])->render(),
+        'hasMorePages' => $requests->hasMorePages(),
+        'nextPageUrl' => $requests->nextPageUrl(),
+    ]);
+}
+
+
 
 
 }

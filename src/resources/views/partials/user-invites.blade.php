@@ -1,6 +1,6 @@
 <li class="flex items-center justify-between" data-invite-id="{{ $invite->id }}">
     <span>
-        Group: <strong>{{ $invite->group->name }}</strong>
+        <strong>{{ $invite->group->name }}</strong>
     </span>
     <div class="space-x-2">
         <button onclick="acceptGroupInvite({{ $invite->id }})" 
