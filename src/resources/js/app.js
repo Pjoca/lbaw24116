@@ -40,6 +40,58 @@ function goWithCommand(location, command) {
 window.goWithCommand = goWithCommand;
 
 
+function openModal(modalId) {
+    console.log(`Opening modal: ${modalId}`);
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        if (modalId === 'create-post-modal') {
+            const groupIdMeta = document.querySelector('meta[name="group-id"]');
+
+            if (groupIdMeta) {
+                const visibilityField = document.getElementById('visibility');
+                const groupField = document.getElementById('id_group');
+
+                if (visibilityField && groupField) {
+                    visibilityField.value = 'group';
+                    visibilityField.setAttribute('disabled', true);
+                    
+                    groupField.value = groupIdMeta.getAttribute('content');
+                    groupField.setAttribute('disabled', true);
+                }
+            } else {
+                const visibilityField = document.getElementById('visibility');
+                const groupField = document.getElementById('id_group');
+
+                if (visibilityField) {
+                    visibilityField.removeAttribute('disabled');
+                    visibilityField.value = 'public';
+                }
+
+                if (groupField) {
+                    groupField.removeAttribute('disabled');
+                    groupField.value = '';
+                }
+            }
+        }
+            
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    } else {
+        console.error(`Modal with ID ${modalId} not found.`);
+    }
+}
+
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('hidden');
+}
+
+
+window.openModal = openModal;
+window.closeModal = closeModal;
+
+
 
 function toggleProfileDropdown() {
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -777,4 +829,33 @@ window.showPostViewModal = postViewModalHandler.show;
 window.hidePostViewModal = postViewModalHandler.hide;
 
 
+function handlePostSubmission(event) {
+    event.preventDefault();
+    const form = document.getElementById('create-post-form');
+    const formData = new FormData(form);
 
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to create post');
+        return response.json();
+    })
+    .then(data => {
+        alert('Post created successfully');
+        closeModal('create-post-modal');
+        form.reset();
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.classList.add('hidden');
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+        alert('Failed to create post. Please try again.');
+    });
+}
+
+window.handlePostSubmission = handlePostSubmission;

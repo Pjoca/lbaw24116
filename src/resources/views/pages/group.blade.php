@@ -8,6 +8,7 @@
             
             <!-- Edit Group Button (only for group owner) -->
             @if (Auth::id() === $group->owner->id)
+                @include('modals.create-post-modal')
                 <button 
                     class="absolute top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition"
                     onclick="openEditGroupModal({{ $group->id }})">
@@ -127,6 +128,17 @@
                 @endif
             </div>
         </div>
+
+        @if (Auth::check() && $isMember)
+            @include('modals.post-modal')
+            <div class="max-w-4xl mx-auto mb-6 flex justify-center">
+                <button 
+                    onclick="openGroupPostModal({{ $group->id }})" 
+                    class="bg-teal-500 text-white px-4 py-2 rounded shadow hover:bg-teal-600 transition">
+                    Create Post
+                </button>
+            </div>
+        @endif
 
         <!-- Group Posts Timeline Section -->
         <div id="timeline-section" class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">

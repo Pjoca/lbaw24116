@@ -11,7 +11,7 @@
                         <h2 class="text-2xl font-bold">TIMELINE POSTS!</h2>
                         <p class="text-sm mt-2">Share your thoughts with our community.</p>
                     </div>
-                    <a href="{{ route('posts.create') }}" 
+                    <a onclick="openModal('create-post-modal')"
                        class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
                         <span class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,6 +40,7 @@
 
     @include('modals.edit-post-modal')
     @include('modals.post-modal')
+    @include('modals.create-post-modal')
     <!-- Include Infinite Scroll Script -->
     @vite('resources/js/infinite-scroll.js')
 @endsection

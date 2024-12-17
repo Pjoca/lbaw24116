@@ -310,27 +310,6 @@ window.removeMember = removeMember;
 
 let nextPageUrl = null;
 
-function openModal(modalId) {
-    console.log(`Opening modal: ${modalId}`);
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    } else {
-        console.error(`Modal with ID ${modalId} not found.`);
-    }
-}
-
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('hidden');
-}
-
-
-window.openModal = openModal;
-window.closeModal = closeModal;
-
 
 function loadMoreJoinRequests(groupId) {
     const modal = document.getElementById('join-requests-modal');
@@ -804,3 +783,107 @@ async function rejectInvite(inviteId) {
 }
 
 window.rejectInvite = rejectInvite;
+
+
+function openGroupPostModal(groupId) {
+    console.log(`Opening Create Post Modal for Group ID: ${groupId}`);
+
+    const modal = document.getElementById('create-post-modal');
+    const visibilityContainer = document.getElementById('visibility-container');
+    const createPostForm = document.getElementById('create-post-form');
+
+    if (!modal || !visibilityContainer || !createPostForm) {
+        console.error('Modal, visibility container, or form not found.');
+        return;
+    }
+
+    /**
+     * 1. Remove the visibility select and replace it with a lock message
+     */
+    const visibilitySelect = document.getElementById('visibility');
+    if (visibilitySelect) {
+        // Store a reference to the original select to restore it later
+        visibilitySelect.style.display = 'none';
+
+        // Add a simple message to indicate visibility is locked
+        let lockMessage = document.getElementById('visibility-lock-message');
+        if (!lockMessage) {
+            lockMessage = document.createElement('p');
+            lockMessage.id = 'visibility-lock-message';
+            lockMessage.className = 'text-teal-700 text-sm mt-1';
+            lockMessage.innerHTML = `
+                <i class="fas fa-lock"></i> 
+                Visibility is locked to <strong>Group</strong> for this post.
+            `;
+            visibilityContainer.appendChild(lockMessage);
+        }
+    }
+
+    /**
+     * 2. Inject a hidden input for visibility = group
+     */
+    let visibilityInput = document.getElementById('hidden-visibility-input');
+    if (!visibilityInput) {
+        visibilityInput = document.createElement('input');
+        visibilityInput.type = 'hidden';
+        visibilityInput.id = 'hidden-visibility-input';
+        visibilityInput.name = 'visibility';
+        visibilityInput.value = 'group';
+        createPostForm.appendChild(visibilityInput);
+    }
+
+    /**
+     * 3. Inject a hidden input for group ID
+     */
+    let groupInput = document.getElementById('id_group');
+    if (!groupInput) {
+        groupInput = document.createElement('input');
+        groupInput.type = 'hidden';
+        groupInput.id = 'id_group';
+        groupInput.name = 'id_group';
+        createPostForm.appendChild(groupInput);
+    }
+    groupInput.value = groupId;
+
+    // Show the modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+
+    // Restore the visibility select
+    const visibilitySelect = document.getElementById('visibility');
+    if (visibilitySelect) {
+        visibilitySelect.style.display = 'block';
+    }
+
+    // Remove lock message
+    const lockMessage = document.getElementById('visibility-lock-message');
+    if (lockMessage) {
+        lockMessage.remove();
+    }
+
+    // Remove hidden visibility input
+    const visibilityInput = document.getElementById('hidden-visibility-input');
+    if (visibilityInput) {
+        visibilityInput.remove();
+    }
+
+    // Remove the group input
+    const groupInput = document.getElementById('id_group');
+    if (groupInput) {
+        groupInput.remove();
+    }
+}
+
+
+
+
+
+
+window.openGroupPostModal = openGroupPostModal;
