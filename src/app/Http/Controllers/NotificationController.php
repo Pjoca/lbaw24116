@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Log;
 use Pusher\Pusher;
 
 class NotificationController extends Controller
@@ -33,12 +34,17 @@ class NotificationController extends Controller
             'created_at' => now(),
         ]);
 
+        Log::info('Pusher: ' . config('broadcasting.connections.pusher.key'));
+        Log::info('Pusher: ' . config('broadcasting.connections.pusher.secret'));
+        Log::info('Pusher: ' . config('broadcasting.connections.pusher.app_id'));
+        Log::info('Pusher: ' . config('broadcasting.connections.pusher.cluster'));
+
         $pusher = new Pusher(
-          env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
+          config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
             [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'useTLS' => true
             ]
         );
