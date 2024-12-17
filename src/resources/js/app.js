@@ -648,11 +648,40 @@ window.deleteNotification = deleteNotification;
 
 // Search
 
-// Date inputs
+// Keeps date inputs
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
 
+    // Set the dropdown value
+    const typeSelect = document.getElementById('search-type');
+    if (urlParams.has('type')) {
+        typeSelect.value = urlParams.get('type');
+    }
+
+    // Set the search query value
+    const searchQuery = document.getElementById('search-bar');
+    if (urlParams.has('query')) {
+        searchQuery.value = urlParams.get('query');
+    }
+
+    // Set the start date value
+    const startDateInput = document.getElementById('start-date');
+    if (urlParams.has('start_date')) {
+        startDateInput.value = urlParams.get('start_date');
+    }
+
+    // Set the end date value
+    const endDateInput = document.getElementById('end-date');
+    if (urlParams.has('end_date')) {
+        endDateInput.value = urlParams.get('end_date');
+    }
+});
+
+// Date inputs
 document.addEventListener('DOMContentLoaded', function () {
     const searchType = document.getElementById('search-type');
     const dateFilters = document.getElementById('date-filters');
+    const searchButton = document.getElementById('search-button');
 
     // Function to toggle visibility of date inputs
     function toggleDateInputs() {
@@ -662,6 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             dateFilters.classList.add('hidden');
         }
+        searchButton.classList.remove('hidden');
     }
 
     // Initialize visibility on page load
@@ -670,6 +700,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listener to the dropdown
     searchType.addEventListener('change', toggleDateInputs);
 });
+
 
 // Filter User List Functionality
 /* function filterUsers() {

@@ -19,24 +19,24 @@
         <!-- Search Bar -->
         <input 
             type="text" 
-            id="search-query" 
+            id="search-bar" 
             name="query" 
             placeholder="Search" 
             class="w-64 border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-teal-400 focus:outline-none placeholder-gray-500" 
             autocomplete="off" required>
 
         <!-- Date Inputs -->
-        <div id="date-filters" class="hidden">
+        <div id="date-filters" class="hidden flex gap-2">
         <input 
             type="date" 
-            id="search-date1" 
+            id="start-date" 
             name="start_date" 
             value="{{ old('start_date', $startDate ?? '') }}" 
             class="w-36 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
 
         <input 
             type="date" 
-            id="search-date2" 
+            id="end-date" 
             name="end_date" 
             value="{{ old('end_date', $endDate ?? '') }}" 
             class="w-36 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
@@ -44,6 +44,7 @@
         <!-- Search Button -->
         <button 
             type="submit" 
+            id="search-button" 
             class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 focus:ring-2 focus:ring-teal-400 focus:outline-none">
             Search
         </button>
