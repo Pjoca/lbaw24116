@@ -137,7 +137,7 @@
                         <h2 class="text-2xl font-bold">TIMELINE POSTS!</h2>
                         <p class="text-sm mt-2">Share your thoughts with our community.</p>
                     </div>
-                    <a onclick="openModal('create-post-modal')"
+                    <a onclick="openGroupPostModal({{ $group->id }})"
                        class="bg-teal-400 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300">
                         <span class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,14 +180,6 @@
                     </div>
                 </div>
             </div>
-        @endif
-
-        <!-- Button to Create New Post -->
-        @if (Auth::check() && $isMember)
-            <a href="{{ route('posts.create') }}" 
-               class="fixed bottom-8 right-8 bg-teal-400 hover:bg-teal-600 text-white font-bold py-4 px-4 rounded-full shadow-lg transform hover:scale-105 transition duration-300">
-                <span class="text-3xl leading-none">+</span>
-            </a>
         @endif
     </div>
 

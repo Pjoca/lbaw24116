@@ -244,7 +244,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/matchmaking/interact', [App\Http\Controllers\MatchmakingController::class, 'interact'])->name('matchmaking.interact');
 });
 
-Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load')->middleware('auth');
+Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load');
 
 Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
 
