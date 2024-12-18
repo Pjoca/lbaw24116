@@ -36,9 +36,6 @@
         <button id="load-more-same" class="bg-blue-600 text-white px-6 py-2 rounded-lg mt-6 transition-all hover:bg-blue-700">Load More</button>
     @endif
 
-    <!-- Linha separadora com gradiente e animação -->
-    <hr class="my-8 border-t-2 border-transparent bg-gradient-to-r from-indigo-500 to-purple-500 h-0.5 transition-all duration-500 ease-in-out transform hover:scale-105">
-
     <!-- Outros uTILIZADORES -->
     <h2 class="text-3xl font-bold mt-12 mb-6 text-gray-800">Other Users</h2>
     <div id="other-users" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
