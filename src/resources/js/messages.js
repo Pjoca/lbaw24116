@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 break;
             } finally {
                 loading = false;
+                scrollToBottom();
             }
 
             if (currentPage === 1 || messageList.scrollHeight > messageList.clientHeight) {
