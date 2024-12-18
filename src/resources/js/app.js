@@ -736,9 +736,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     data.results.forEach(result => {
                         const resultItem = document.createElement('div');
                         resultItem.classList.add('px-4', 'py-2', 'cursor-pointer', 'hover:bg-gray-100');
-
+                        console.log('TYPE: ' + type);
                         // types
                         if (type === 'users' || type === 'groups') {
+                            console.log('REACHED THIS');
                             resultItem.textContent = result.name;
                         } else if (type === 'posts' || type === 'comments') {
                             resultItem.textContent = result.content || 'No content available'; 
