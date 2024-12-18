@@ -15,57 +15,53 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentContactId = null;
     let currentPage = 1;
     let lastPage = 1;
-    let loading = false; // Para evitar requisições múltiplas simultâneas
+    let loading = false; 
     let pusherChannel = null;
 
-
     const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
-            cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-            encrypted: true,
-            authEndpoint: '/broadcasting/auth',
-            auth: {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            },
-            logToConsole: true 
+        cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+        encrypted: true,
+        authEndpoint: '/broadcasting/auth',
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        },
+        logToConsole: true 
+    });
+
+    function subscribeToChannel(contactId) {
+        if (pusherChannel) {
+            console.log(`Unsubscribing from channel: ${pusherChannel.name}`);
+            pusherChannel.unbind_all();
+            pusher.unsubscribe(pusherChannel.name);
+        }
+    
+        const channelName = `private-notification.${userId}.${contactId}`;
+        pusherChannel = pusher.subscribe(channelName);
+
+        pusherChannel.bind('pusher:subscription_succeeded', function() {
+            console.log(`Subscription successful to channel: ${channelName}`);
         });
 
-
-        function subscribeToChannel(contactId) {
-            if (pusherChannel) {
-                console.log(`Unsubscribing from channel: ${pusherChannel.name}`);
-                pusherChannel.unbind_all();
-                pusher.unsubscribe(pusherChannel.name);
+        pusherChannel.bind('pusher:subscription_error', function(status) {
+            console.error(`Subscription error to channel: ${channelName}`, status);
+        });
+    
+        console.log(`Subscribed to channel: ${channelName}`);
+    
+        pusherChannel.bind('new-message', function(data) {
+            console.log(`New message from Pusher:`, data);
+            console.log(`Current contact ID: ${currentContactId}`);
+            if (data.message.id_sender == currentContactId) {
+                console.log("Adding message to list");
+                const listItem = createMessageListItem(data.message, data.message.sender_image_url);
+                console.log(listItem);
+                messageList.appendChild(listItem);
+                scrollToBottom();
             }
-    
-            const channelName = `private-notification.${userId}.${contactId}`;
-            pusherChannel = pusher.subscribe(channelName);
-
-            pusherChannel.bind('pusher:subscription_succeeded', function() {
-                console.log(`Subscription successful to channel: ${channelName}`);
-            });
-
-            pusherChannel.bind('pusher:subscription_error', function(status) {
-                console.error(`Subscription error to channel: ${channelName}`, status);
-            });
-    
-            console.log(`Subscribed to channel: ${channelName}`);
-    
-            pusherChannel.bind('new-message', function(data) {
-                console.log(`New message from Pusher:`, data);
-                console.log(`Current contact ID: ${currentContactId}`);
-                if (data.message.id_sender == currentContactId) {
-                    console.log("Adding message to list");
-                    const listItem = createMessageListItem(data.message, data.message.sender_image_url);
-                    console.log(listItem);
-                    messageList.appendChild(listItem);
-                    scrollToBottom();
-                }
-            });
-
-            
-        }
+        });
+    }
 
     function scrollToBottom() {
         messageList.scrollTop = messageList.scrollHeight;
@@ -125,6 +121,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
             scrollToBottom();
         }
+
+        await ensureScrollIsPossible(contactId);
+    }
+
+    async function ensureScrollIsPossible(contactId) {
+        while (messageList.scrollHeight <= messageList.clientHeight && currentPage > 1 && !loading) {
+            loading = true;
+            const previousPage = currentPage - 1;
+            try {
+                const response = await fetch(`/messages/${contactId}?page=${previousPage}`);
+                if (!response.ok) {
+                    console.error("Failed to load previous messages");
+                    break;
+                }
+
+                const result = await response.json();
+                const { data, current_page } = result;
+                data.reverse().forEach((message) => {
+                    const listItem = createMessageListItem(message, message.sender_image_url);
+                    messageList.insertBefore(listItem, messageList.firstChild);
+                });
+                currentPage = current_page;
+            } catch (error) {
+                console.error(error);
+                break;
+            } finally {
+                loading = false;
+            }
+
+            if (currentPage === 1 || messageList.scrollHeight > messageList.clientHeight) {
+                break;
+            }
+        }
     }
 
     if (conversationList) {
@@ -132,11 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const listItem = event.target.closest(".conversation-item");
             if (listItem) {
                 const contactId = listItem.getAttribute("data-contact-id");
-                const contactName = listItem.querySelector("p").textContent.trim(); // Capturar o nome do contato
+                const contactName = listItem.querySelector("p").textContent.trim();
                 currentContactId = contactId;
                 subscribeToChannel(contactId);
     
-                // Atualizar o nome do contato no painel
+                // Update the contact name on the panel
                 const contactNamePanel = document.getElementById("contact-name-panel");
                 contactNamePanel.textContent = `Chat with ${contactName}`;
     
@@ -149,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const newMessageList = document.getElementById("message-list");
                 newMessageList.classList.remove("hidden");
     
-                // Resetar paginação ao selecionar nova conversa
+                // Reset pagination for new conversation
                 currentPage = 1;
                 lastPage = 1;
     
@@ -163,10 +192,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-
-    // Evento de scroll: se chegar ao topo, carregamos a página anterior (mais antiga)
+    // Scroll event: load previous messages when scrolling to the top
     messageList.addEventListener('scroll', async () => {
-        // Quando o scroll chega ao topo, se currentPage > 1 temos páginas anteriores a carregar
         if (messageList.scrollTop === 0 && currentPage > 1 && !loading && currentContactId) {
             loading = true;
             const oldScrollHeight = messageList.scrollHeight;
@@ -188,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 currentPage = current_page;
 
-                // Ajusta a posição do scroll para o utilizador não perder a posição
+                // Adjust scroll position so user doesn't lose their place
                 const newScrollHeight = messageList.scrollHeight;
                 messageList.scrollTop = newScrollHeight - oldScrollHeight;
             } catch (error) {
@@ -199,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Envio de mensagens
+    // Sending messages
     if (messageForm) {
         messageForm.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -250,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Open modal
+    // Open modal for new conversation
     if (newConversationBtn) {
         newConversationBtn.addEventListener("click", () => {
             newConversationModal.classList.remove("hidden");
@@ -294,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             noConversationsPlaceholder.remove();
                         }
     
-                        // Adicionar a nova conversa no topo da lista
+                        // Add the new conversation at the top of the list
                         const newContact = document.createElement("li");
                         const contactImage = contact.image_url ? `/storage/${contact.image_url}` : '/storage/users/images/default.png';
                         newContact.className = "p-4 flex items-center gap-4 hover:bg-gray-100 cursor-pointer conversation-item";
