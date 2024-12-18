@@ -35,44 +35,50 @@ public function loadMoreUsers(Request $request)
         $user = auth()->user();
         $userGroups = $user->groups()->pluck('id')->toArray();
 
-        // Verifica se o tipo é 'sameGroup' ou 'otherUsers'
+        // Validação do tipo de carregamento
+        if (!in_array($request->type, ['sameGroup', 'otherUsers'])) {
+            return response()->json(['error' => 'Tipo inválido'], 400);
+        }
+
+        // Query base para usuários do mesmo grupo
         if ($request->type === 'sameGroup') {
             $users = User::whereHas('groups', function ($query) use ($userGroups) {
-                $query->whereIn('id', $userGroups);
-            })->where('id', '!=', $user->id)->paginate(9, ['*'], 'page', $request->page);
-        } else if ($request->type === 'otherUsers') {
-            $query = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
-                $query->whereIn('id', $userGroups);
-            })->where('id', '!=', $user->id);
+                    $query->whereIn('id', $userGroups);
+                })
+                ->where('id', '!=', $user->id)
+                ->distinct() // Remove duplicados
+                ->paginate(9, ['*'], 'page', $request->page);
+        }
 
-            // Se o filtro "não amigos" estiver ativo
+        // Query para outros usuários fora dos grupos
+        if ($request->type === 'otherUsers') {
+            $query = User::whereDoesntHave('groups', function ($query) use ($userGroups) {
+                    $query->whereIn('id', $userGroups);
+                })
+                ->where('id', '!=', $user->id)
+                ->distinct(); // Remove duplicados
+
+            // Aplica filtro "não amigos"
             if ($request->filter === 'not-friends') {
-                $query->whereDoesntHave('friends', function($query) use ($user) {
+                $query->whereDoesntHave('friends', function ($query) use ($user) {
                     $query->where('friend_id', $user->id);
                 });
             }
 
             $users = $query->paginate(9, ['*'], 'page', $request->page);
-        } else {
-            return response()->json(['error' => 'Tipo inválido'], 400);
         }
 
-        // Adiciona o status de amizade a cada usuário
+        // Adiciona status de amizade para cada usuário retornado
         $users->getCollection()->transform(function ($userItem) use ($user) {
-            $userItem->is_friend = $user->isFriend($userItem); // Adiciona o status de amizade
+            $userItem->is_friend = $user->isFriend($userItem);
             return $userItem;
         });
 
-        // Retorna os dados em JSON
+        // Retorna os dados paginados em JSON
         return response()->json(['users' => $users]);
     } catch (\Exception $e) {
         \Log::error('Erro ao carregar mais usuários: ' . $e->getMessage());
         return response()->json(['error' => 'Erro ao carregar mais usuários'], 500);
     }
 }
-
-
-
-
 }
-
