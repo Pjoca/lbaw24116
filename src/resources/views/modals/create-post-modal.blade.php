@@ -19,7 +19,7 @@
 
             <!-- Post Content -->
             <div class="mb-4">
-                <label for="content" class="block text-sm font-medium text-gray-700">Content</label>
+                <label for="text-content" class="block text-sm font-medium text-gray-700">Content</label>
                 <textarea id="content" name="content" rows="4" required
                           class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
             </div>

@@ -3,6 +3,7 @@
         <!-- Botão para Fechar -->
         <button 
             id="close-post-view-modal" 
+            onclick="hidePostViewModal()"
             class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition z-10">
             <i class="fas fa-times text-2xl"></i>
         </button>

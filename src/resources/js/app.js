@@ -738,11 +738,6 @@ const postViewModalHandler = {
     },
 };
 
-// Botão para fechar o modal
-document.getElementById('close-post-view-modal').addEventListener('click', () => {
-    postViewModalHandler.hide();
-});
-
 window.showPostViewModal = postViewModalHandler.show;
 window.hidePostViewModal = postViewModalHandler.hide;
 
