@@ -631,7 +631,7 @@ const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
         postViewModal.setAttribute('data-post-id', id);
-
+    
         const modalPostImage = document.getElementById('modal-post-image');
         const modalUserImage = document.getElementById('modal-user-image');
         const modalUserName = document.getElementById('modal-user-name');
@@ -641,24 +641,27 @@ const postViewModalHandler = {
         const modalComments = document.getElementById('modal-comments');
         const modalLikeButton = document.getElementById('modal-like-button');
         const modalLikeText = document.getElementById('modal-like-text');
-
+    
+        // Pagination state for comments
+        let currentPage = 1;
+    
         try {
             const response = await fetch(`/posts/${id}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
-
+    
             if (!response.ok) throw new Error('Erro ao buscar os dados do post');
-
+    
             const postData = await response.json();
-
+    
             modalPostImage.src = postData.image_url ? `/storage/${postData.image_url}` : '';
             modalUserImage.src = `/storage/${postData.user_image}`;
             modalUserName.textContent = postData.user_name;
             modalCreatedAt.textContent = postData.created_at;
             modalPostContent.textContent = postData.content;
             modalLikesCount.textContent = `${postData.likes_count} Like${postData.likes_count !== 1 ? 's' : ''}`;
-
-            // Atualiza estado do like no botão
+    
+            // Update like button state
             if (postData.liked_by_current_user) {
                 modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
                 modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
@@ -668,12 +671,47 @@ const postViewModalHandler = {
                 modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
                 modalLikeText.textContent = 'Like';
             }
-
-            // Carregar comentários do modal
+    
+            // Clear previous comments
             modalComments.innerHTML = '';
-            const commentsResponse = await fetch(`/posts/${id}/comments`);
-            if (commentsResponse.ok) {
+    
+            // Load the first page of comments
+            await loadComments(id, currentPage);
+    
+            postViewModal.classList.remove('hidden');
+            postViewModal.classList.add('flex');
+    
+            // Add event to like button
+            modalLikeButton.onclick = async () => {
+                const data = await toggleLike(id);
+                if (data.liked) {
+                    modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
+                    modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
+                    modalLikeText.textContent = 'Remove like';
+                } else {
+                    modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
+                    modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
+                    modalLikeText.textContent = 'Like';
+                }
+                modalLikesCount.textContent = `${data.likesCount} Like${data.likesCount !== 1 ? 's' : ''}`;
+            };
+    
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao carregar o post.');
+        }
+    
+        async function loadComments(postId, page) {
+            try {
+                const commentsResponse = await fetch(`/posts/${postId}/comments?page=${page}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+    
+                if (!commentsResponse.ok) throw new Error('Erro ao carregar os comentários.');
+    
                 const commentsData = await commentsResponse.json();
+    
+                // Append new comments to the modal
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
                         <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
@@ -706,31 +744,30 @@ const postViewModalHandler = {
                         </div>
                     `;
                 });
-            }
-
-            postViewModal.classList.remove('hidden');
-            postViewModal.classList.add('flex');
-
-            // Adicionar evento ao botão de like no modal
-            modalLikeButton.onclick = async () => {
-                const data = await toggleLike(id);
-                if (data.liked) {
-                    modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
-                    modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
-                    modalLikeText.textContent = 'Remove like';
-                } else {
-                    modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
-                    modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
-                    modalLikeText.textContent = 'Like';
+    
+                // Remove old "Load More" button if it exists
+                const existingLoadMoreButton = document.getElementById('load-more-comments-button');
+                if (existingLoadMoreButton) existingLoadMoreButton.remove();
+    
+                // Show "Load More" button if more comments are available
+                if (commentsData.hasMore) {
+                    const loadMoreButton = document.createElement('button');
+                    loadMoreButton.id = 'load-more-comments-button';
+                    loadMoreButton.textContent = 'Carregar mais comentários';
+                    loadMoreButton.className = 'text-blue-500 hover:text-blue-700 mt-4';
+                    loadMoreButton.onclick = () => {
+                        currentPage++;
+                        loadComments(postId, currentPage);
+                    };
+                    modalComments.appendChild(loadMoreButton);
                 }
-                modalLikesCount.textContent = `${data.likesCount} Like${data.likesCount !== 1 ? 's' : ''}`;
-            };            
-
-        } catch (error) {
-            console.error(error);
-            alert('Erro ao carregar o post.');
+    
+            } catch (error) {
+                console.error('Erro ao carregar os comentários:', error);
+            }
         }
     },
+    
 
     hide() {
         const postViewModal = document.getElementById('post-view-modal');
