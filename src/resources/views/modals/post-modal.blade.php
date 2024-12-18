@@ -30,8 +30,7 @@
             <!-- Likes -->
             <div class="flex items-center mb-4">
                 <button id="modal-like-button" class="flex items-center like-button mr-4">
-                    <i class="far fa-heart text-2xl mr-2 text-gray-500"></i>
-                    <span id="modal-like-text">Like</span>
+                    <i class="far fa-heart text-2xl text-gray-500"></i>
                 </button>
                 <span id="modal-likes-count" class="text-gray-600">0 Likes</span>
             </div>

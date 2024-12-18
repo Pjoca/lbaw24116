@@ -220,15 +220,43 @@ function handleDropdowns(event) {
     if (dropdownButton) {
         const dropdownId = dropdownButton.id.replace('dropdownMenuButton-', '');
         const menu = document.getElementById(`dropdownMenu-${dropdownId}`);
-        const isHidden = menu?.classList.contains('hidden');
+
+        if (!menu) return;
+
+        const isHidden = menu.classList.contains('hidden');
 
         allDropdowns.forEach(dropdown => dropdown.classList.add('hidden'));
-        if (isHidden) menu?.classList.remove('hidden');
+        if (isHidden) menu.classList.remove('hidden');
+
         event.stopPropagation();
     } else {
         allDropdowns.forEach(menu => menu.classList.add('hidden'));
     }
 }
+
+
+function toggleDropdown(event, postId) {
+    event.stopPropagation(); // Prevent event from bubbling to parent
+    const menu = document.getElementById(`dropdownMenu-${postId}`);
+    
+    document.querySelectorAll('[id^="dropdownMenu-"]').forEach(dropdown => {
+        if (dropdown !== menu) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+}
+
+document.addEventListener('click', function() {
+    document.querySelectorAll('[id^="dropdownMenu-"]').forEach(menu => {
+        menu.classList.add('hidden');
+    });
+});
+
+window.toggleDropdown = toggleDropdown;
 
 function handleEditPostSubmission() {
     const editPostForm = document.getElementById('edit-post-form');
@@ -626,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// Modal de Visualização do Post
+
 const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
@@ -642,7 +670,6 @@ const postViewModalHandler = {
         const modalLikeButton = document.getElementById('modal-like-button');
         const modalLikeText = document.getElementById('modal-like-text');
     
-        // Pagination state for comments
         let currentPage = 1;
     
         try {
@@ -659,41 +686,33 @@ const postViewModalHandler = {
             modalUserName.textContent = postData.user_name;
             modalCreatedAt.textContent = postData.created_at;
             modalPostContent.textContent = postData.content;
-            modalLikesCount.textContent = `${postData.likes_count} Like${postData.likes_count !== 1 ? 's' : ''}`;
+            modalLikesCount.textContent = `${postData.likes_count}`;
     
-            // Update like button state
             if (postData.liked_by_current_user) {
                 modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
                 modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
-                modalLikeText.textContent = 'Remove like';
             } else {
                 modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
                 modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
-                modalLikeText.textContent = 'Like';
             }
     
-            // Clear previous comments
             modalComments.innerHTML = '';
     
-            // Load the first page of comments
             await loadComments(id, currentPage);
     
             postViewModal.classList.remove('hidden');
             postViewModal.classList.add('flex');
     
-            // Add event to like button
             modalLikeButton.onclick = async () => {
                 const data = await toggleLike(id);
                 if (data.liked) {
                     modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
                     modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
-                    modalLikeText.textContent = 'Remove like';
                 } else {
                     modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
                     modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
-                    modalLikeText.textContent = 'Like';
                 }
-                modalLikesCount.textContent = `${data.likesCount} Like${data.likesCount !== 1 ? 's' : ''}`;
+                modalLikesCount.textContent = `${data.likesCount}`;
             };
     
         } catch (error) {
@@ -710,7 +729,9 @@ const postViewModalHandler = {
                 if (!commentsResponse.ok) throw new Error('Erro ao carregar os comentários.');
     
                 const commentsData = await commentsResponse.json();
-    
+                
+                console.log(commentsData);
+
                 // Append new comments to the modal
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `

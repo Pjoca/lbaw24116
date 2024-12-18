@@ -41,6 +41,6 @@
     @include('modals.edit-post-modal')
     @include('modals.post-modal')
     @include('modals.create-post-modal')
-    <!-- Include Infinite Scroll Script -->
+    @vite('resources/js/comments.js')
     @vite('resources/js/infinite-scroll.js')
 @endsection

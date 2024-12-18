@@ -16,11 +16,11 @@ function toggleLike(postId) {
     .then(data => {
         if (likeButton && likeCount) {
             if (data.liked) {
-                likeButton.innerHTML = '<i class="fas fa-heart text-2xl mr-2 text-red-500"></i> Remove like';
+                likeButton.innerHTML = '<i class="fas fa-heart text-2xl text-red-500"></i>';
             } else {
-                likeButton.innerHTML = '<i class="far fa-heart text-2xl mr-2 text-gray-500"></i> Like';
+                likeButton.innerHTML = '<i class="far fa-heart text-2xl text-gray-500"></i>';
             }
-            likeCount.textContent = `${data.likesCount} ${data.likesCount === 1 ? 'like' : 'likes'}`;
+            likeCount.textContent = `${data.likesCount}`;
         }
         return data; 
     })

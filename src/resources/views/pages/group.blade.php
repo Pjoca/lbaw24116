@@ -185,4 +185,5 @@
 
     <!-- Include JavaScript -->
     @vite('resources/js/group.js')
+    @vite('resources/js/comments.js')
 @endsection
