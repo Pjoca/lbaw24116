@@ -179,7 +179,7 @@ class PostController extends Controller
             ->with('success', 'Post deleted successfully!');
     }
 
-    public function like($postId, NotificationController $notificationController)
+    /* public function like($postId, NotificationController $notificationController)
     {
         if (Auth::check()) {
             $post = Post::findOrFail($postId);
@@ -279,7 +279,7 @@ class PostController extends Controller
             'editable' => (Auth::id() === $comment->id_user)
         ],
     ]);
-}
+} */
 
 
     public function toggleLike(Request $request, Post $post, NotificationController $notificationController)

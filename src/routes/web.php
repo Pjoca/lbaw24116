@@ -90,6 +90,8 @@ Route::controller(PostController::class)->group(function () {
     Route::put('/posts/{post}', 'update')->middleware('auth')->name('posts.update');
     Route::delete('/post/{id}', 'delete')->middleware('auth')->name('post.delete');
     Route::get('/pages/create-post', 'showCreateForm')->name('posts.create'); // Rota para mostrar o formulário de criação
+    Route::get('/posts/{id}', 'show')->name('posts.show');
+    Route::post('/posts/{post}/like-toggle', 'toggleLike')->middleware('auth');
 
 });
 
@@ -161,7 +163,6 @@ Route::controller(ForgotPasswordController::class)->group( function () {
 
 
 Route::post('/broadcasting/auth', function (Request $request) {
-    // Check if the user is authenticated
     if (!Auth::check()) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
@@ -169,24 +170,21 @@ Route::post('/broadcasting/auth', function (Request $request) {
     $userId = Auth::id();
     $channelName = $request->input('channel_name');
 
-    // Regex for private-notification.<userId> or private-messages.<userId>.<contactId>
     if (!preg_match('/^private-(notification|messages)\.(\d+)(?:\.(\d+))?$/', $channelName, $matches)) {
         Log::info('Invalid channel name: ' . $channelName);
         return response()->json(['message' => 'Invalid channel name'], 403);
     }
 
-    $channelType = $matches[1]; // "notification" or "messages"
-    $channelUserId = (int) $matches[2]; // User ID for whom the channel is created
+    $channelType = $matches[1];
+    $channelUserId = (int) $matches[2];
     Log::info('Channel user ID: ' . $channelUserId);
-    $contactId = isset($matches[3]) ? (int) $matches[3] : null; // Contact ID (only for messages channel)
+    $contactId = isset($matches[3]) ? (int) $matches[3] : null;
     Log::info('Contact ID: ' . $contactId);
 
-    // Check if the authenticated user is authorized to access this channel
     if ($userId !== $channelUserId && $userId !== $contactId) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
-    // Configure the Pusher instance
     $pusher = new Pusher(
         config('broadcasting.connections.pusher.key'),
         config('broadcasting.connections.pusher.secret'),
@@ -200,57 +198,41 @@ Route::post('/broadcasting/auth', function (Request $request) {
         ]
     );
 
-    // Authenticate the Pusher socket for the channel
     return $pusher->socket_auth($channelName, $request->input('socket_id'));
 });
 
 
-
-
-Route::middleware('auth')->group(function () {
-Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+Route::controller(MessageController::class)->group( function () {
+    Route::get('/messages/conversation/{contactId}',  'getConversation')->name('messages.conversation');
+    Route::get('/messages/{contactId}',  'getMessages')->name('messages.get');
+    Route::post('/messages/send', 'sendMessage')->name('messages.send');
+    Route::post('/messages/start-conversation', 'startConversation')->name('messages.startConversation');
+    Route::get('/messages', 'index')->middleware('auth')->name('messages.index');
 });
 
-Route::get('/messages/conversation/{contactId}', [MessageController::class, 'getConversation'])->name('messages.conversation');
-Route::get('/messages/{contactId}', [MessageController::class, 'getMessages'])->name('messages.get');
-Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('messages.send');
-Route::post('/messages/start-conversation', [MessageController::class, 'startConversation'])->name('messages.startConversation');
+Route::controller(CommentController::class)->group(function () {
+    Route::post('/comments/{postId}', 'store')->name('comments.store');
+    Route::get('/comments/{comment}/edit', 'edit')->name('comments.edit');
+    Route::put('/comments/{comment}', 'update')->name('comments.update');
+    Route::delete('/comments/{id}', 'destroy')->middleware('auth')->name('comments.destroy');
+    Route::get('/posts/{postId}/comments', 'loadComments')->name('comments.load');
+});
 
 
-Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
-Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
+
+/* Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
+Route::delete('/posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike'); */
 
 // Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
-Route::post('/comments/{postId}', [CommentController::class, 'store'])->name('comments.store');
-Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
+/* Route::get('/posts/{postId}/comments', [PostController::class, 'getComments'])->name('comments.get');
 Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments'])->name('comments.loadMore');
-Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']);
+Route::get('/posts/{postId}/comments/load/{offset}', [PostController::class, 'loadMoreComments']); */
 
 
-Route::get('/comments/{comment}/edit', [CommentController::class, 'edit'])->name('comments.edit');
-
-Route::put('/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
-
-Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
-
-Route::post('/posts/{post}/like-toggle', [PostController::class, 'toggleLike'])->middleware('auth');
-
-Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->middleware('auth');
-
-Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
-    Route::post('/matchmaking/interact', [App\Http\Controllers\MatchmakingController::class, 'interact'])->name('matchmaking.interact');
+Route::controller(MatchmakingController::class)->middleware('auth')->group(function () {
+    Route::get('/matchmaking', 'index')->name('matchmaking.index');
+    Route::get('/matchmaking/load-more', 'loadMoreUsers')->name('matchmaking.loadMore');
 });
-
-Route::get('/posts/{postId}/comments', [CommentController::class, 'loadComments'])->name('comments.load');
-
-Route::get('/matchmaking', [App\Http\Controllers\MatchmakingController::class, 'index'])->name('matchmaking.index');
-
-Route::get('/matchmaking/load-more', [MatchmakingController::class, 'loadMoreUsers'])->name('matchmaking.loadMore');
-
-
 
 
 
