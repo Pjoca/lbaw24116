@@ -28,9 +28,7 @@ class UserController extends Controller
 {
     $user = User::findOrFail($id);
 
-    if ($user->visibility !== 'public' && !Auth::check()) {
-        abort(403, 'You are not authorized to view this profile.');
-    }
+    $this->authorize('show', $user);
 
     $userData = [
         'id' => $user->id,
@@ -165,9 +163,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         // Verifica se o usuário autenticado é o dono do perfil
-        if (Auth::id() !== $user->id) {
-            abort(403, 'You are not authorized to edit this profile.');
-        }
+        $this->authorize('update', $user);
 
         return view('pages.edit', compact('user'));
     }

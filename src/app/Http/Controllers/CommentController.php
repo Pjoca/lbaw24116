@@ -12,10 +12,7 @@ class CommentController extends Controller
     {
         $comment = Comment::findOrFail($id);
 
-        if ($comment->id_user !== auth()->id()) {
-            return redirect()->route('posts.show', ['id' => $comment->id_post])
-                             ->with('error', 'Você não tem permissão para editar este comentário.');
-        }
+        $this->authorize('update', $comment);
 
         if (!$comment->id_post) {
             return redirect()->route('home')->with('error', 'Post não encontrado para este comentário.');
@@ -28,9 +25,7 @@ class CommentController extends Controller
 {
     $comment = Comment::findOrFail($id);
 
-    if ($comment->id_user !== auth()->id()) {
-        return response()->json(['success' => false, 'error' => 'Sem permissão'], 403);
-    }
+    $this->authorize('update', $comment);
 
     $comment->content = $request->input('content');
     $comment->save();
@@ -46,9 +41,7 @@ public function destroy($id)
         return response()->json(['success' => false, 'message' => 'Comentário não encontrado'], 404);
     }
 
-    if ($comment->id_user !== auth()->id()) {
-        return response()->json(['success' => false, 'message' => 'Sem permissão'], 403);
-    }
+    $this->authorize('update', $comment);
 
     if ($comment->delete()) {
         return response()->json(['success' => true, 'message' => 'Comentário excluído com sucesso']);

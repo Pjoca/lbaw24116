@@ -132,10 +132,7 @@ class GroupMembershipController extends Controller
             $request = GroupMembershipRequest::findOrFail($requestId);
             $group = Group::findOrFail($request->id_group);
 
-            // Ensure only the group owner can reject requests
-            if ($group->id_owner !== Auth::id()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
+            $this->authorize('owner', $group);
 
             // Delete the request
             $request->delete();
@@ -181,9 +178,7 @@ class GroupMembershipController extends Controller
         $group = Group::findOrFail($groupId);
     
         // Ensure only the group owner can send invites
-        if ($group->id_owner !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $this->authorize('owner', $group);
     
         $validated = $request->validate([
             'usernameOrEmail' => 'required|string', // Validate the username or email
@@ -233,10 +228,7 @@ public function cancelInvite($inviteId)
     try {
         $invite = GroupMembershipRequest::findOrFail($inviteId);
 
-        // Ensure only the group owner can cancel the invite
-        if ($invite->is_invite && $invite->group->id_owner !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
+        $this->authorize('updateInvite', [Group::class, $invite->group, $invite]);
 
         $invite->delete();
 
@@ -251,9 +243,7 @@ public function acceptInvite($inviteId, NotificationController $notificationCont
 {
     $invite = GroupMembershipRequest::findOrFail($inviteId);
 
-    if (!$invite->is_invite || $invite->id_user !== Auth::id()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    $this->authorize('acceptRejectInvite',$invite);
 
     DB::beginTransaction();
 
@@ -286,9 +276,7 @@ public function rejectInvite($inviteId, NotificationController $notificationCont
 {
     $invite = GroupMembershipRequest::findOrFail($inviteId);
 
-    if (!$invite->is_invite || $invite->id_user !== Auth::id()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    $this->authorize('acceptRejectInvite',$invite);
 
     $invite->delete();
 
@@ -311,9 +299,7 @@ public function removeMember($groupId, $memberId)
     Log::info('Group Owner ID: ' . $group->id_owner);
 
     // Check if the authenticated user is the group owner
-    if ($group->id_owner !== Auth::id()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    $this->authorize('owner', $group);
 
     // Find the membership using the composite key
     $membership = GroupMembership::where('id_user', $memberId)
@@ -352,12 +338,8 @@ public function getJoinRequests(Request $request, $groupId)
     $group = Group::findOrFail($groupId);
 
     $user = Auth::user();
-    // Ensure the user is the group owner
-    if ($group->id_owner !== $user->id) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+    $this->authorize('owner', $group);
 
-    // Query join requests (pending status)
     $query = GroupMembershipRequest::where('id_group', $groupId)
         ->where('request_status', 'pending')
         ->where('is_invite', false) // Only join requests, not invites
@@ -381,17 +363,14 @@ public function getGroupInvites(Request $request)
 {
     $userId = Auth::id();
 
-    // Query pending group invites for the authenticated user
     $query = GroupMembershipRequest::where('id_user', $userId)
         ->where('request_status', 'pending')
-        ->where('is_invite', true) // Only invites, not join requests
+        ->where('is_invite', true) 
         ->with('group')
-        ->orderBy('requested_at', 'desc'); // Assuming requested_at tracks the invite time
+        ->orderBy('requested_at', 'desc');
 
-    // Paginate the invites (5 per page)
     $invites = $query->simplePaginate(5);
 
-    // Render the invites as HTML to be dynamically loaded into a view
     $html = view('partials.user-invites-renderer', compact('invites'))->render();
 
     return response()->json([

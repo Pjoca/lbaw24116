@@ -146,9 +146,7 @@ public function store(Request $request)
         $group = Group::findOrFail($id);
 
         // Check if the user is the owner of the group
-        if ($group->id_owner !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        $this->authorize('owner', $group);
 
         $request->validate([
             'name' => 'required|string|max:255',

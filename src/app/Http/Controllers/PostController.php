@@ -105,6 +105,8 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
 
+        $this->authorize('update', $post);
+
         $validatedData = $request->validate([
             'content' => 'required|string|max:500',
             'visibility' => 'required|in:public,private,group',

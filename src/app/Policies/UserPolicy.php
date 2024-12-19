@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\GroupMembershipRequest;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\User;
@@ -27,4 +28,16 @@ class UserPolicy
         // Only allow updating their own profile
         return $currentUser->id === $profileUser->id;
     }
+
+
+    public function show(User $currentUser, User $user): bool
+    {
+        return $user->visibility === 'public'  || !is_null($currentUser);
+    }
+
+    public function startConversation(User $user, User $friend)
+    {   
+        return $user->id !== $friend->id && $friend->exists;
+    }
+
 }

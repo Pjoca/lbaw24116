@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Policies\MessagePolicy;
 use Illuminate\Http\Request;
 use App\Models\Message;
 use App\Models\User;
@@ -58,12 +59,9 @@ public function startConversation(Request $request)
 {
     $userId = Auth::id();
     $friendId = $request->input('friend_id');
-
-    if ($userId == $friendId || !User::find($friendId)) {
-        return response()->json(['error' => 'Invalid friend ID'], 400);
-    }
-
     $contact = User::find($friendId);
+
+    $this->authorize('startConversation', $contact);
 
     return response()->json([
         'success' => true,
