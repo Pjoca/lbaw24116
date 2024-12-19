@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+use App\Http\Controllers\NotificationController;
+
 class PostController extends Controller
 {
     public function publicTimeline(Request $request)
@@ -177,7 +179,7 @@ class PostController extends Controller
             ->with('success', 'Post deleted successfully!');
     }
 
-    public function like($postId)
+    public function like($postId, NotificationController $notificationController)
     {
         if (Auth::check()) {
             $post = Post::findOrFail($postId);
@@ -188,6 +190,12 @@ class PostController extends Controller
                     'id_post' => $post->id,
                     'visibility' => 'public',
                 ]);
+
+                $notificationController->addNotification(new Request([
+                    'id_user' => $post->id_user,
+                    'message_content' => auth()->user()->name . ' liked your post.',
+                    'onclick_url' => 'javascript:goWithCommand(\'/timeline/personalized/\', \'showPostViewModal(' . $postId . ');\')',
+                ]));
             }
 
             $previousUrl = url()->previous();
@@ -274,7 +282,7 @@ class PostController extends Controller
 }
 
 
-    public function toggleLike(Request $request, Post $post)
+    public function toggleLike(Request $request, Post $post, NotificationController $notificationController)
     {
         $user = Auth::user();
 
@@ -285,6 +293,12 @@ class PostController extends Controller
             $post->likes()->create(['id_user' => $user->id]);
             $liked = true;
         }
+
+        $notificationController->addNotification(new Request([
+            'id_user' => $post->id_user,
+            'message_content' => auth()->user()->name . ' liked your post.',
+            'onclick_url' => 'javascript:goWithCommand(\'/timeline/personalized/\', \'showPostViewModal(' . $post->id . ');\')',
+        ]));
 
         return response()->json([
             'liked' => $liked,

@@ -51,7 +51,7 @@ public function destroy($id)
 }
 
 
-    public function store(Request $request, $postId)
+    public function store(Request $request, $postId, NotificationController $notificationController)
 {
     $validator = \Validator::make($request->all(), [
         'content' => 'required|string',
@@ -71,6 +71,13 @@ public function destroy($id)
         'id_post' => $postId,
     ]);
     $comment->save();
+
+    // Notifica o autor do post
+    $notificationController->addNotification(new Request([
+        'id_user' => $comment->post->id_user,
+        'message_content' => auth()->user()->name . ' commented on your post.',
+        'onclick_url' => 'javascript:goWithCommand(\'/timeline/personalized/\', \'showPostViewModal(' . $comment->post->id . ');\')',
+    ]));
 
     return response()->json([
         'success' => true,
