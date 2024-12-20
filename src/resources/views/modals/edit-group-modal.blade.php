@@ -14,45 +14,55 @@
             @csrf
             @method('PUT')
 
-            <!-- Name -->
-            <div class="mb-4">
-                <label for="edit-group-name" class="block font-bold mb-2">Group Name</label>
-                <input type="text" id="edit-group-name" name="name" 
-                       class="w-full border border-gray-300 rounded p-2" required>
-            </div>
+            <!-- Group Details -->
+            <fieldset class="mb-6">
+                <legend class="text-lg font-semibold mb-2">Group Details</legend>
 
-            <!-- Description -->
-            <div class="mb-4">
-                <label for="edit-group-description" class="block font-bold mb-2">Description</label>
-                <textarea id="edit-group-description" name="description" 
-                          class="w-full border border-gray-300 rounded p-2" required></textarea>
-            </div>
-
-            <!-- Visibility -->
-            <div class="mb-4">
-                <label for="edit-group-visibility" class="block font-bold mb-2">Visibility</label>
-                <select id="edit-group-visibility" name="visibility" 
-                        class="w-full border border-gray-300 rounded p-2" required>
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                </select>
-            </div>
-
-            <!-- Group Image -->
-            <div class="mb-4">
-                <label for="image" class="block font-bold mb-2">Group Image</label>
-
-                <!-- Image Input -->
-                <input type="file" id="image" name="image" accept="image/*" 
-                       class="w-full border border-gray-300 rounded p-2">
-                
-                <!-- Image Preview Container -->
-                <div id="preview-container" class="mt-4 hidden">
-                    <p class="font-semibold mb-2">Image Preview</p>
-                    <img id="preview-image" src="#" 
-                         class="w-32 h-32 rounded-full border border-gray-200 object-cover">
+                <!-- Name -->
+                <div class="mb-4">
+                    <label for="edit-group-name" class="block font-bold mb-2">Group Name</label>
+                    <input type="text" id="edit-group-name" name="name" 
+                           class="w-full border border-gray-300 rounded p-2" required>
                 </div>
-            </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                    <label for="edit-group-description" class="block font-bold mb-2">Description</label>
+                    <textarea id="edit-group-description" name="description" 
+                              class="w-full border border-gray-300 rounded p-2" required></textarea>
+                </div>
+            </fieldset>
+
+            <!-- Group Settings -->
+            <fieldset class="mb-6">
+                <legend class="text-lg font-semibold mb-2">Group Settings</legend>
+
+                <!-- Visibility -->
+                <div class="mb-4">
+                    <label for="edit-group-visibility" class="block font-bold mb-2">Visibility</label>
+                    <select id="edit-group-visibility" name="visibility" size="2"
+                            class="w-full border border-gray-300 rounded p-2" required>
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+
+                <!-- Group Image -->
+                <div class="mb-4">
+                    <label for="image" class="block font-bold mb-2">Group Image</label>
+
+                    <!-- Image Input -->
+                    <input type="file" id="image" name="image" accept="image/*" 
+                           class="w-full border border-gray-300 rounded p-2">
+                    
+                    <!-- Image Preview Container -->
+                    <div id="preview-container" class="mt-4 hidden">
+                        <p class="font-semibold mb-2">Image Preview</p>
+                        <img id="preview-image" src="#" 
+                             class="w-32 h-32 rounded-full border border-gray-200 object-cover">
+                    </div>
+                </div>
+            </fieldset>
 
             <!-- Submit Button -->
             <div class="text-right">

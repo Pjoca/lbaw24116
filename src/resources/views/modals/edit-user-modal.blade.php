@@ -4,34 +4,37 @@
         <form id="edit-user-form" method="POST" action="">
             @csrf
             @method('PUT')
-            <div>
-                <label for="edit-name" class="block text-sm font-medium">Name</label>
-                <input type="text" name="name" id="edit-name" class="w-full border rounded p-2" required>
-            </div>
-            <div>
-                <label for="edit-email" class="block text-sm font-medium">Email</label>
-                <input type="email" name="email" id="edit-email" class="w-full border rounded p-2" required>
-            </div>
-            <div>
-                <label for="edit-username" class="block text-sm font-medium">Username</label>
-                <input type="text" name="username" id="edit-username" class="w-full border rounded p-2" required>
-            </div>
-            <div>
-                <label for="edit-visibility" class="block text-sm font-medium">Visibility</label>
-                <select name="visibility" id="edit-visibility" class="w-full border rounded p-2" required>
-                    <option value="public">Public</option>
-                    <option value="private">Private</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="edit-account-status" class="block text-sm font-medium">Account Status</label>
-                <select name="account_status" id="edit-account-status" class="w-full border rounded p-2" required>
-                    <option value="active">Active</option>
-                    <option value="offline">Offline</option>
-                    <option value="deleted">Deleted</option>
-                    <option value="blocked">Blocked</option>
-                </select>
-            </div>
+            <fieldset>
+                <legend class="text-lg font-medium mb-2">User Information</legend>
+                <div>
+                    <label for="edit-name" class="block text-sm font-medium">Name</label>
+                    <input type="text" name="name" id="edit-name" class="w-full border rounded p-2" required>
+                </div>
+                <div>
+                    <label for="edit-email" class="block text-sm font-medium">Email</label>
+                    <input type="email" name="email" id="edit-email" class="w-full border rounded p-2" required>
+                </div>
+                <div>
+                    <label for="edit-username" class="block text-sm font-medium">Username</label>
+                    <input type="text" name="username" id="edit-username" class="w-full border rounded p-2" required>
+                </div>
+                <div>
+                    <label for="edit-visibility" class="block text-sm font-medium">Visibility</label>
+                    <select name="visibility" id="edit-visibility" class="w-full border rounded p-2" required>
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-account-status" class="block text-sm font-medium">Account Status</label>
+                    <select name="account_status" id="edit-account-status" class="w-full border rounded p-2" required>
+                        <option value="active">Active</option>
+                        <option value="offline">Offline</option>
+                        <option value="deleted">Deleted</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+            </fieldset>
             <button type="submit" class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
                 Save Changes
             </button>

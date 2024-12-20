@@ -18,36 +18,40 @@
             @csrf
 
             <!-- Post Content -->
-            <div class="mb-4">
+            <fieldset class="mb-4">
+                <legend class="block text-lg font-medium text-gray-700 mb-2">Post Content</legend>
                 <label for="text-content" class="block text-sm font-medium text-gray-700">Content</label>
                 <textarea id="text-content" name="content" rows="4" required
                           class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
-            </div>
+            </fieldset>
 
             <!-- Visibility -->
-            <div class="mb-4" id="visibility-container">
-                <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
+            <fieldset class="mb-4" id="visibility-container">
+                <legend class="block text-lg font-medium text-gray-700 mb-2">Visibility</legend>
+                <label for="visibility" class="block text-sm font-medium text-gray-700">Who can see this post?</label>
                 <select id="visibility" name="visibility" required size="2"
                         class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="public">Public</option>
                     <option value="private">Private</option>
                 </select>
-            </div>
+            </fieldset>
 
             <input type="hidden" id="id_group" name="id_group" value="">
 
             <!-- Image Upload -->
-            <div class="mb-4">
+            <fieldset class="mb-4">
+                <legend class="block text-lg font-medium text-gray-700 mb-2">Image Upload</legend>
                 <label for="image" class="block text-sm font-medium text-gray-700">Image (Optional)</label>
                 <input type="file" id="image" name="image" accept="image/*"
                        class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
+            </fieldset>
 
             <!-- Preview -->
-            <div id="preview-container" class="mb-4 hidden">
+            <fieldset id="preview-container" class="mb-4 hidden">
+                <legend class="block text-lg font-medium text-gray-700 mb-2">Image Preview</legend>
                 <label class="block text-sm font-medium text-gray-700">Preview:</label>
                 <img id="preview-image" src="#" alt="Image Preview" class="w-full h-auto rounded-md shadow-md mt-2">
-            </div>
+            </fieldset>
 
             <!-- Submit Button -->
             <button type="submit" 

@@ -21,60 +21,72 @@
             @csrf
             @method('PUT')
 
-            <!-- Name -->
-            <div class="mb-4">
-                <label for="edit-name" class="block font-bold mb-2">Name:</label>
-                <input type="text" id="edit-name" name="name" value="{{ data_get($user, 'name') }}" 
-                       class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
-            </div>
+            <fieldset>
+                <legend class="text-lg font-bold mb-4">Personal Information</legend>
 
-            <!-- Email -->
-            <div class="mb-4">
-                <label for="edit-email" class="block font-bold mb-2">Email:</label>
-                <input type="email" id="edit-email" name="email" value="{{ data_get($user, 'email') }}" 
-                       class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
-            </div>
+                <!-- Name -->
+                <div class="mb-4">
+                    <label for="edit-name" class="block font-bold mb-2">Name:</label>
+                    <input type="text" id="edit-name" name="name" value="{{ data_get($user, 'name') }}" 
+                           class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
 
-            <!-- Username -->
-            <div class="mb-4">
-                <label for="edit-username" class="block font-bold mb-2">Username:</label>
-                <input type="text" id="edit-username" name="username" value="{{ data_get($user, 'username') }}" 
-                       class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
-            </div>
+                <!-- Email -->
+                <div class="mb-4">
+                    <label for="edit-email" class="block font-bold mb-2">Email:</label>
+                    <input type="email" id="edit-email" name="email" value="{{ data_get($user, 'email') }}" 
+                           class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
 
-            <!-- Password -->
-            <div class="mb-4">
-                <label for="edit-password" class="block font-bold mb-2">New Password (Optional):</label>
-                <input type="password" id="edit-password" name="password" 
-                       class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
-            </div>
+                <!-- Username -->
+                <div class="mb-4">
+                    <label for="edit-username" class="block font-bold mb-2">Username:</label>
+                    <input type="text" id="edit-username" name="username" value="{{ data_get($user, 'username') }}" 
+                           class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
+            </fieldset>
 
-            <!-- Confirm Password -->
-            <div class="mb-4">
-                <label for="edit-password-confirmation" class="block font-bold mb-2">Confirm Password:</label>
-                <input type="password" id="edit-password-confirmation" name="password_confirmation" 
-                       class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
-            </div>
+            <fieldset>
+                <legend class="text-lg font-bold mb-4">Security</legend>
 
-            <!-- Profile Image -->
-            <div class="mb-4">
-                <label for="edit-image" class="block font-bold mb-2">Profile Image:</label>
-                <input type="file" id="edit-image" name="image" class="w-full">
-                @if (data_get($user, 'image_url'))
-                    <img src="{{ asset('storage/' . data_get($user, 'image_url')) }}" alt="Current Profile Image" 
-                         class="mt-2 w-24 h-24 rounded-full">
-                @endif
-            </div>
+                <!-- Password -->
+                <div class="mb-4">
+                    <label for="edit-password" class="block font-bold mb-2">New Password (Optional):</label>
+                    <input type="password" id="edit-password" name="password" 
+                           class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
+                </div>
 
-            <!-- Visibility -->
-            <div class="mb-4">
-                <label for="edit-visibility" class="block font-bold mb-2">Visibility:</label>
-                <select id="edit-visibility" name="visibility" 
-                        class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
-                    <option value="public" {{ data_get($user, 'visibility') === 'public' ? 'selected' : '' }}>Public</option>
-                    <option value="private" {{ data_get($user, 'visibility') === 'private' ? 'selected' : '' }}>Private</option>
-                </select>
-            </div>
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label for="edit-password-confirmation" class="block font-bold mb-2">Confirm Password:</label>
+                    <input type="password" id="edit-password-confirmation" name="password_confirmation" 
+                           class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend class="text-lg font-bold mb-4">Profile Settings</legend>
+
+                <!-- Profile Image -->
+                <div class="mb-4">
+                    <label for="edit-image" class="block font-bold mb-2">Profile Image:</label>
+                    <input type="file" id="edit-image" name="image" class="w-full">
+                    @if (data_get($user, 'image_url'))
+                        <img src="{{ asset('storage/' . data_get($user, 'image_url')) }}" alt="Current Profile Image" 
+                             class="mt-2 w-24 h-24 rounded-full">
+                    @endif
+                </div>
+
+                <!-- Visibility -->
+                <div class="mb-4">
+                    <label for="edit-visibility" class="block font-bold mb-2">Visibility:</label>
+                    <select id="edit-visibility" name="visibility" 
+                            class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" required>
+                        <option value="public" {{ data_get($user, 'visibility') === 'public' ? 'selected' : '' }}>Public</option>
+                        <option value="private" {{ data_get($user, 'visibility') === 'private' ? 'selected' : '' }}>Private</option>
+                    </select>
+                </div>
+            </fieldset>
 
             <!-- Submit Button -->
             <div class="text-right">
