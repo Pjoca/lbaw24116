@@ -14,7 +14,7 @@
     @vite('resources/css/app.css')
     <script type="text/javascript" src="{{ url('js/app.js') }}" defer></script>
 </head>
-<body class="flex items-center justify-center h-screen bg-blue-100 font-roboto">
+<body class="flex items-center justify-center h-screen bg-blue-100 font-roboto overflow-y-auto">
     
     <!-- Logo -->
     <a href="{{ route('login') }}" class="absolute top-12 left-16 transform transition-transform hover:scale-110">
