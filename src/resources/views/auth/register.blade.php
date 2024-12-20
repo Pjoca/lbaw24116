@@ -137,7 +137,6 @@
 
                 <!-- Action Buttons Fieldset -->
                 <fieldset>
-                    <legend class="text-lg font-bold text-teal-500 mb-4">Actions</legend>
 
                     <!-- Submit Button -->
                     <button 
