@@ -103,14 +103,20 @@ public function loadComments(Request $request, $postId)
                           ->take($perPage)
                           ->get();
 
+        // Verifica se existem mais comentários para carregar
+        $totalComments = Comment::where('id_post', $postId)->count();
+        $loadedComments = $page * $perPage;
+        $hasMore = $loadedComments < $totalComments;
+
         // Formata os comentários para a resposta JSON
-        $formattedComments = $comments->map(function($comment) {
+        $formattedComments = $comments->map(function($comment) use ($hasMore) {
             return [
                 'id' => $comment->id,
                 'content' => $comment->content,
                 'user_name' => $comment->user->name,
                 'user_image' => asset('storage/' . ($comment->user->image_url ?? 'users/images/default.png')),
                 'editable' => (Auth::check() && Auth::id() === $comment->id_user),
+                'hasMorePages' => $hasMore,
             ];
         });
 
@@ -122,7 +128,7 @@ public function loadComments(Request $request, $postId)
         return response()->json([
             'success' => true,
             'comments' => $formattedComments,
-            'hasMore' => $hasMore,
+            'hasMorePages' => $hasMore,
         ]);
     }
 

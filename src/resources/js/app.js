@@ -1,6 +1,8 @@
 import './bootstrap';
 import Pusher from 'pusher-js';
 
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     encrypted: true,
@@ -721,11 +723,11 @@ const postViewModalHandler = {
                 const commentsResponse = await fetch(`/posts/${postId}/comments?page=${page}`, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 });
-    
+        
                 if (!commentsResponse.ok) throw new Error('Erro ao carregar os comentários.');
-    
+        
                 const commentsData = await commentsResponse.json();
-                
+        
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
                         <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
@@ -736,27 +738,57 @@ const postViewModalHandler = {
                                 </div>
                                 ${comment.editable ? `
                                 <div class="flex space-x-2">
+                                    <!-- Edit Button -->
                                     <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 010 3L7 16.5 3 17l.5-4L16.5 3.5z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L10 17l-4 1 1-4L18.5 2.5z" />
                                         </svg>
                                     </button>
+                    
+                                    <!-- Delete Button -->
                                     <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M9 6v12m6-12v12m-9 0a2 2 0 002 2h6a2 2 0 002-2V6M5 6h14M10 6v12M14 6v12M8 6h8" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </button>
                                 </div>
                                 ` : ''}
                             </div>
+                            
                             <p class="mt-2 text-gray-700" id="modal-commentContent-${comment.id}">${comment.content}</p>
+                            
+                            <!-- Edit Form -->
+                            <form id="modal-editForm-${comment.id}" class="hidden mt-2" onsubmit="saveModalInlineEdit(event, ${comment.id})">
+                                <input type="hidden" name="_token" value="${csrfToken}">
+                                <textarea name="content" class="w-full p-2 border rounded-lg" id="modal-editTextArea-${comment.id}"></textarea>
+                                <div class="flex justify-end mt-2">
+                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
+                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+                                </div>
+                            </form>
                         </div>
                     `;
                 });
+        
+                // Handle Load More Button
+                const existingLoadMoreButton = document.getElementById('load-more-comments-button');
+                if (existingLoadMoreButton) existingLoadMoreButton.remove();
+        
+                if (commentsData.hasMorePages) {
+                    const loadMoreButton = document.createElement('button');
+                    loadMoreButton.id = 'load-more-comments-button';
+                    loadMoreButton.textContent = 'Load More Comments';
+                    loadMoreButton.className = 'text-blue-500 hover:text-blue-700 mt-4 w-full';
+                    loadMoreButton.onclick = () => {
+                        currentPage++;
+                        loadComments(postId, currentPage);
+                    };
+                    modalComments.appendChild(loadMoreButton);
+                }
             } catch (error) {
                 console.error('Erro ao carregar os comentários:', error);
             }
-        }
+        }        
     },
     
     hide() {
