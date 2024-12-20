@@ -117,6 +117,7 @@ Route::controller(FriendshipController::class)->middleware('auth')->group(functi
         Route::delete('/friends/reject/{id}', 'reject');
         Route::get('/friends/requests/received/{userId}',  'getReceivedRequests')->name('friends.requests.received');
         Route::get('/friends/requests/sent/{userId}',  'getSentRequests')->name('friends.requests.sent');
+        Route::get('/friends/list/{userId}',  'getFriends');
     });
 
 

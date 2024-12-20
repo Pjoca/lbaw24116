@@ -3,21 +3,24 @@
         <!-- Botão para Fechar -->
         <button 
             id="close-post-view-modal" 
-            onclick="hidePostViewModal()"
-            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition z-10">
-            <i class="fas fa-times text-2xl"></i>
+            onclick="hidePostViewModal()" 
+            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition z-50"
+        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
         </button>
 
         <!-- Imagem do Post -->
         <div class="flex-1 bg-gray-100 rounded-l-lg overflow-hidden">
-            <img id="modal-post-image" src="" alt="Post Image" class="w-full h-full object-contain">
+            <img id="modal-post-image" src="1" alt="Post Image" class="w-full h-full object-contain">
         </div>
 
         <!-- Conteúdo do Post -->
         <div class="w-2/5 flex flex-col bg-white p-6 rounded-r-lg overflow-y-auto">
             <!-- Autor -->
             <div class="flex items-center mb-4">
-                <img id="modal-user-image" src="" alt="User Image" class="w-10 h-10 rounded-full mr-4">
+                <img id="modal-user-image" src="1" alt="User Image" class="w-10 h-10 rounded-full mr-4">
                 <div>
                     <p id="modal-user-name" class="text-lg font-semibold text-gray-800"></p>
                     <p id="modal-created-at" class="text-sm text-gray-500"></p>
@@ -30,7 +33,9 @@
             <!-- Likes -->
             <div class="flex items-center mb-4">
                 <button id="modal-like-button" class="flex items-center like-button mr-4">
-                    <i class="far fa-heart text-2xl text-gray-500"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
                 </button>
                 <span id="modal-likes-count" class="text-gray-600">0 Likes</span>
             </div>

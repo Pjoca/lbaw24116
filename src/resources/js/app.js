@@ -405,18 +405,27 @@ async function removeFriend(userId) {
         });
 
         if (!response.ok) throw new Error('Failed to remove friend');
+        
         const data = await response.json();
 
-        const button = document.querySelector(`[data-user-id="${userId}"]`);
-        if (button) {
-            button.textContent = 'Add Friend';
-            button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
-            button.setAttribute('onclick', `addFriend(${userId})`);
+        // Check if the friend is being displayed in the modal
+        const friendElementInModal = document.getElementById(`friend-${userId}`);
+        if (friendElementInModal) {
+            // Remove the friend from the modal list
+            friendElementInModal.remove();
+        } else {
+            // If not in the modal, change the button to 'Add Friend'
+            const button = document.querySelector(`[data-user-id="${userId}"]`);
+            if (button) {
+                button.textContent = 'Add Friend';
+                button.className = 'bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition';
+                button.setAttribute('onclick', `addFriend(${userId})`);
+            }
         }
 
         window.showFeedbackMessage('green', 'Friend removed successfully!');
     } catch (error) {
-        console.error(error);
+        console.error('Error removing friend:', error);
         window.showFeedbackMessage('red', 'An error occurred while removing the friend.');
     }
 }
@@ -668,7 +677,6 @@ const postViewModalHandler = {
         const modalLikesCount = document.getElementById('modal-likes-count');
         const modalComments = document.getElementById('modal-comments');
         const modalLikeButton = document.getElementById('modal-like-button');
-        const modalLikeText = document.getElementById('modal-like-text');
     
         let currentPage = 1;
     
@@ -688,13 +696,7 @@ const postViewModalHandler = {
             modalPostContent.textContent = postData.content;
             modalLikesCount.textContent = `${postData.likes_count}`;
     
-            if (postData.liked_by_current_user) {
-                modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
-                modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
-            } else {
-                modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
-                modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
-            }
+            updateLikeButton(modalLikeButton, postData.liked_by_current_user);
     
             modalComments.innerHTML = '';
     
@@ -705,13 +707,7 @@ const postViewModalHandler = {
     
             modalLikeButton.onclick = async () => {
                 const data = await toggleLike(id);
-                if (data.liked) {
-                    modalLikeButton.querySelector('i').classList.remove('far', 'text-gray-500');
-                    modalLikeButton.querySelector('i').classList.add('fas', 'text-red-500');
-                } else {
-                    modalLikeButton.querySelector('i').classList.remove('fas', 'text-red-500');
-                    modalLikeButton.querySelector('i').classList.add('far', 'text-gray-500');
-                }
+                updateLikeButton(modalLikeButton, data.liked);
                 modalLikesCount.textContent = `${data.likesCount}`;
             };
     
@@ -730,9 +726,6 @@ const postViewModalHandler = {
     
                 const commentsData = await commentsResponse.json();
                 
-                console.log(commentsData);
-
-                // Append new comments to the modal
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
                         <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
@@ -744,52 +737,28 @@ const postViewModalHandler = {
                                 ${comment.editable ? `
                                 <div class="flex space-x-2">
                                     <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
-                                        <i class="fas fa-edit"></i> Editar
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 010 3L7 16.5 3 17l.5-4L16.5 3.5z" />
+                                        </svg>
                                     </button>
                                     <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-trash-alt"></i> Excluir
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M9 6v12m6-12v12m-9 0a2 2 0 002 2h6a2 2 0 002-2V6M5 6h14M10 6v12M14 6v12M8 6h8" />
+                                        </svg>
                                     </button>
                                 </div>
                                 ` : ''}
                             </div>
                             <p class="mt-2 text-gray-700" id="modal-commentContent-${comment.id}">${comment.content}</p>
-                            <form id="modal-editForm-${comment.id}" class="hidden mt-2" onsubmit="saveModalInlineEdit(event, ${comment.id})">
-                                @csrf
-                                @method('PUT')
-                                <textarea name="content" class="w-full p-2 border rounded-lg" id="modal-editTextArea-${comment.id}"></textarea>
-                                <div class="flex justify-end mt-2">
-                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
-                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
-                                </div>
-                            </form>
                         </div>
                     `;
                 });
-    
-                // Remove old "Load More" button if it exists
-                const existingLoadMoreButton = document.getElementById('load-more-comments-button');
-                if (existingLoadMoreButton) existingLoadMoreButton.remove();
-    
-                // Show "Load More" button if more comments are available
-                if (commentsData.hasMore) {
-                    const loadMoreButton = document.createElement('button');
-                    loadMoreButton.id = 'load-more-comments-button';
-                    loadMoreButton.textContent = 'Carregar mais comentários';
-                    loadMoreButton.className = 'text-blue-500 hover:text-blue-700 mt-4';
-                    loadMoreButton.onclick = () => {
-                        currentPage++;
-                        loadComments(postId, currentPage);
-                    };
-                    modalComments.appendChild(loadMoreButton);
-                }
-    
             } catch (error) {
                 console.error('Erro ao carregar os comentários:', error);
             }
         }
     },
     
-
     hide() {
         const postViewModal = document.getElementById('post-view-modal');
         postViewModal.classList.add('hidden');
@@ -798,6 +767,39 @@ const postViewModalHandler = {
 
 window.showPostViewModal = postViewModalHandler.show;
 window.hidePostViewModal = postViewModalHandler.hide;
+
+/**
+ * Update the like button's SVG icon based on like status
+ * 
+ * @param {Element} button 
+ * @param {boolean} isLiked 
+ */
+function updateLikeButton(button, isLiked) {
+    const svg = button.querySelector('svg');
+    svg.setAttribute('class', 'w-6 h-6');
+    
+    if (isLiked) {
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'currentColor');
+        svg.setAttribute('stroke', 'none');
+        svg.setAttribute('stroke-width', '0');
+        svg.setAttribute('class', 'w-6 h-6 text-red-500');
+        svg.innerHTML = `
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        `;
+    } else {
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('class', 'w-6 h-6 text-gray-500');
+        svg.innerHTML = `
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        `;
+    }
+}
+
+
 
 
 function handlePostSubmission(event) {

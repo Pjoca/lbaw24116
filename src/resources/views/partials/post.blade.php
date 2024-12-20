@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-</head>
-<body>
 <article class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:bg-gray-50 transition-all duration-300 transform hover:scale-105" data-id="{{ $post->id }}" onclick="event.stopPropagation(); showPostViewModal({{ $post->id }});">
     <header class="flex items-center justify-between mb-4" onclick="event.stopPropagation();">
-        <!-- Avatar e Info do usuário -->
+        <!-- Avatar and User Info -->
         <div class="flex items-center">
             <a href="{{ route('profile.show', ['id' => $post->id_user]) }}" class="mr-4" onclick="event.stopPropagation();">
                 <img src="{{ asset('storage/' . ($post->user->image_url ?? 'users/images/default.png')) }}"
@@ -19,7 +9,7 @@
             </a>
             <div class="flex flex-col">
                 <a href="{{ route('profile.show', ['id' => $post->id_user]) }}" class="text-lg font-semibold text-gray-800 hover:text-blue-500" onclick="event.stopPropagation();">
-                    {{ $post->user->name }}
+                    <h2>{{ $post->user->name }}</h2>
                 </a>
                 <p class="text-sm text-gray-500">{{ $post->created_at->toFormattedDateString() }}</p>
             </div>
@@ -42,11 +32,14 @@
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                         Edit
                     </button>
-                    <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este post?');" class="block px-4 py-2">
+                    <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');" class="block px-4 py-2">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-500 hover:text-red-700 w-full text-left">
-                            <i class="fa fa-trash"></i> Delete
+                        <button type="submit" class="flex items-center text-red-500 hover:text-red-700 w-full text-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Delete
                         </button>
                     </form>
                 </div>
@@ -61,21 +54,34 @@
     <p class="text-lg text-gray-800 mb-1">{{ $post->content }}</p>
 
     <div class="flex items-center mt-4">
+        <!-- Like Button -->
         <button onclick="event.stopPropagation();toggleLike({{ $post->id }})" class="flex items-center like-button" id="like-button-{{ $post->id }}">
             @if($post->likes()->where('id_user', Auth::id())->exists())
-                <i class="fas fa-heart text-2xl text-red-500"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
             @else
-                <i class="far fa-heart text-2xl text-gray-500"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
             @endif
         </button>
+
+        <!-- Like Count -->
         <span class="ml-4 text-gray-600" id="like-count-{{ $post->id }}">
             {{ $post->likes->count() }}
         </span>
+
+        <!-- Comment Button -->
         <button onclick="showPostViewModal({{ $post->id }})" class="flex items-center comment-button" id="comment-button-{{ $post->id }}">
-            <i class="far fa-comment-alt text-2xl ml-8 text-gray-500"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
+    </svg>
+
+
+
+
         </button>
     </div>
 
 </article>
-</body>
-</html>

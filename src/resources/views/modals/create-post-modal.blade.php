@@ -20,14 +20,14 @@
             <!-- Post Content -->
             <div class="mb-4">
                 <label for="text-content" class="block text-sm font-medium text-gray-700">Content</label>
-                <textarea id="content" name="content" rows="4" required
+                <textarea id="text-content" name="content" rows="4" required
                           class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
             </div>
 
             <!-- Visibility -->
             <div class="mb-4" id="visibility-container">
                 <label for="visibility" class="block text-sm font-medium text-gray-700">Visibility</label>
-                <select id="visibility" name="visibility" required
+                <select id="visibility" name="visibility" required size="2"
                         class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="public">Public</option>
                     <option value="private">Private</option>

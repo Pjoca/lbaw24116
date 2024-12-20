@@ -197,6 +197,33 @@ public function getSentRequests(Request $request, $userId)
 }
 
 
+public function getFriends(Request $request, $userId)
+{
+    $perPage = $request->query('per_page', 5); // Default 10 friends per page
+    $page = $request->query('page', 1); // Default page 1
+
+    try {
+        $friends = User::select('user.*')
+            ->join('friendship', 'user.id', '=', 'friendship.id_user2')
+            ->where('friendship.id_user1', $userId)
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json([
+            'html' => view('partials.friend-list', ['friends' => $friends])->render(),
+            'current_page' => $friends->currentPage(),
+            'hasMorePages' => $friends->hasMorePages(),
+            'last_page' => $friends->lastPage(),
+            'nextPageUrl' => $friends->nextPageUrl(),
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching friends: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        return response()->json(['error' => 'An error occurred while fetching friends.'], 500);
+    }
+}
+
+
+
 
 
 }

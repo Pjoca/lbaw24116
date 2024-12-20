@@ -15,20 +15,47 @@ function toggleLike(postId) {
     .then(response => response.json())
     .then(data => {
         if (likeButton && likeCount) {
-            if (data.liked) {
-                likeButton.innerHTML = '<i class="fas fa-heart text-2xl text-red-500"></i>';
-            } else {
-                likeButton.innerHTML = '<i class="far fa-heart text-2xl text-gray-500"></i>';
+            const svg = likeButton.querySelector('svg');
+
+            if (!svg) {
+                console.error('SVG not found in like button');
+                return;
             }
+
+            if (data.liked) {
+                // Liked states
+                svg.setAttribute('viewBox', '0 0 24 24');
+                svg.setAttribute('fill', 'currentColor');
+                svg.setAttribute('stroke', 'none');
+                svg.setAttribute('stroke-width', '0');
+                svg.setAttribute('class', 'w-6 h-6 text-red-500');
+                svg.innerHTML = `
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                `;
+            } else {
+                // Unliked state
+                svg.setAttribute('viewBox', '0 0 24 24');
+                svg.setAttribute('fill', 'none');
+                svg.setAttribute('stroke', 'currentColor');
+                svg.setAttribute('stroke-width', '2');
+                svg.setAttribute('class', 'w-6 h-6 text-gray-500');
+                svg.innerHTML = `
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                `;
+            }
+
+            // Update like count
             likeCount.textContent = `${data.likesCount}`;
         }
+
         return data; 
     })
     .catch(error => {
-        console.error('Erro ao processar like:', error);
+        console.error('Error processing like:', error);
         throw error;
     });
 }
+
 
 // Funções para editar comentário no timeline
 function openInlineEdit(commentId, content) {

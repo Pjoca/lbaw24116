@@ -26,7 +26,7 @@
             autocomplete="off" required>
 
         <!-- Date Inputs -->
-        <div id="date-filters" class="hidden flex gap-2">
+        <div id="date-filters" class="hidden flex gap-2"></div>
         <input 
             type="date" 
             id="start-date" 
