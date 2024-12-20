@@ -1,5 +1,5 @@
-<div id="edit-group-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative">
+<div id="edit-group-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center overflow-y-auto z-50">
+    <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full p-6 relative max-h-screen overflow-y-auto">
         <h2 class="text-2xl font-bold mb-4">Edit Group</h2>
 
         <!-- Close Modal Button -->

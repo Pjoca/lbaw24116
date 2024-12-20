@@ -1,7 +1,7 @@
-<div id="create-post-modal" 
-     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white w-full max-w-lg rounded-lg shadow-2xl p-6 relative">
-
+<!-- Create Post Modal -->
+<div id="create-post-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center overflow-y-auto z-50">
+    <div class="bg-white w-full max-w-lg rounded-lg shadow-2xl p-6 relative max-h-screen overflow-y-auto">
+        
         <!-- Close Button -->
         <button 
             onclick="closeModal('create-post-modal')" 
@@ -16,7 +16,6 @@
 
         <!-- Create Post Form -->
         <form id="create-post-form" method="POST" action="{{ route('posts.store') }}" enctype="multipart/form-data">
-
             @csrf
 
             <!-- Post Content -->

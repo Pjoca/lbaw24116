@@ -1,6 +1,6 @@
 <div id="friend-requests-modal" 
-     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white w-96 rounded-lg shadow-lg p-6 relative">
+     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+    <div class="bg-white w-96 rounded-lg shadow-lg p-6 relative overflow-y-auto max-h-screen">
         <button 
             onclick="closeModal('friend-requests-modal')" 
             class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition text-2xl font-bold">

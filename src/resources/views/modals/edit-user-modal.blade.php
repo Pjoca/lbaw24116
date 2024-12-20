@@ -1,5 +1,5 @@
-<div id="edit-user-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-96">
+<div id="edit-user-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+    <div class="bg-white p-6 rounded shadow-lg w-96 overflow-y-auto max-h-screen">
         <h2 class="text-xl font-semibold mb-4">Edit User</h2>
 
         <!-- User Edit Form -->

@@ -1,5 +1,5 @@
-<div id="edit-post-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-96">
+<div id="edit-post-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center overflow-y-auto z-50">
+    <div class="bg-white p-6 rounded shadow-lg w-96 max-h-screen overflow-y-auto">
         <h2 class="text-xl font-semibold mb-4">Edit Post</h2>
 
         <!-- Post Edit Form -->

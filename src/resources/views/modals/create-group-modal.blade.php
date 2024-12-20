@@ -1,6 +1,6 @@
 <!-- Create Group Modal -->
-<div id="create-group-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
-    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 p-6">
+<div id="create-group-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 sm:w-2/3 md:w-1/2 lg:w-1/3 p-6 max-h-screen overflow-y-auto">
         <h2 class="text-2xl font-bold mb-4">Create Group</h2>
 
         <!-- Group Creation Form -->

@@ -1,7 +1,7 @@
 <div id="group-invites-modal" 
-     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+     class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
      data-next-page-url="">
-    <div class="bg-white w-96 rounded-lg shadow-lg p-6 relative">
+    <div class="bg-white w-96 rounded-lg shadow-lg p-6 relative max-h-screen overflow-y-auto">
 
         <!-- Close Button -->
         <button 
