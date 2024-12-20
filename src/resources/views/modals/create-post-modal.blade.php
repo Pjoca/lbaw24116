@@ -42,8 +42,7 @@
                     id="visibility" 
                     name="visibility" 
                     required 
-                    size="2" 
-                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="w-full border-gray-300 rounded-md shadow-sm focus:border-teal-400 focus:ring-teal-600"
                     title="Select who can view this post. Public posts are visible to everyone, while private posts are only visible to specific members."
                 >
                     <option value="public" title="This post will be visible to everyone.">Public</option>
