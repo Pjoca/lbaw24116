@@ -32,57 +32,72 @@
         <form method="POST" action="{{ route('login') }}" class="mt-6 text-center">
             {{ csrf_field() }}
 
-            <!-- Email Field -->
-            <div class="mb-4 text-left">
-                <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-mail</label>
-                <input 
-                    id="email" 
-                    type="email" 
-                    name="email" 
-                    required 
-                    autofocus
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+            <!-- User Credentials Fieldset -->
+            <fieldset class="mb-6">
+                <legend class="text-lg font-bold text-teal-500 mb-4">User Credentials</legend>
+
+                <!-- Email Field -->
+                <div class="mb-4 text-left">
+                    <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-mail</label>
+                    <input 
+                        id="email" 
+                        type="email" 
+                        name="email" 
+                        required 
+                        autofocus
+                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    >
+                    @error('email')
+                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4 text-left">
+                    <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
+                    <input 
+                        id="password" 
+                        type="password" 
+                        name="password" 
+                        required
+                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    >
+                    @error('password')
+                        <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Forgot Password Link -->
+                <div class="mb-4 text-right">
+                    <a href="{{ route('password.request') }}" class="text-sm text-teal-500 hover:underline">Forgot Password?</a>
+                </div>
+            </fieldset>
+
+            <!-- Action Buttons Fieldset -->
+            <fieldset>
+
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition"
                 >
-                @error('email')
-                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                @enderror
-            </div>
+                    Login
+                </button>
 
-            <!-- Password Field -->
-            <div class="mb-4 text-left">
-                <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
-                <input 
-                    id="password" 
-                    type="password" 
-                    name="password" 
-                    required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                <!-- Register Link -->
+                <a href="{{ route('register') }}" 
+                    class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition"
                 >
-                @error('password')
-                    <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
-                @enderror
-            </div>
+                    Register
+                </a>
 
-            <!-- Forgot Password Link -->
-            <div class="mb-4 text-right">
-                <a href="{{ route('password.request') }}" class="text-sm text-teal-500 hover:underline">Forgot Password?</a>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition">
-                Login
-            </button>
-
-            <!-- Register Link -->
-            <a href="{{ route('register') }}" 
-                class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition">
-                Register
-            </a>
-
-            <a href="{{ route('timeline.public') }}" 
-                class="block w-full mt-4 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition">
-                Continue as a Guest
-            </a>
+                <!-- Continue as Guest -->
+                <a href="{{ route('timeline.public') }}" 
+                    class="block w-full mt-4 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition"
+                >
+                    Continue as a Guest
+                </a>
+            </fieldset>
 
             <!-- Success Message -->
             @if (session('success'))

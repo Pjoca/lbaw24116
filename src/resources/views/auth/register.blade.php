@@ -30,101 +30,110 @@
             <form method="POST" action="{{ route('register') }}" class="mt-6 text-center">
                 {{ csrf_field() }}
 
-                <!-- Name Field -->
-                <div class="mb-4 text-left">
-                    <label for="name" class="block text-sm font-bold text-teal-500 mb-2">Name</label>
-                    <input 
-                        id="name" 
-                        type="text" 
-                        name="name" 
-                        value="{{ old('name') }}" 
-                        required 
-                        autofocus 
-                        placeholder="Your full name" 
-                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                <!-- User Information Fieldset -->
+                <fieldset class="mb-6">
+                    <legend class="text-lg font-bold text-teal-500 mb-4">User Information</legend>
+
+                    <!-- Name Field -->
+                    <div class="mb-4 text-left">
+                        <label for="name" class="block text-sm font-bold text-teal-500 mb-2">Name</label>
+                        <input 
+                            id="name" 
+                            type="text" 
+                            name="name" 
+                            value="{{ old('name') }}" 
+                            required 
+                            autofocus 
+                            placeholder="Your full name" 
+                            class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                        >
+                        @if ($errors->has('name'))
+                            <span class="text-sm text-red-500">{{ $errors->first('name') }}</span>
+                        @endif
+                    </div>
+
+                    <!-- Username Field -->
+                    <div class="mb-4 text-left">
+                        <label for="username" class="block text-sm font-bold text-teal-500 mb-2">Username</label>
+                        <input 
+                            id="username" 
+                            type="text" 
+                            name="username" 
+                            value="{{ old('username') }}" 
+                            required 
+                            placeholder="Choose a unique username" 
+                            class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                        >
+                        @if ($errors->has('username'))
+                            <span class="text-sm text-red-500">{{ $errors->first('username') }}</span>
+                        @endif
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="mb-4 text-left">
+                        <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-Mail Address</label>
+                        <input 
+                            id="email" 
+                            type="email" 
+                            name="email" 
+                            value="{{ old('email') }}" 
+                            required 
+                            placeholder="Enter a valid email address" 
+                            class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                        >
+                        @if ($errors->has('email'))
+                            <span class="text-sm text-red-500">{{ $errors->first('email') }}</span>
+                        @endif
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4 text-left">
+                        <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
+                        <input 
+                            id="password" 
+                            type="password" 
+                            name="password" 
+                            required 
+                            placeholder="Choose a strong password" 
+                            class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                        >
+                        @if ($errors->has('password'))
+                            <span class="text-sm text-red-500">{{ $errors->first('password') }}</span>
+                        @endif
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="mb-6 text-left">
+                        <label for="password-confirm" class="block text-sm font-bold text-teal-500 mb-2">Confirm Password</label>
+                        <input 
+                            id="password-confirm" 
+                            type="password" 
+                            name="password_confirmation" 
+                            required 
+                            placeholder="Re-enter your password" 
+                            class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                        >
+                    </div>
+                </fieldset>
+
+                <!-- Action Buttons Fieldset -->
+                <fieldset>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition"
                     >
-                    @if ($errors->has('name'))
-                        <span class="text-sm text-red-500">{{ $errors->first('name') }}</span>
-                    @endif
-                </div>
+                        Register
+                    </button>
 
-                <!-- Username Field -->
-                <div class="mb-4 text-left">
-                    <label for="username" class="block text-sm font-bold text-teal-500 mb-2">Username</label>
-                    <input 
-                        id="username" 
-                        type="text" 
-                        name="username" 
-                        value="{{ old('username') }}" 
-                        required 
-                        placeholder="Choose a unique username" 
-                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    <!-- Login Link -->
+                    <a href="{{ route('login') }}" 
+                        class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition"
                     >
-                    @if ($errors->has('username'))
-                        <span class="text-sm text-red-500">{{ $errors->first('username') }}</span>
-                    @endif
-                </div>
-
-                <!-- Email Field -->
-                <div class="mb-4 text-left">
-                    <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-Mail Address</label>
-                    <input 
-                        id="email" 
-                        type="email" 
-                        name="email" 
-                        value="{{ old('email') }}" 
-                        required 
-                        placeholder="Enter a valid email address" 
-                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
-                    >
-                    @if ($errors->has('email'))
-                        <span class="text-sm text-red-500">{{ $errors->first('email') }}</span>
-                    @endif
-                </div>
-
-                <!-- Password Field -->
-                <div class="mb-4 text-left">
-                    <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
-                    <input 
-                        id="password" 
-                        type="password" 
-                        name="password" 
-                        required 
-                        placeholder="Choose a strong password" 
-                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
-                    >
-                    @if ($errors->has('password'))
-                        <span class="text-sm text-red-500">{{ $errors->first('password') }}</span>
-                    @endif
-                </div>
-
-                <!-- Confirm Password Field -->
-                <div class="mb-6 text-left">
-                    <label for="password-confirm" class="block text-sm font-bold text-teal-500 mb-2">Confirm Password</label>
-                    <input 
-                        id="password-confirm" 
-                        type="password" 
-                        name="password_confirmation" 
-                        required 
-                        placeholder="Re-enter your password" 
-                        class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
-                    >
-                </div>
-
-                <!-- Submit Button -->
-                <button 
-                    type="submit" 
-                    class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition"
-                >
-                    Register
-                </button>
-
-                <!-- Login Link -->
-                <a href="{{ route('login') }}" 
-                    class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition"
-                >
-                    Login
-                </a>
+                        Login
+                    </a>
+                </fieldset>
             </form>
         </div>
     </div>
