@@ -4,12 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Tailwind CSS -->
     @vite('resources/css/app.css')
     <script type="text/javascript" src="{{ url('js/app.js') }}" defer></script>
 </head>
@@ -32,8 +28,17 @@
             <!-- Name Field -->
             <div class="mb-4 text-left">
                 <label for="name" class="block text-sm font-bold text-teal-500 mb-2">Name</label>
-                <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+                <input 
+                    id="name" 
+                    type="text" 
+                    name="name" 
+                    value="{{ old('name') }}" 
+                    required 
+                    autofocus 
+                    placeholder="Your full name" 
+                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    title="Please enter your full name as it appears on official documents."
+                >
                 @if ($errors->has('name'))
                     <span class="text-sm text-red-500">{{ $errors->first('name') }}</span>
                 @endif
@@ -42,8 +47,16 @@
             <!-- Username Field -->
             <div class="mb-4 text-left">
                 <label for="username" class="block text-sm font-bold text-teal-500 mb-2">Username</label>
-                <input id="username" type="text" name="username" value="{{ old('username') }}" required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+                <input 
+                    id="username" 
+                    type="text" 
+                    name="username" 
+                    value="{{ old('username') }}" 
+                    required 
+                    placeholder="Choose a unique username" 
+                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    title="Create a username that is unique and easy to remember."
+                >
                 @if ($errors->has('username'))
                     <span class="text-sm text-red-500">{{ $errors->first('username') }}</span>
                 @endif
@@ -52,8 +65,16 @@
             <!-- Email Field -->
             <div class="mb-4 text-left">
                 <label for="email" class="block text-sm font-bold text-teal-500 mb-2">E-Mail Address</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+                <input 
+                    id="email" 
+                    type="email" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    placeholder="Enter a valid email address" 
+                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    title="Use a valid email address for account verification."
+                >
                 @if ($errors->has('email'))
                     <span class="text-sm text-red-500">{{ $errors->first('email') }}</span>
                 @endif
@@ -62,8 +83,15 @@
             <!-- Password Field -->
             <div class="mb-4 text-left">
                 <label for="password" class="block text-sm font-bold text-teal-500 mb-2">Password</label>
-                <input id="password" type="password" name="password" required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+                <input 
+                    id="password" 
+                    type="password" 
+                    name="password" 
+                    required 
+                    placeholder="Choose a strong password" 
+                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    title="Your password should be at least 8 characters long and include letters and numbers."
+                >
                 @if ($errors->has('password'))
                     <span class="text-sm text-red-500">{{ $errors->first('password') }}</span>
                 @endif
@@ -72,17 +100,32 @@
             <!-- Confirm Password Field -->
             <div class="mb-6 text-left">
                 <label for="password-confirm" class="block text-sm font-bold text-teal-500 mb-2">Confirm Password</label>
-                <input id="password-confirm" type="password" name="password_confirmation" required
-                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white">
+                <input 
+                    id="password-confirm" 
+                    type="password" 
+                    name="password_confirmation" 
+                    required 
+                    placeholder="Re-enter your password" 
+                    class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
+                    title="Re-enter the password to confirm it matches the above."
+                >
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition duration-300">
+            <button 
+                type="submit" 
+                class="w-full bg-teal-400 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-teal-500 transition duration-300"
+                title="Click here to complete your registration."
+            >
                 Register
             </button>
 
             <!-- Login Link -->
-            <a href="{{ route('login') }}" class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition duration-300">
+            <a 
+                href="{{ route('login') }}" 
+                class="block w-full mt-4 text-teal-400 font-bold border border-teal-400 py-3 rounded-lg hover:bg-teal-400 hover:text-white transition duration-300"
+                title="Already have an account? Click here to log in."
+            >
                 Login
             </a>
         </form>
