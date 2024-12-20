@@ -8,8 +8,13 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="user-id" content="{{Auth::id()}}">
+        <meta property="og:title" content="{{ config('app.name', 'Laravel') }}">
+        <meta property="og:description" content="Description of your page">
+        <meta property="og:image" content="{{ asset('path/to/image.jpg') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
         @vite('resources/css/app.css')
         <title>{{ config('app.name', 'Laravel') }}</title>
+        
     </head>
     <body class="bg-gray-100 text-gray-800 font-sans">
         @vite('resources/js/app.js')
