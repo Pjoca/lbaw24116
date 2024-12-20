@@ -94,6 +94,11 @@
                             class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
                         View Group Invites
                     </button>
+
+                    <button onclick="openModal('friend-list-modal'); loadInitialFriends({{ Auth::id() }});" 
+                            class="bg-teal-500 text-white py-2 px-4 rounded hover:bg-teal-600 transition">
+                        View Friends
+                    </button>
                 </div>
             @endif
         </div>
@@ -125,6 +130,7 @@
     @include('modals.edit-profile-modal')
     @include('modals.friend-requests-modal')
     @include('modals.user-group-invites-modal')
+    @include('modals.friends-modal')
     @include('modals.post-modal')
 
 @endsection

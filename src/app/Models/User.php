@@ -80,6 +80,16 @@ class User extends Authenticatable
          return Friendship::where('id_user1', $this->id);
      }
 
+     public function friends()
+    {
+        return $this->belongsToMany(
+            User::class, 
+            'friendship', 
+            'id_user1', 
+            'id_user2'
+        )->distinct(); 
+    }
+
      public function requestedFriends()
      {
          return $this->belongsToMany(User::class, 'friendship_request', 'id_sender', 'id_receiver')

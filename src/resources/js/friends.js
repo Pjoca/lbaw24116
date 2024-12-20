@@ -246,3 +246,114 @@ async function loadMoreGroupInvites() {
 
 window.loadInitialGroupInvites = loadInitialGroupInvites;
 window.loadMoreGroupInvites = loadMoreGroupInvites;
+
+
+async function loadInitialFriends(userId) {
+    const modal = document.getElementById('friend-list-modal');
+    const friendsList = document.getElementById('friend-list');
+    const loadMoreButtonContainer = modal.querySelector('.mt-4');
+    let loadMoreButton = document.getElementById('load-more-friends');
+
+    if (!modal || !friendsList) {
+        console.error('Modal or Friends List not found');
+        return;
+    }
+
+    try {
+        console.log(`Fetching friends for user ${userId}`);
+
+        const response = await fetch(`/friends/list/${userId}?per_page=5`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch friends.');
+
+        const data = await response.json();
+
+        // Clear existing list before loading
+        friendsList.innerHTML = ''; 
+
+        if (!data.html || data.html.trim() === '') {
+            console.log('No friends found');
+            friendsList.innerHTML = `<p class="text-gray-500 text-center">No friends at the moment.</p>`;
+        } else {
+            console.log('Friends loaded successfully');
+            friendsList.insertAdjacentHTML('beforeend', data.html); // Insert HTML from response
+        }
+
+        if (data.hasMorePages) {
+            if (!loadMoreButton) {
+                console.log('Creating load more button');
+                loadMoreButton = document.createElement('button');
+                loadMoreButton.id = 'load-more-friends';
+                loadMoreButton.textContent = 'Load More';
+                loadMoreButton.className = 'w-full bg-teal-500 text-white px-3 py-2 rounded hover:bg-teal-600 transition';
+                loadMoreButton.addEventListener('click', loadMoreFriends);
+                
+                if (!loadMoreButtonContainer) {
+                    console.error('Load More Button Container not found');
+                    return;
+                }
+
+                loadMoreButtonContainer.appendChild(loadMoreButton);
+            } else {
+                loadMoreButton.classList.remove('hidden');
+            }
+
+            modal.setAttribute('data-nextPageUrl', data.nextPageUrl);
+        } else if (loadMoreButton) {
+            loadMoreButton.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Error loading friends:', error.message);
+    }
+}
+
+async function loadMoreFriends() {
+    console.log('Loading more friends...');
+    const modal = document.getElementById('friend-list-modal');
+    const nextPageUrl = modal.getAttribute('data-nextPageUrl');
+    const friendsList = document.getElementById('friend-list');
+
+    if (!nextPageUrl) {
+        console.warn('No next page URL found');
+        return;
+    }
+
+    if (!modal || !friendsList) {
+        console.error('Modal or Friends List not found');
+        return;
+    }
+
+    try {
+        console.log(`Loading more friends from ${nextPageUrl}`);
+
+        const response = await fetch(nextPageUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) throw new Error('Failed to load more friends.');
+
+        const data = await response.json();
+
+        if (data.html && data.html.trim() !== '') {
+            console.log('Appending more friends');
+            friendsList.insertAdjacentHTML('beforeend', data.html);
+        }
+
+        if (data.hasMorePages) {
+            modal.setAttribute('data-nextPageUrl', data.nextPageUrl);
+        } else {
+            const loadMoreButton = document.getElementById('load-more-friends');
+            if (loadMoreButton) {
+                console.log('Removing load more button');
+                loadMoreButton.remove();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading more friends:', error.message);
+    }
+}
+
+window.loadInitialFriends = loadInitialFriends;
+window.loadMoreFriends = loadMoreFriends;
