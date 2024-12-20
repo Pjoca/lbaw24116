@@ -50,10 +50,10 @@
                             autofocus 
                             placeholder="Your full name" 
                             class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
-                            title="Enter your full name as it appears on official documents."
+                            title="Enter your full name."
                             aria-describedby="name-help"
                         >
-                        <small id="name-help" class="text-gray-500">This should be your full legal name.</small>
+                        <small id="name-help" class="text-gray-500">This should be your full name.</small>
                         @if ($errors->has('name'))
                             <span class="text-sm text-red-500">{{ $errors->first('name') }}</span>
                         @endif
@@ -90,7 +90,7 @@
                             required 
                             placeholder="Enter a valid email address" 
                             class="w-full px-4 py-3 border rounded-lg shadow-inner bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white"
-                            title="Provide a valid email address to receive important notifications."
+                            title="Provide a valid email address."
                             aria-describedby="email-help"
                         >
                         <small id="email-help" class="text-gray-500">We'll never share your email with anyone else.</small>

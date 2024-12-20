@@ -40,7 +40,7 @@
                         value="{{ data_get($user, 'name') }}" 
                         placeholder="Enter your full name" 
                         class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" 
-                        title="Enter your full name as it will appear on your profile." 
+                        title="Enter your full name." 
                         required
                     >
                 </div>
@@ -55,7 +55,7 @@
                         value="{{ data_get($user, 'email') }}" 
                         placeholder="Enter your email address" 
                         class="w-full border border-gray-300 rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" 
-                        title="Enter a valid email address. This will be used for notifications and login." 
+                        title="Enter a valid email address." 
                         required
                     >
                 </div>
