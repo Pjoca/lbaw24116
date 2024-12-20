@@ -7,6 +7,10 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta property="og:title" content="{{ config('app.name', 'Laravel') }}">
+    <meta property="og:description" content="Description of your page">
+    <meta property="og:image" content="{{ asset('path/to/image.jpg') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
