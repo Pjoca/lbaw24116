@@ -1,5 +1,5 @@
-<div id="post-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center" data-post-id="">
-    <div class="bg-white w-full max-w-5xl h-[90vh] rounded-lg shadow-lg flex relative">
+<div id="post-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center max-h-screen" data-post-id="">
+    <div id="main-div-modal" class="bg-white w-full max-w-5xl h-[90vh] rounded-lg shadow-lg flex relative max-h-screen">
         <!-- Botão para Fechar -->
         <button 
             id="close-post-view-modal" 
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Conteúdo do Post -->
-        <div class="w-2/5 flex flex-col bg-white p-6 rounded-r-lg overflow-y-auto">
+        <div id="div-post-content" class="w-2/5 flex flex-col bg-white p-6 rounded-r-lg overflow-y-auto">
             <!-- Autor -->
             <div class="flex items-center mb-4">
                 <img id="modal-user-image" src="1" alt="User Image" class="w-10 h-10 rounded-full mr-4">
