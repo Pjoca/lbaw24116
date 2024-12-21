@@ -137,9 +137,12 @@
                                         </li>
                                     @endif
                                     <li>
-                                        <a href="{{ url('/logout') }}" class="block px-4 py-2 text-red-500 hover:bg-red-100 transition">
-                                            Logout
-                                        </a>
+                                        <form id="logout-form" action="{{ url('/logout') }}" method="POST" class="block">
+                                            @csrf
+                                            <button type="submit" class="w-full text-left px-4 py-2 text-red-500 hover:bg-red-100 transition">
+                                                Logout
+                                            </button>
+                                        </form>
                                     </li>
                                 </ul>
                             </div>
