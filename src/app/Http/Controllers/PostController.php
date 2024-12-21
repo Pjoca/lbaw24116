@@ -97,9 +97,9 @@ class PostController extends Controller
 
         if ($request->id_group) {
             return redirect()->route('groups.show', ['id' => $request->id_group])
-                ->with('success', 'Você criou um novo post no grupo com sucesso');
+                ->with('success', 'You sucessfully created a new post in this group.');
         } else {
-            return redirect()->route('timeline.public')->with('success', 'Você criou um novo post com sucesso');
+            return redirect()->route('timeline.public')->with('success', 'You sucessfully created a new post.');
         }
     }
 

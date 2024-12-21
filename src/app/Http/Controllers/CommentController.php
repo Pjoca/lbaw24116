@@ -15,7 +15,7 @@ class CommentController extends Controller
         $this->authorize('update', $comment);
 
         if (!$comment->id_post) {
-            return redirect()->route('home')->with('error', 'Post não encontrado para este comentário.');
+            return redirect()->route('home')->with('error', 'Post not found for this comment.');
         }
 
         return view('comments.edit', compact('comment'));
