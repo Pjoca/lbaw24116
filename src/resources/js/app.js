@@ -842,7 +842,7 @@ const postViewModalHandler = {
                         <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
+                                    <img src="${comment.user_image}" class="w-8 h-8 rounded-full mr-3">
                                     <span class="font-semibold text-gray-800">${comment.user_name}</span>
                                 </div>
                                 ${comment.editable ? `
