@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-
-
+<div class="max-w-4xl mx-auto py-8">
 <div class="mb-4">
     <input 
         type="text" 
@@ -45,7 +44,6 @@
                                     class=" ml-4 text-red-500 hover:underline">
                                   Delete
                                 </button>
-                            </form>
                             </form>
                         </td>
                     </tr>
@@ -102,7 +100,25 @@
     </form>
 </div>
 
+<!-- Posts Section -->
+<div class="mt-8">
+<div id="posts-container" class="max-w-3xl mx-auto space-y-8">
+    <h2 class="text-2xl font-semibold mb-4">Posts</h2>
+    @include('partials.posts-renderer', ['posts' => $posts])
+</div>
+
+<!-- Loader -->
+<div id="loader" class="hidden text-center py-4">
+    <div class="flex justify-center items-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+        <span class="ml-4 text-gray-600 font-medium">Loading...</span>
+    </div>
+</div>
+</div>
+</div>  
+
 <!-- Include Modals -->
 @include('modals.edit-user-modal')
+@vite('resources/js/infinite-scroll.js')
 
 @endsection
