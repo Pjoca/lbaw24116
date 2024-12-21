@@ -131,6 +131,7 @@
     @include('modals.friend-requests-modal')
     @include('modals.user-group-invites-modal')
     @include('modals.friends-modal')
+    @include('modals.edit-post-modal')
     @include('modals.post-modal')
 
 @endsection
