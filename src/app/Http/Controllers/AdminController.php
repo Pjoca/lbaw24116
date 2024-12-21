@@ -5,16 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class AdminController extends Controller
 {
-    public function listUsers()
+    public function listUsers(Request $request)
     {
         $this->authorize('general', Admin::class);
 
         $users = User::all();
+        $postsQuery = Post::latest();
 
-        return view('pages.admin', compact('users'));
+        // Handle infinite scroll for posts
+        if ($request->ajax()) {
+            $posts = $postsQuery->simplePaginate(5);
+            return view('partials.posts-renderer', compact('posts'))->render();
+        }
+
+        $posts = $postsQuery->simplePaginate(5);
+
+        return view('pages.admin', compact('users', 'posts'));
     }
 
     public function showUser($id)
@@ -48,7 +58,6 @@ class AdminController extends Controller
             'email' => 'required|email|unique:user,email,' . $id,
             'username' => 'required|string|max:50|unique:user,username,' . $id,
             'visibility' => 'required|in:public,private',
-            'account_status' => 'required|in:active,offline,deleted,blocked',
         ]);
 
         $user = User::findOrFail($id);

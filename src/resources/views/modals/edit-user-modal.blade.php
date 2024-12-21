@@ -70,24 +70,6 @@
                     </select>
                     <small class="text-gray-500">Set the visibility of the user's profile as public or private.</small>
                 </div>
-
-                <!-- Account Status -->
-                <div class="mb-4">
-                    <label for="edit-account-status" class="block text-sm font-medium">Account Status</label>
-                    <select 
-                        name="account_status" 
-                        id="edit-account-status" 
-                        class="w-full border rounded p-2 focus:ring focus:ring-teal-500 focus:border-teal-500" 
-                        title="Set the user's account status. Options include Active, Offline, Deleted, or Blocked." 
-                        required
-                    >
-                        <option value="active" title="The user account is active and fully functional.">Active</option>
-                        <option value="offline" title="The user is currently offline.">Offline</option>
-                        <option value="deleted" title="The user account is marked as deleted.">Deleted</option>
-                        <option value="blocked" title="The user account is blocked and cannot be accessed.">Blocked</option>
-                    </select>
-                    <small class="text-gray-500">Select the current status of the user's account. Status options include Active, Offline, Deleted, or Blocked.</small>
-                </div>
             </fieldset>
 
             <!-- Submit Button -->

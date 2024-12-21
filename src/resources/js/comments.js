@@ -245,12 +245,16 @@ document.querySelectorAll('form.comment-form').forEach(commentForm => {
                         </div>
                         ${data.comment.editable ? `
                         <div class="flex space-x-2">
-                            <button type="button" onclick="openInlineEdit(${data.comment.id}, '${data.comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button onclick="deleteComment(${data.comment.id})" class="text-red-500 hover:text-red-700">
-                                <i class="fas fa-trash-alt"></i> Excluir
-                            </button>
+                            <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L10 17l-4 1 1-4L18.5 2.5z" />
+                                        </svg>
+                                    </button>
+                            <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                         </div>
                         ` : ''}
                     </div>
@@ -314,11 +318,15 @@ if (modalCommentForm) {
                         ${comment.editable ? `
                         <div class="flex space-x-2">
                             <button type="button" onclick="openModalInlineEdit(${comment.id}, '${comment.content.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L10 17l-4 1 1-4L18.5 2.5z" />
+                                        </svg>
+                                    </button>
                             <button onclick="deleteModalComment(${comment.id})" class="text-red-500 hover:text-red-700">
-                                <i class="fas fa-trash-alt"></i> Excluir
-                            </button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
                         </div>
                         ` : ''}
                     </div>

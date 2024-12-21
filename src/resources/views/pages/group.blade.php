@@ -118,6 +118,7 @@
                 </button>
 
                 @if ($isMember || Auth::id() === $group->owner->id)
+                    @include('modals.edit-post-modal')
                     <!-- Members Button (Only shown for members or owners) -->
                     <button 
                         id="members-tab" 
@@ -131,6 +132,7 @@
 
         @if (Auth::check() && $isMember)
             @include('modals.post-modal')
+            @include('modals.create-post-modal')
         
         @endif
 

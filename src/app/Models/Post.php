@@ -60,6 +60,11 @@ class Post extends Model
         return $this->belongsTo(User::class, 'id_user');
     }
 
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(Group::class, 'id_group');
+    }
+
     public static function getAuthorizedPosts($profileOwnerId)
     {
         $authUserId = Auth::id();

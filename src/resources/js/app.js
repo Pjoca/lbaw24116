@@ -755,9 +755,13 @@ window.deleteNotification = deleteNotification;
 const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
-        postViewModal.setAttribute('data-post-id', id);
-    
+        const modalMainDiv = document.getElementById('main-div-modal');
         const modalPostImage = document.getElementById('modal-post-image');
+        const modalPostImageContainer = modalPostImage.parentElement;
+        const modalContentDiv = document.getElementById('div-post-content');
+
+        postViewModal.setAttribute('data-post-id', id);
+
         const modalUserImage = document.getElementById('modal-user-image');
         const modalUserName = document.getElementById('modal-user-name');
         const modalCreatedAt = document.getElementById('modal-created-at');
@@ -765,61 +769,80 @@ const postViewModalHandler = {
         const modalLikesCount = document.getElementById('modal-likes-count');
         const modalComments = document.getElementById('modal-comments');
         const modalLikeButton = document.getElementById('modal-like-button');
-    
+
         let currentPage = 1;
-    
+
         try {
             const response = await fetch(`/posts/${id}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             });
-    
-            if (!response.ok) throw new Error('Erro ao buscar os dados do post');
-    
+
+            if (!response.ok) throw new Error('Error fetching the post data.');
+
             const postData = await response.json();
-    
-            modalPostImage.src = postData.image_url ? `/storage/${postData.image_url}` : '';
+
+            // Set the post data
+            if (postData.image_url) {
+                modalMainDiv.classList.remove('w-2/5');
+                modalMainDiv.classList.add('w-full');
+                modalPostImageContainer.classList.remove('hidden');
+                modalPostImage.src = `/storage/${postData.image_url}`;
+                modalContentDiv.classList.add('w-2/5');
+                modalContentDiv.classList.remove('w-full');
+            } else {
+                modalMainDiv.classList.remove('w-full');
+                if (window.innerWidth >= 768) {
+                    modalMainDiv.classList.add('w-2/5');
+                } else {
+                    modalMainDiv.classList.add('w-full');
+                }
+                modalPostImageContainer.classList.add('hidden');
+                modalContentDiv.classList.add('w-full');
+                modalContentDiv.classList.remove('w-2/5');
+            }
+
             modalUserImage.src = `/storage/${postData.user_image}`;
             modalUserName.textContent = postData.user_name;
             modalCreatedAt.textContent = postData.created_at;
             modalPostContent.textContent = postData.content;
             modalLikesCount.textContent = `${postData.likes_count}`;
-    
+
             updateLikeButton(modalLikeButton, postData.liked_by_current_user);
-    
+
             modalComments.innerHTML = '';
-    
+
             await loadComments(id, currentPage);
-    
+
             postViewModal.classList.remove('hidden');
             postViewModal.classList.add('flex');
-    
+
             modalLikeButton.onclick = async () => {
                 const data = await toggleLike(id);
                 updateLikeButton(modalLikeButton, data.liked);
                 modalLikesCount.textContent = `${data.likesCount}`;
             };
-    
+
         } catch (error) {
             console.error(error);
-            alert('Erro ao carregar o post.');
+            alert('Error loading the post.');
         }
-    
+
         async function loadComments(postId, page) {
             try {
                 const commentsResponse = await fetch(`/posts/${postId}/comments?page=${page}`, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 });
-        
-                if (!commentsResponse.ok) throw new Error('Erro ao carregar os comentários.');
-        
+
+                if (!commentsResponse.ok) throw new Error('Error loading comments.');
+
                 const commentsData = await commentsResponse.json();
-        
+
                 commentsData.comments.forEach(comment => {
                     modalComments.innerHTML += `
                         <div class="bg-gray-100 p-4 rounded-lg mb-2" id="modal-comment-${comment.id}">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <img src="/storage/${comment.user_image_url}" class="w-8 h-8 rounded-full mr-3">
+                                    <img src="${comment.user_image}" class="w-8 h-8 rounded-full mr-3">
                                     <span class="font-semibold text-gray-800">${comment.user_name}</span>
                                 </div>
                                 ${comment.editable ? `
@@ -848,18 +871,17 @@ const postViewModalHandler = {
                                 <input type="hidden" name="_token" value="${csrfToken}">
                                 <textarea name="content" class="w-full p-2 border rounded-lg" id="modal-editTextArea-${comment.id}"></textarea>
                                 <div class="flex justify-end mt-2">
-                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancelar</button>
-                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Salvar</button>
+                                    <button type="button" onclick="cancelModalInlineEdit(${comment.id})" class="mr-2 text-gray-600">Cancel</button>
+                                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
                                 </div>
                             </form>
                         </div>
                     `;
                 });
-        
-                // Handle Load More Button
+
                 const existingLoadMoreButton = document.getElementById('load-more-comments-button');
                 if (existingLoadMoreButton) existingLoadMoreButton.remove();
-        
+
                 if (commentsData.hasMorePages) {
                     const loadMoreButton = document.createElement('button');
                     loadMoreButton.id = 'load-more-comments-button';
@@ -872,11 +894,11 @@ const postViewModalHandler = {
                     modalComments.appendChild(loadMoreButton);
                 }
             } catch (error) {
-                console.error('Erro ao carregar os comentários:', error);
+                console.error('Error loading comments:', error);
             }
         }        
     },
-    
+
     hide() {
         const postViewModal = document.getElementById('post-view-modal');
         postViewModal.classList.add('hidden');
@@ -885,6 +907,7 @@ const postViewModalHandler = {
 
 window.showPostViewModal = postViewModalHandler.show;
 window.hidePostViewModal = postViewModalHandler.hide;
+
 
 /**
  * Update the like button's SVG icon based on like status

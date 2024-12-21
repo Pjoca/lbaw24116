@@ -26,7 +26,7 @@ class UserPolicy
     public function update(User $currentUser, User $profileUser): bool
     {
         // Only allow updating their own profile
-        return $currentUser->id === $profileUser->id;
+        return $currentUser->id === $profileUser->id || $currentUser->isAdmin();
     }
 
 
