@@ -132,6 +132,7 @@
 
         @if (Auth::check() && $isMember)
             @include('modals.post-modal')
+            @include('modals.create-post-modal')
         
         @endif
 

@@ -24,7 +24,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->id === $post->id_user; // Only the post owner can update
+        return $user->id === $post->id_user || $user->isAdmin(); // Only the post owner can update or admin or group admin
     }
 
     /**
@@ -34,7 +34,7 @@ class PostPolicy
     public function delete(User $user, Post $post)
     {
         // Only the owner of the post can delete it
-        return $user->id === $post->user->id;
+        return $user->id === $post->user->id || $user->isAdmin();
     }
 
     

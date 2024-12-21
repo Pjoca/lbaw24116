@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        @if (Auth::check() && Auth::user()->id == $post->id_user)
+        @if (Auth::check() && (Auth::user()->id == $post->id_user || Auth::user()->isAdmin() || (isset($post->id_group) && $post->group && Auth::user()->id == $post->group->id_owner)))
             <div class="relative">
                 <button class="text-gray-500 hover:text-gray-700 focus:outline-none" id="dropdownMenuButton-{{ $post->id }}" aria-haspopup="true" aria-expanded="false" onclick="toggleDropdown(event, '{{ $post->id }}');">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -23,6 +23,7 @@
                     </svg>
                 </button>
                 <div id="dropdownMenu-{{ $post->id }}" class="hidden absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                @if(Auth::check() && Auth::user()->id == $post->id_user)
                 <button
                     onclick="showEditPostModal(
                         {{ $post->id }},
@@ -35,6 +36,12 @@
                 </svg>
                 Edit
                     </button>
+                @endif
+                <?php Log::info('Post ID Group: ' . $post->id_group); ?>
+                <?php Log::info('Post Group: ' . json_encode($post->group)); ?>
+                <?php Log::info('Post Group Owner ID: ' . optional($post->group)->id_owner); ?>
+                <?php Log::info('Authenticated User ID: ' . Auth::user()->id); ?>
+                @if (Auth::check() && (Auth::user()->id == $post->id_user || Auth::user()->isAdmin() || (isset($post->id_group) && Auth::user()->id == $post->group->id_owner)))
                     <form action="{{ route('post.delete', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this post?');" class="block px-4 py-2">
                         @csrf
                         @method('DELETE')
@@ -45,6 +52,7 @@
                             Delete
                         </button>
                     </form>
+                @endif
                 </div>
             </div>
         @endif
