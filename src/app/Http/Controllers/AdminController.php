@@ -48,7 +48,6 @@ class AdminController extends Controller
             'email' => 'required|email|unique:user,email,' . $id,
             'username' => 'required|string|max:50|unique:user,username,' . $id,
             'visibility' => 'required|in:public,private',
-            'account_status' => 'required|in:active,offline,deleted,blocked',
         ]);
 
         $user = User::findOrFail($id);

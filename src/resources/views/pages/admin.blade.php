@@ -36,6 +36,17 @@
                                 class="text-green-500 hover:underline">
                                 Edit
                             </button>
+                            <form action="{{ route('profile.delete', ['id' => $user->id]) }}" method="POST" 
+                                onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');" 
+                                class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                    class=" ml-4 text-red-500 hover:underline">
+                                  Delete
+                                </button>
+                            </form>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
