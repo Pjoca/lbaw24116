@@ -192,6 +192,139 @@ const profileModalHandler = {
 window.showEditProfileModal = profileModalHandler.show;
 window.hideEditProfileModal = profileModalHandler.hide;
 
+// Search
+
+// Keeps date inputs
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Set the dropdown value
+    const typeSelect = document.getElementById('search-type');
+    if (urlParams.has('type')) {
+        typeSelect.value = urlParams.get('type');
+    }
+
+    // Set the search query value
+    const searchQuery = document.getElementById('search-bar');
+    if (urlParams.has('query')) {
+        searchQuery.value = urlParams.get('query');
+    }
+
+    // Set the start date value
+    const startDateInput = document.getElementById('start-date');
+    if (urlParams.has('start_date')) {
+        startDateInput.value = urlParams.get('start_date');
+    }
+
+    // Set the end date value
+    const endDateInput = document.getElementById('end-date');
+    if (urlParams.has('end_date')) {
+        endDateInput.value = urlParams.get('end_date');
+    }
+});
+
+// Date inputs
+document.addEventListener('DOMContentLoaded', function () {
+    const searchType = document.getElementById('search-type');
+    const dateFilters = document.getElementById('date-filters');
+    const searchButton = document.getElementById('search-button');
+
+    // Function to toggle visibility of date inputs
+    function toggleDateInputs() {
+        const selectedType = searchType.value;
+        if (selectedType === 'groups' || selectedType === 'posts') {
+            dateFilters.classList.remove('hidden');
+        } else {
+            dateFilters.classList.add('hidden');
+        }
+        searchButton.classList.remove('hidden');
+    }
+
+    // Initialize visibility on page load
+    toggleDateInputs();
+
+    // Add event listener to the dropdown
+    searchType.addEventListener('change', toggleDateInputs);
+});
+
+// Quick Search 
+function handleSearchInput() {
+    const searchQueryInput = document.getElementById('search-query');
+    const searchResultsDiv = document.getElementById('search-results');
+    const searchForm = document.getElementById('search-form'); // Form element for non-AJAX fallback
+
+    if (!searchQueryInput || !searchResultsDiv || !searchForm) return;
+
+    // Function to perform the AJAX search
+    function performSearch(query) {
+        if (query.length > 0) {
+            fetch(`/search/quickSearch?query=${encodeURIComponent(query)}&limit=3`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.text();
+                })
+                .then(data => {
+                    searchResultsDiv.innerHTML = data;
+                    searchResultsDiv.classList.remove('hidden');
+                })
+                .catch(err => console.error('Error:', err));
+        } else {
+            searchResultsDiv.classList.add('hidden');
+            searchResultsDiv.innerHTML = '';
+        }
+    }
+
+    // Handle input event (dynamic search)
+    searchQueryInput.addEventListener('input', function () {
+        const query = this.value;
+        performSearch(query);
+    });
+
+    // Handle "Enter" key press
+    searchQueryInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent the default form submission
+
+            const query = searchQueryInput.value;
+            if (query.length > 0) {
+                // Redirect to the full results page
+                window.location.href = `/search?query=${encodeURIComponent(query)}&type=users`;
+            }
+        }
+    });
+
+    // Hide search results when clicking outside
+    document.addEventListener('click', function (event) {
+        if (!searchQueryInput.contains(event.target) && !searchResultsDiv.contains(event.target)) {
+            searchResultsDiv.classList.add('hidden');
+        }
+    });
+}
+
+// Filter User List Functionality
+function filterUserList() {
+    const searchValue = document.getElementById('user-search-input')?.value.toLowerCase();
+    const rows = document.querySelectorAll('#user-list-tbody tr');
+
+    rows.forEach(row => {
+        const name = row.children[1]?.textContent.toLowerCase();
+        const email = row.children[2]?.textContent.toLowerCase();
+        const isVisible = name.includes(searchValue) || email.includes(searchValue);
+        row.style.display = isVisible ? '' : 'none';
+    });
+}
+
+// Attach event listener for user search input
+function handleUserSearchInput() {
+    const userSearchInput = document.getElementById('user-search-input');
+    if (userSearchInput) {
+        userSearchInput.addEventListener('keyup', filterUserList);
+    }
+}
+
+
 function handleImagePreview() {
     const imageInput = document.getElementById('image');
     if (!imageInput) return;
@@ -235,7 +368,6 @@ function handleDropdowns(event) {
         allDropdowns.forEach(menu => menu.classList.add('hidden'));
     }
 }
-
 
 function toggleDropdown(event, postId) {
     event.stopPropagation(); // Prevent event from bubbling to parent
@@ -356,6 +488,8 @@ window.showFeedbackMessage = (type, message) => messageHandler.show(type, messag
 function addEventListeners() {
     document.addEventListener('click', handleDropdowns);
     handleImagePreview();
+    handleSearchInput();
+    handleUserSearchInput();
     handleEditPostSubmission();
     initializeMessageHandler();
 }
@@ -618,54 +752,6 @@ function deleteNotification(notificationId) {
 
 window.deleteNotification = deleteNotification;
 
-// Search
-document.addEventListener('DOMContentLoaded', function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const typeSelect = document.getElementById('search-type');
-    if (typeSelect && urlParams.has('type')) {
-        typeSelect.value = urlParams.get('type');
-    }
-
-    const searchQuery = document.getElementById('search-bar');
-    if (searchQuery && urlParams.has('query')) {
-        searchQuery.value = urlParams.get('query');
-    }
-
-    const startDateInput = document.getElementById('start-date');
-    if (startDateInput && urlParams.has('start_date')) {
-        startDateInput.value = urlParams.get('start_date');
-    }
-
-    const endDateInput = document.getElementById('end-date');
-    if (endDateInput && urlParams.has('end_date')) {
-        endDateInput.value = urlParams.get('end_date');
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const searchType = document.getElementById('search-type');
-    const dateFilters = document.getElementById('date-filters');
-    const searchButton = document.getElementById('search-button');
-
-    function toggleDateInputs() {
-        if (!searchType) return;
-        const selectedType = searchType.value;
-        if (selectedType === 'groups' || selectedType === 'posts') {
-            if (dateFilters) dateFilters.classList.remove('hidden');
-        } else {
-            if (dateFilters) dateFilters.classList.add('hidden');
-        }
-        if (searchButton) searchButton.classList.remove('hidden');
-    }
-
-    if (searchType) {
-        toggleDateInputs();
-        searchType.addEventListener('change', toggleDateInputs);
-    }
-});
-
-
-
 const postViewModalHandler = {
     async show(id) {
         const postViewModal = document.getElementById('post-view-modal');
@@ -865,46 +951,3 @@ function handlePostSubmission(event) {
 
 window.handlePostSubmission = handlePostSubmission;
 
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('search-bar');
-    const searchType = document.getElementById('search-type');
-    const resultsContainer = document.getElementById('search-results');
-
-    if (searchInput && resultsContainer && searchType) {
-        searchInput.addEventListener('input', function () {
-            const query = searchInput.value;
-            const type = searchType.value;
-
-            if (query.length < 2) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.classList.add('hidden');
-                return;
-            }
-
-            fetch(`{{ route('search.preview') }}?query=${query}&type=${type}`)
-                .then(response => response.json())
-                .then(data => {
-                    resultsContainer.innerHTML = '';
-                    if (data.length > 0) {
-                        resultsContainer.classList.remove('hidden');
-                        data.forEach(item => {
-                            let content = item.name || item.content;
-                            const resultItem = document.createElement('div');
-                            resultItem.classList.add('px-4', 'py-2', 'hover:bg-gray-100', 'cursor-pointer');
-                            resultItem.textContent = content;
-                            resultsContainer.appendChild(resultItem);
-                        });
-                    } else {
-                        resultsContainer.classList.add('hidden');
-                    }
-                })
-                .catch(error => console.error('Error fetching results:', error));
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!resultsContainer.contains(event.target) && event.target !== searchInput) {
-                resultsContainer.classList.add('hidden');
-            }
-        });
-    }
-});

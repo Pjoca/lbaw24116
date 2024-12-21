@@ -97,7 +97,7 @@ Route::controller(PostController::class)->group(function () {
 
 // Search
 Route::get('/search', [SearchController::class, 'search'])->name('search');
-Route::get('/search-preview', [SearchController::class, 'searchPreview'])->name('search.preview');
+Route::get('/search/quickSearch', [SearchController::class, 'quickSearch'])->name('search.quickSearch');
 
 //Admin
 Route::controller(AdminController::class)->middleware('auth')->group(function () {

@@ -203,45 +203,51 @@ class SearchController extends Controller
         return view('search.results', compact('comments', 'query'));
     }
 
-    public function searchPreview(Request $request)
-{
-    $query = $request->input('query');
-    $type = $request->input('type');
-
-    if (empty($query)) {
-        return response()->json([]);
+    public function quickSearch(Request $request)
+    {
+        $query = $request->input('query'); // Capture query input
+        $type = $request->input('type', 'users'); // Default to 'users' type
+        $limit = $request->input('limit', null); // Optional limit parameter
+    
+        // If no query is provided, return an empty collection
+        if (empty($query)) {
+            $users = collect(); // Empty collection
+        } else {
+            // Perform full-text search with fallback to ILIKE for matching
+            $users = User::where(function ($queryBuilder) use ($query) {
+                $queryBuilder->whereRaw("
+                    to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('portuguese', ?)
+                    OR to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('english', ?)
+                ", [$query, $query]);
+    
+                // Fallback to ILIKE for additional matches
+                $queryBuilder->orWhere('name', 'ILIKE', '%' . $query . '%');
+            });
+    
+            // Add visibility condition for guest users
+            if (!Auth::check()) {
+                $users->where('visibility', 'public');
+            }
+    
+            // Order by rank (using ts_rank) for better relevance
+            $users->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
+                  ->orderBy('name'); // Secondary ordering by name for tie-breaking
+    
+            // Apply a limit if provided
+            if ($limit) {
+                $users = $users->take($limit);
+            }
+    
+            $users = $users->get(); // Execute the query
+        }
+    
+        // If the request is AJAX, return the partial view
+        if ($request->ajax()) {
+            return response(view('partials.search-results', compact('users'))->render());
+        }
+    
+        // Fallback for non-AJAX requests to return a full results view
+        return view('search.results', compact('users', 'query'));
     }
-
-    $results = [];
-
-    switch ($type) {
-        case 'users':
-            $results = User::where('name', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'name']);
-            break;
-
-        case 'groups':
-            $results = Group::where('name', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'name']);
-            break;
-
-        case 'posts':
-            $results = Post::where('content', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'content']);
-            break;
-
-        case 'comments':
-            $results = Comment::where('content', 'ILIKE', '%' . $query . '%')
-                ->take(3)
-                ->get(['id', 'content']);
-            break;
-    }
-
-    return response()->json($results);
-}
-
 }
 
