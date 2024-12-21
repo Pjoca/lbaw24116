@@ -10,7 +10,7 @@
                 <div class="relative">
                     @if($currentUser->isFriend($user))
                         <span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                            Amigo
+                            Friend
                         </span>
                     @endif
                     <div class="flex items-center space-x-4">
@@ -44,7 +44,7 @@
                 <div class="relative">
                     @if($currentUser->isFriend($user))
                         <span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                            Amigo
+                            Friend
                         </span>
                     @endif
                     <div class="flex items-center space-x-4">
