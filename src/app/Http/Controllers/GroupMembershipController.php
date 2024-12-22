@@ -11,6 +11,7 @@ use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\GroupMembershipRequest;
 use App\Models\User;
+use App\Models\Post;
 
 use App\Http\Controllers\NotificationController;
 
@@ -149,29 +150,58 @@ class GroupMembershipController extends Controller
         }
     }
 
-    /**
-     * Leave a group.
-     */
     public function leaveGroup($groupId)
     {
         $user = Auth::user();
 
-        // Find the membership using composite keys
-        $membership = GroupMembership::where('id_user', $user->id)
-            ->where('id_group', $groupId)
-            ->first();
+        DB::beginTransaction();
 
-        if (!$membership) {
-            return response()->json(['error' => 'You are not a member of this group'], 404);
+        try {
+            $membership = GroupMembership::where('id_user', $user->id)
+                ->where('id_group', $groupId)
+                ->first();
+
+            if (!$membership) {
+                return response()->json(['error' => 'You are not a member of this group'], 404);
+            }
+
+            $group = Group::find($groupId);
+
+            if (!$group) {
+                return response()->json(['error' => 'Group not found'], 404);
+            }
+
+            if ($group->id_owner === $user->id) {
+                $otherMembers = GroupMembership::where('id_group', $groupId)
+                    ->where('id_user', '!=', $user->id)
+                    ->pluck('id_user');
+
+                if ($otherMembers->isEmpty()) {
+                    Post::where('id_group', $groupId)->delete();
+                    GroupMembership::where('id_group', $groupId)->delete();
+                    $group->delete(); 
+
+                    DB::commit();
+                    return response()->json(['success' => 'Group and all associated posts deleted as no other members are present'], 200);
+                } else {
+                    $newOwnerId = $otherMembers->first();
+                    $group->id_owner = $newOwnerId;
+                    $group->save();
+                }
+            }
+
+            GroupMembership::where('id_user', $user->id)
+                ->where('id_group', $groupId)
+                ->delete();
+
+            DB::commit();
+            return response()->json(['success' => 'You have left the group successfully'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'An error occurred while leaving the group. Please try again.'], 500);
         }
-
-        // Perform the delete operation manually
-        GroupMembership::where('id_user', $user->id)
-            ->where('id_group', $groupId)
-            ->delete();
-
-        return response()->json(['success' => 'You have left the group successfully'], 200);
     }
+
 
     public function sendInvite(Request $request, $groupId, NotificationController $notificationController)
     {
