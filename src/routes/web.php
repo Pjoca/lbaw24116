@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\AboutController;
 
 use App\Http\Controllers\AdminController;
 
@@ -64,6 +65,9 @@ Route::controller(RegisterController::class)->group(function () {
     Route::post('/register', 'register');
 });
 
+Route::get('/about', [AboutController::class, 'about'])->name('about');
+
+
 // Profile
 Route::controller(UserController::class)->group(function () {
     Route::get('/profile/{id}', 'show')->name('profile.show');
@@ -104,10 +108,7 @@ Route::controller(AdminController::class)->middleware('auth')->group(function ()
     Route::get('/admin', 'listUsers')->name('admin.panel');
     Route::put('/admin/update-user/{id}', [AdminController::class, 'updateUser'])->name('admin.updateUser');
     Route::post('/admin/store-user', 'storeUser')->name('admin.storeUser');   // Submit user creation form
-    
 });
-
-
 
 Route::controller(FriendshipController::class)->middleware('auth')->group(function () {
         Route::post('/friends/add/{id}', 'add');

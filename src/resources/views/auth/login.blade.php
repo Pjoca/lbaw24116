@@ -94,13 +94,14 @@
                 >
                     Register
                 </a>
-
+                
                 <!-- Continue as Guest -->
                 <a href="{{ route('timeline.public') }}" 
                     class="block w-full mt-4 bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition"
                 >
                     Continue as a Guest
                 </a>
+
             </fieldset>
 
             <!-- Success Message -->
