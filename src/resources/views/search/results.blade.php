@@ -26,7 +26,8 @@
             autocomplete="off" required>
 
         <!-- Date Inputs -->
-        <div id="date-filters" class="hidden flex gap-2"></div>
+        <!-- Date Inputs -->
+    <div id="date-filters" class="hidden flex gap-2">
         <input 
             type="date" 
             id="start-date" 
@@ -40,6 +41,8 @@
             name="end_date" 
             value="{{ old('end_date', $endDate ?? '') }}" 
             class="w-36 border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-teal-400 focus:outline-none">
+    </div>
+
 
         <!-- Search Button -->
         <button 
