@@ -84,7 +84,7 @@
         </span>
 
         <!-- Comment Button -->
-        <button onclick="showPostViewModal({{ $post->id }})" class="flex items-center comment-button" id="comment-button-{{ $post->id }}">
+        <button onclick="event.stopPropagation();showPostViewModal({{ $post->id }})" class="flex items-center comment-button" id="comment-button-{{ $post->id }}">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
     </svg>
