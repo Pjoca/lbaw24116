@@ -80,8 +80,14 @@ async function leaveGroup(groupId) {
 
         if (!response.ok) throw new Error('Failed to leave group');
         const data = await response.json();
+        console.log(data);
 
-        window.reloadP("showFeedbackMessage('green', 'Left group successfully!');");
+        if (data.deleted){
+            console.log('Deleted');
+            window.goWithCommand('/groups', "showFeedbackMessage('green', 'Left group successfully!');");
+        }else{
+            window.reloadP("showFeedbackMessage('green', 'Left group successfully!');");
+        }
     } catch (error) {
         console.error(error);
         window.showFeedbackMessage('red', 'An error occurred while leaving the group.');

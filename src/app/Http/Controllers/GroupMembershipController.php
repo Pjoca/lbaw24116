@@ -166,6 +166,7 @@ class GroupMembershipController extends Controller
             }
 
             $group = Group::find($groupId);
+            $deleted = false;
 
             if (!$group) {
                 return response()->json(['error' => 'Group not found'], 404);
@@ -182,7 +183,7 @@ class GroupMembershipController extends Controller
                     $group->delete(); 
 
                     DB::commit();
-                    return response()->json(['success' => 'Group and all associated posts deleted as no other members are present'], 200);
+                    $deleted = true;
                 } else {
                     $newOwnerId = $otherMembers->first();
                     $group->id_owner = $newOwnerId;
@@ -195,7 +196,7 @@ class GroupMembershipController extends Controller
                 ->delete();
 
             DB::commit();
-            return response()->json(['success' => 'You have left the group successfully'], 200);
+            return response()->json(['success' => 'You have left the group successfully', 'deleted' => $deleted], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => 'An error occurred while leaving the group. Please try again.'], 500);
