@@ -81,3 +81,4 @@
 
 @vite('resources/js/infinite-group.js')
 @vite('resources/js/group.js')
+@vite('resources/js/comments.js')

@@ -133,5 +133,6 @@
     @include('modals.friends-modal')
     @include('modals.edit-post-modal')
     @include('modals.post-modal')
+    @vite('resources/js/comments.js')
 
 @endsection
