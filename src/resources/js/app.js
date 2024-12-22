@@ -227,17 +227,14 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const searchType = document.getElementById('search-type');
     const dateFilters = document.getElementById('date-filters');
-    const searchButton = document.getElementById('search-button');
 
     // Function to toggle visibility of date inputs
     function toggleDateInputs() {
-        const selectedType = searchType.value;
-        if (selectedType === 'groups' || selectedType === 'posts') {
-            dateFilters.classList.remove('hidden');
+        if (searchType.value === 'posts') {
+            dateFilters.classList.remove('hidden'); // Show date inputs
         } else {
-            dateFilters.classList.add('hidden');
+            dateFilters.classList.add('hidden'); // Hide date inputs
         }
-        searchButton.classList.remove('hidden');
     }
 
     // Initialize visibility on page load
@@ -246,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add event listener to the dropdown
     searchType.addEventListener('change', toggleDateInputs);
 });
+
 
 // Quick Search 
 function handleSearchInput() {
