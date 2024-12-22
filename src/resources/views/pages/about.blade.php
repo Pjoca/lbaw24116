@@ -54,10 +54,10 @@
             <p class="text-gray-600">
                 Email us at:
                 <ul class="list-disc list-inside ml-4">
-                    <li>Rui Borges - <a href="mailto:202207475@up.pt" class="text-teal-500 hover:underline">202207475@up.pt</a></li>
-                    <li>Tiago Torrado - <a href="up202206399@up.pt" class="text-teal-500 hover:underline">202206399@up.pt</a></li>
-                    <li>Pedro Paixão - <a href="up202008467@up.pt" class="text-teal-500 hover:underline">202008467@up.pt</a></li>
-                    <li>Alexandre Chouzende - <a href="up202207429@up.pt" class="text-teal-500 hover:underline">202207429@up.pt</a></li>
+                    <li>Rui Borges - <a href="mailto:202207475@up.pt" class="text-teal-500 hover:underline">up202207475@up.pt</a></li>
+                    <li>Tiago Torrado - <a href="up202206399@up.pt" class="text-teal-500 hover:underline">up202206399@up.pt</a></li>
+                    <li>Pedro Paixão - <a href="up202008467@up.pt" class="text-teal-500 hover:underline">up202008467@up.pt</a></li>
+                    <li>Alexandre Chouzende - <a href="up202207429@up.pt" class="text-teal-500 hover:underline">up202207429@up.pt</a></li>
                 </ul>
             </p>
         </div>    
