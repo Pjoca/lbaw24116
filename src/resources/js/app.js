@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to toggle visibility of date inputs
     function toggleDateInputs() {
         const selectedType = searchType.value;
-        if (selectedType === 'groups' || selectedType === 'posts') {
+        if (selectedType === 'posts') {
             dateFilters.classList.remove('hidden');
         } else {
             dateFilters.classList.add('hidden');

@@ -34,91 +34,124 @@ class SearchController extends Controller
             // Search for users if 'users' type is selected
             if ($type === 'users') {
                 $users = User::where(function ($queryBuilder) use ($query) {
-                    // Searching by name using full-text search
                     $queryBuilder->whereRaw("
                         to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('portuguese', ?)
                         OR to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('english', ?)
-                    ", [$query, $query]);
-
-                    // Fallback to ILIKE for additional matching
-                    $queryBuilder->orWhere('name', 'ILIKE', '%' . $query . '%');
+                    ", [$query, $query])
+                    ->orWhere('name', 'ILIKE', '%' . $query . '%');
                 })
-                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public users
-                ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
+                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // Only public users for non-authenticated users
+                ->orderByRaw("
+                    ts_rank_cd(
+                        to_tsvector('portuguese', name) || to_tsvector('english', name),
+                        websearch_to_tsquery(?)
+                    ) DESC,
+                    CASE 
+                        WHEN visibility = 'public' THEN 2
+                        WHEN visibility = 'private' THEN 1
+                        ELSE 0
+                    END DESC
+                ", [$query])
                 ->paginate(8)
                 ->appends([
                     'query' => $query,
                     'type' => $type
-                ]);
+                ]);                
 
             }
             // Search for groups if 'groups' type is selected
             elseif ($type === 'groups') {
                 $groups = Group::where(function ($queryBuilder) use ($query) {
-                    // Searching by name using full-text search
                     $queryBuilder->whereRaw("
-                        to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('portuguese', ?)
-                        OR to_tsvector('portuguese', name) || to_tsvector('english', name) @@ websearch_to_tsquery('english', ?)
-                    ", [$query, $query]);
-
-                    // Fallback to ILIKE for additional matching
-                    $queryBuilder->orWhere('name', 'ILIKE', '%' . $query . '%');
+                        to_tsvector('portuguese', name) * 2 || to_tsvector('portuguese', description) ||
+                        to_tsvector('english', name) * 2 || to_tsvector('english', description) @@ websearch_to_tsquery('portuguese', ?)
+                        OR to_tsvector('portuguese', name) * 2 || to_tsvector('portuguese', description) ||
+                        to_tsvector('english', name) * 2 || to_tsvector('english', description) @@ websearch_to_tsquery('english', ?)
+                    ", [$query, $query])
+                    ->orWhere('name', 'ILIKE', '%' . $query . '%')
+                    ->orWhere('description', 'ILIKE', '%' . $query . '%');
                 })
-                ->when($startDate, fn($q) => $q->where('created_at', '>=', $startDate . ' 00:00:00')) // Filter by start date
-                ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
-                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public groups
-                ->orderByRaw("ts_rank(to_tsvector('portuguese', name) || to_tsvector('english', name), websearch_to_tsquery(?)) DESC", [$query])
+                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public'))
+                ->orderByRaw("
+                    ts_rank_cd(
+                        to_tsvector('portuguese', name) * 2 || to_tsvector('portuguese', description) ||
+                        to_tsvector('english', name) * 2 || to_tsvector('english', description),
+                        websearch_to_tsquery(?)
+                    ) +
+                    CASE visibility
+                        WHEN 'public' THEN 2
+                        WHEN 'private' THEN 1
+                        ELSE 0
+                    END DESC
+                ", [$query])
                 ->paginate(8)
-                ->appends([
-                    'query' => $query,
-                    'type' => $type,
-                    'start_date' => $startDate,
-                    'end_date' => $endDate
-                ]);
-            }
-            // Search for posts if 'posts' type is selected
-            elseif ($type === 'posts') {
-                $posts = Post::where(function ($queryBuilder) use ($query) {
-                    // Searching by content using full-text search
-                    $queryBuilder->whereRaw("
-                        to_tsvector('portuguese', content) || to_tsvector('english', content) @@ websearch_to_tsquery('portuguese', ?)
-                        OR to_tsvector('portuguese', content) || to_tsvector('english', content) @@ websearch_to_tsquery('english', ?)
-                    ", [$query, $query]);
-
-                    // Fallback to ILIKE for additional matching
-                    $queryBuilder->orWhere('content', 'ILIKE', '%' . $query . '%');
-                })
-                ->when($startDate, fn($q) => $q->where('created_at', '>=', $startDate . ' 00:00:00')) // Filter by start date
-                ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59')) // Filter by end date
-                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public posts
-                ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), plainto_tsquery(?)) DESC", [$query])
-                ->paginate(3)
-                ->appends([
-                    'query' => $query,
-                    'type' => $type,
-                    'start_date' => $startDate,
-                    'end_date' => $endDate
-                ]);
-            }
-            // Search for comments if 'comments' type is selected
-            elseif ($type === 'comments') {
-                $comments = Comment::where(function ($queryBuilder) use ($query) {
-                    // Searching by content using full-text search
-                    $queryBuilder->whereRaw("
-                        to_tsvector('portuguese', content) || to_tsvector('english', content) @@ websearch_to_tsquery('portuguese', ?)
-                        OR to_tsvector('portuguese', content) || to_tsvector('english', content) @@ websearch_to_tsquery('english', ?)
-                    ", [$query, $query]);
-
-                    // Fallback to ILIKE for additional matching
-                    $queryBuilder->orWhere('content', 'ILIKE', '%' . $query . '%');
-                })
-                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public')) // If not logged in, only show public comments
-                ->orderByRaw("ts_rank(to_tsvector('portuguese', content) || to_tsvector('english', content), websearch_to_tsquery(?)) DESC", [$query])
-                ->paginate(3)
                 ->appends([
                     'query' => $query,
                     'type' => $type
                 ]);
+                
+            }
+            // Search for posts if 'posts' type is selected
+            elseif ($type === 'posts') {
+                $posts = Post::where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->whereRaw("
+                        to_tsvector('portuguese', content) * 1.5 || to_tsvector('english', content) * 1.5 @@ websearch_to_tsquery('portuguese', ?)
+                        OR to_tsvector('portuguese', content) * 1.5 || to_tsvector('english', content) * 1.5 @@ websearch_to_tsquery('english', ?)
+                    ", [$query, $query])
+                    ->orWhere('content', 'ILIKE', '%' . $query . '%');
+                })
+                ->when($startDate, fn($q) => $q->where('created_at', '>=', $startDate . ' 00:00:00'))
+                ->when($endDate, fn($q) => $q->where('created_at', '<=', $endDate . ' 23:59:59'))
+                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public'))
+                ->orderByRaw("
+                    ts_rank_cd(
+                        to_tsvector('portuguese', content) * 1.5 || to_tsvector('english', content) * 1.5,
+                        websearch_to_tsquery(?)
+                    ) +
+                    CASE visibility
+                        WHEN 'public' THEN 2
+                        WHEN 'private' THEN 1
+                        ELSE 0
+                    END DESC
+                ", [$query])
+                ->paginate(4)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]);
+                
+            }
+            // Search for comments if 'comments' type is selected
+            elseif ($type === 'comments') {
+                $comments = Comment::where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->whereRaw("
+                        to_tsvector('portuguese', content) * 2 || 
+                        to_tsvector('english', content) * 2 @@ websearch_to_tsquery('portuguese', ?)
+                        OR to_tsvector('portuguese', content) * 2 || 
+                        to_tsvector('english', content) * 2 @@ websearch_to_tsquery('english', ?)
+                    ", [$query, $query])
+                    ->orWhere('content', 'ILIKE', '%' . $query . '%');
+                })
+                ->when(!Auth::check(), fn($q) => $q->where('visibility', 'public'))
+                ->orderByRaw("
+                    ts_rank_cd(
+                        to_tsvector('portuguese', content) * 2 || to_tsvector('english', content) * 2,
+                        websearch_to_tsquery(?)
+                    ) +
+                    CASE visibility
+                        WHEN 'public' THEN 2
+                        WHEN 'private' THEN 1
+                        ELSE 0
+                    END DESC
+                ", [$query])
+                ->paginate(4)
+                ->appends([
+                    'query' => $query,
+                    'type' => $type
+                ]);
+                
             }
         }
         
