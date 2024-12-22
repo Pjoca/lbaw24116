@@ -66,6 +66,11 @@
                                 </a>
                             </li>
                         @endif
+                        <li>
+                                <a href="{{ route('about') }}" class="text-sm hover:bg-teal-600 py-2 px-3 rounded-lg transition">
+                                    About
+                                </a>
+                            </li>
                     </ul>
                 </nav>
                 @if (Auth::check())
