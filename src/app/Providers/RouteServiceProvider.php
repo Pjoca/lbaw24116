@@ -25,6 +25,15 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Route::pattern('id', '[0-9]+');
+        Route::patern('userId', '[0-9]+');
+        Route::patern('groupId', '[0-9]+');
+        Route::pattern('memberId', '[0-9]+');
+        Route::pattern('inviteId', '[0-9]+');
+        Route::pattern('id_user', '[0-9]+');
+        Route::pattern('contactId', '[0-9]+');
+        Route::pattern('comment', '[0-9]+');
+        Route::pattern('postId', '[0-9]+');
+        
         
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
